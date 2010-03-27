@@ -38,7 +38,6 @@ class WapInterface
 		}
 		else
 		{
-			$wapService = new WapUserService();
 			return "
 					<table width=\"100%\">
 							<tr>
@@ -59,7 +58,7 @@ class WapInterface
 															From:
 														</td>
 														<td>
-															".$wapService->getDropDownListForAccounts("fromAccountId",1)."
+															".self::getDropDownListForAccounts("fromAccountId",array(1,2))."
 														</td>
 													</tr>
 													<tr>
@@ -67,7 +66,7 @@ class WapInterface
 															To:
 														</td>
 														<td>
-															".$wapService->getDropDownListForAccounts("toAccountId",4)."
+															".self::getDropDownListForAccounts("toAccountId",array(4))."
 														</td>
 													</tr>
 													<tr>
@@ -80,7 +79,7 @@ class WapInterface
 													</tr>
 													<tr>
 														<td>
-															Comments:
+															Description:
 														</td>
 														<td>
 															<input type='text' style='width:100%' name='comments'/>
@@ -112,7 +111,7 @@ class WapInterface
 															Into:
 														</td>
 														<td>
-															".$wapService->getDropDownListForAccounts("toAccountId",3)."
+															".self::getDropDownListForAccounts("toAccountId",array(3))."
 														</td>
 													</tr>
 													<tr>
@@ -125,7 +124,7 @@ class WapInterface
 													</tr>
 													<tr>
 														<td>
-															Comments:
+															Description:
 														</td>
 														<td>
 															<input type='text' style='width:100%' name='comments'/>
@@ -205,10 +204,10 @@ class WapInterface
 						<td>
 							<b style='color:green'>$info</b><br />
 							<a href='/manageAccounts/'>Back</a> 
-							&nbsp;&nbsp; | &nbsp;&nbsp; <a href='/addAccount/".$entry->getId()."'>Add New Account Under '".$entry->getName()."'</a>
+							&nbsp;&nbsp; | &nbsp;&nbsp; <a href='/addAccount/".$entry->getId()."'>Create New Account Under '".$entry->getName()."'</a>
 							".self::getViewAccountTable($accountId,$entry->getName(),$entry->getAccountNumber(),$entry->getValue(),$entry->getComments())."
 							<a href='/manageAccounts/'>Back</a>
-							&nbsp;&nbsp; | &nbsp;&nbsp; <a href='/addAccount/".$entry->getId()."'>Add New Account Under '".$entry->getName()."'</a>
+							&nbsp;&nbsp; | &nbsp;&nbsp; <a href='/addAccount/".$entry->getId()."'>Create New Account Under '".$entry->getName()."'</a>
 						</td>
 					</tr>
 					<tr>
@@ -351,7 +350,8 @@ class WapInterface
 			
 		$table = "
 				<br />
-				<a href='/manageAccounts/'>Bank</a>&nbsp;&nbsp;| &nbsp;&nbsp;
+				<a href='/manageAccounts/'>Assets</a>&nbsp;&nbsp;| &nbsp;&nbsp;
+				<a href='/manageAccounts/2'>Liability</a>&nbsp;&nbsp;| &nbsp;&nbsp;
 				<a href='/manageAccounts/3'>Income</a>&nbsp;&nbsp;| &nbsp;&nbsp;
 				<a href='/manageAccounts/4'>Expense</a>
 				<br />
@@ -388,7 +388,8 @@ class WapInterface
 							".(
 									(
 										$row['countChildren']==0 
-										&& $row['parentId']!=NULL
+										&& $row['parentId']!= NULL
+										&& $row['rootId']!= $row['id']
 									) ? "<a href='/deleteAccount/".$row["id"]."'> Delete </a>" : ""
 								)."
 						</td>
@@ -495,6 +496,22 @@ class WapInterface
 		$newWholeNos[] = $temp;
 		unset($newWholeNos[0]);
 		return $sign.strrev(implode(",",$newWholeNos)).".".$decimal;
+	}
+	
+	public static function getDropDownListForAccounts($htmlName,$typeIds=array())
+	{
+		$service = new AccountEntryService();
+		$list = "<select name='$htmlName'>";
+		foreach($typeIds as $typeId)
+		{
+			$results = $service->getAllLeavesForType($typeId);
+			foreach($results as $row)
+			{
+				$list .= "<option value='{$row["id"]}'>{$row['name']} - \${$row['value']}</option>";
+			}
+		}
+		$list .= "</select>";
+		return $list;
 	}
 }
 ?>

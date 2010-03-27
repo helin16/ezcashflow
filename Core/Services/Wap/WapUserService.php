@@ -107,19 +107,6 @@ class WapUserService
 		header("Location: /manageAccounts/".$entry->getRoot()->getId()."/deleted_successfully!");
 	}
 	
-	public function getDropDownListForAccounts($htmlName,$typeId=1)
-	{
-		$service = new AccountEntryService();
-		$results = $service->getAllLeavesForType($typeId);
-		$list = "<select name='$htmlName'>";
-			foreach($results as $row)
-			{
-				$list .= "<option value='{$row["id"]}'>{$row['name']} - \${$row['value']}</option>";
-			}
-		$list .= "</select>";
-		return $list;
-	}
-	
 	public function spendMoney($vars)
 	{
 		$fromAccountId = $vars["fromAccountId"];
