@@ -105,7 +105,7 @@ class WapInterface
 									<div style='padding:15px;'>
 										<fieldset>
 											<legend>Earn Money</legend>
-											<form action='' method='POST'>
+											<form action='/post/WapUserService/earnMoney' method='POST'>
 												<table width=\"100%\" style='background:#cccccc;'>
 													<tr>
 														<td>
