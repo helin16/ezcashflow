@@ -38,6 +38,11 @@ class WapInterface
 		}
 		else
 		{
+			$transactionService = new TransactionService();
+			$today_day = date('d');
+			$today_month = date('m');
+			$today_year = date('Y');
+			$today_week = date('W');
 			return "
 					<table width=\"100%\">
 							<tr>
@@ -48,6 +53,49 @@ class WapInterface
 							<tr>
 								<td>
 									<b style='color:green'>$info</b><br />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div style='padding:15px;'>
+										<fieldset>
+											<legend>Summary Of Expense</legend>
+												<table width=\"100%\">
+													<tr style='background:#000000;color:#ffffff;height:34px;'>
+														<td>
+															Day
+														</td>
+														<td>
+															Week
+														</td>
+														<td>
+															Month
+														</td>
+														<td>
+															Year
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<a href='/reports/day/4'>$".self::getCurrency($transactionService->getSumOfExpenseDay($today_year,$today_month,$today_day))."</a>
+														</td>
+														<td>
+															<a href='/reports/week/4'>$".self::getCurrency($transactionService->getSumOfExpenseWeek($today_year,$today_week))."</a>
+														</td>
+														<td>
+															<a href='/reports/month/4'>$".self::getCurrency($transactionService->getSumOfExpenseMonth($today_year,$today_month,$today_day))."</a>
+														</td>
+														<td>
+															<a href='/reports/year/4'>$".self::getCurrency($transactionService->getSumOfExpenseYear($today_year))."</a>
+														</td>
+													</tr>
+												</table>
+										</fieldset>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
 									<div style='padding:15px;'>
 										<fieldset>
 											<legend>Expense</legend>
@@ -112,6 +160,59 @@ class WapInterface
 														</td>
 														<td>
 															".self::getDropDownListForAccounts("toAccountId",array(3))."
+														</td>
+													</tr>
+													<tr>
+														<td width='100px'>
+															Value:
+														</td>
+														<td>
+															<input type='text' style='width:100%' name='value'/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															Description:
+														</td>
+														<td>
+															<input type='text' style='width:100%' name='comments'/>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															&nbsp;
+														</td>
+														<td>
+															<input type='submit' value='save'/>
+														</td>
+													</tr>
+												</table>
+											</form>
+										</fieldset>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div style='padding:15px;'>
+										<fieldset>
+											<legend>Transfer</legend>
+											<form action='/post/WapUserService/spendMoney' method='POST'>
+												<table width=\"100%\" style='background:#cccccc;'>
+													<tr>
+														<td width='100px'>
+															From:
+														</td>
+														<td>
+															".self::getDropDownListForAccounts("fromAccountId",array(1,2))."
+														</td>
+													</tr>
+													<tr>
+														<td width='100px'>
+															To:
+														</td>
+														<td>
+															".self::getDropDownListForAccounts("toAccountId",array(2,1))."
 														</td>
 													</tr>
 													<tr>
@@ -278,15 +379,56 @@ class WapInterface
 	
 	public static function reports($vars)
 	{
+		$searchType=(isset($vars[2]) ? $vars[2] : "");
+		
 		return "<table width=\"100%\">
 					<tr>
 						<td>
 							".self::getMenu(2)."
 						</td>
 					</tr>
+					".($searchType!="" ? "":  "
 					<tr>
 						<td>
-							Under construction!
+							
+							<form action='/post/WapUserService/reportTransaction' method='POST'>
+								<table width=\"100%\" style=\"background:#cccccc;\">
+									<tr>
+										<td colspan='2'>
+											<b>Reporting Transactions:</b>
+										</td>
+									</tr>
+									<tr>
+										<td width='100px'>
+											From Date:
+										</td>
+										<td>
+											<input type='text' name='fromDate' />(YYYY-MM-DD)
+										</td>
+									</tr>
+									<tr>
+										<td>
+											To Date:
+										</td>
+										<td>
+											<input type='text' name='toDate' />(YYYY-MM-DD)
+										</td>
+									</tr>
+									<tr>
+										<td>
+											&nbsp;
+										</td>
+										<td>
+											<input type='submit' value='search' />
+										</td>
+									</tr>
+								</table>
+							</form>
+						</td>
+					</tr> ")."
+					<tr>
+						<td style='border:1px #cccccc solid;padding:15px;'>
+							".self::showReports($vars)."
 						</td>
 					</tr>
 					<tr>
@@ -513,5 +655,100 @@ class WapInterface
 		$list .= "</select>";
 		return $list;
 	}
+	
+	public static function showReports($vars)
+	{
+		$searchType=(isset($vars[2]) ? $vars[2] : "");
+		$accountTypeId=(isset($vars[3]) && trim($vars[3])!=0 ? $vars[3] : "");
+		if($searchType=="")
+			return "Invalid Search Type!";
+			
+		$fromDate = new DateTime();
+		$toDate = new DateTime();
+		switch(strtolower($searchType))
+		{
+			case 'year':
+				{
+					$fromDate->setDate($toDate->format('Y'),$toDate->format('m'),1);
+					$toDate->modify('+1 year');
+					$year = $toDate->format('Y');
+					$month = $toDate->format('m');
+					$toDate->setDate($year,$month,1);
+					break;
+				}
+			case 'month':
+				{
+					$fromDate->setDate($toDate->format('Y'),$toDate->format('m'),1);
+					$toDate->modify('+1 month');
+					$year = $toDate->format('Y');
+					$month = $toDate->format('m');
+					$toDate->setDate($year,$month,1);
+					break;
+				}
+			case 'week':
+				{
+					$year = $fromDate->format('Y');
+					$week = $fromDate->format('W');
+					
+					$fromDate = new DateTime(self::week_start_date($week,$year));
+					$toDate = new DateTime(self::week_start_date($week,$year));
+					$toDate->modify("+1 week");
+					break;
+				}
+			case 'day':
+				{
+					$toDate->modify('+1 day');
+					break;
+				}
+			case 'range':
+				{
+					$fromDate = new DateTime(trim($vars[4]));
+					$toDate = new DateTime(trim($vars[5]));
+					break;
+				}
+		}
+		$transactionService = new TransactionService();
+		
+		$where ="created >='".$fromDate->format("Y-m-d")."' and created < '".$toDate->format("Y-m-d")."'";
+		$title ="Transactions created between '".$fromDate->format("Y-m-d")."' and '".$toDate->format("Y-m-d")."'";
+		if($accountTypeId!="")
+		{
+			$where .=" AND toId in(select distinct id from accountentry where active=1 and rootId = $accountTypeId)";
+			$accountService = new AccountEntryService();
+			$title .=" and Transaction for '".$accountService->get($accountTypeId)->getName()."'";
+		}
+		
+		$result = $transactionService->findByCriteria($where);
+		$table ="<b>$title</b><br />
+				<table width=\"100%\">";
+			$table .="<tr style='background:#000000;color:#ffffff;height:34px;'>";
+				$table .="<td width=\"10%\">Date</td>";
+				$table .="<td width=\"15%\">From Acc.</td>";
+				$table .="<td width=\"15%\">To Acc.</td>";
+				$table .="<td width=\"10%\">Value</td>";
+				$table .="<td>Description</td>";
+			$table .="</tr>";
+			$rowNo=0;
+			foreach($result as $transaction)
+			{
+				$table .="<tr ".($rowNo %2 ==0 ? "": " style='background:#cccccc;'" ).">";
+					$table .="<td>".$transaction->getCreated()."</td>";
+					$table .="<td><a href='/viewAccount/".$transaction->getFrom()->getId()."'>".$transaction->getFrom()->getName()."</a></td>";
+					$table .="<td><a href='/viewAccount/".$transaction->getTo()->getId()."'>".$transaction->getTo()->getName()."</a></td>";
+					$table .="<td>$".self::getCurrency($transaction->getValue())."</td>";
+					$table .="<td>".$transaction->getComments()."</td>";
+				$table .="</tr>";
+				$rowNo++;
+			}
+		$table.="</table>";
+		return $table;
+	}
+	
+	public static function week_start_date($wk_num, $yr, $first = 1, $format = 'Y-m-d')
+	{
+	    $wk_ts  = strtotime('+' . $wk_num . ' weeks', strtotime($yr . '0101'));
+	    $mon_ts = strtotime('-' . date('w', $wk_ts) + $first . ' days', $wk_ts);
+	    return date($format, $mon_ts);
+	} 
 }
 ?>

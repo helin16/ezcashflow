@@ -60,6 +60,25 @@ class Transaction extends ProjectEntity
 	{
 		$this->to = $to;
 	}
+	/**
+	 * getter comments
+	 *
+	 * @return comments
+	 */
+	public function getComments()
+	{
+		return $this->comments;
+	}
+	
+	/**
+	 * setter comments
+	 *
+	 * @var comments
+	 */
+	public function setComments($comments)
+	{
+		$this->comments = $comments;
+	}
 	
 	
 	protected function __meta()
@@ -69,6 +88,7 @@ class Transaction extends ProjectEntity
 		Map::setField($this,new TString("value"));
 		Map::setField($this,new ManyToOne("from","AccountEntry",true));
 		Map::setField($this,new ManyToOne("to","AccountEntry"));
+		Map::setField($this,new TString("comments",6400));
 	}	
 }
 ?>

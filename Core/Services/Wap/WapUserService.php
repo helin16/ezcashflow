@@ -29,9 +29,9 @@ class WapUserService
 	{
 		$parentAccountId = $vars["accParentId"];
 		$accountId = $vars["accId"];
-		$accName = trim($vars["accName"]);
+		$accName = addslashes(trim($vars["accName"]));
 		$accValue = str_replace(",","",$vars["accValue"]);
-		$accComments= trim($vars["accComments"]);
+		$accComments= addslashes(trim($vars["accComments"]));
 		
 		if($accName=="")
 			header("Location: /viewAccount/$accountId/Invalid_Account_Name!");
@@ -112,10 +112,11 @@ class WapUserService
 		$fromAccountId = $vars["fromAccountId"];
 		$toAccountId = $vars["toAccountId"];
 		$value = $vars["value"];
+		$comments = $vars["comments"];
 		
 		$service = new AccountEntryService();
 		$transactionService = new TransactionService();
-		$transactionService->spendMoney($service->get($fromAccountId),$service->get($toAccountId),$value);
+		$transactionService->spendMoney($service->get($fromAccountId),$service->get($toAccountId),$value,$comments);
 		
 		header("Location: /loadDefaultPageWithMsg/Spend_Successfully!");
 	}
@@ -124,12 +125,21 @@ class WapUserService
 	{
 		$toAccountId = $vars["toAccountId"];
 		$value = $vars["value"];
+		$comments = $vars["comments"];
 		
 		$service = new AccountEntryService();
 		$transactionService = new TransactionService();
-		$transactionService->earnMoney($service->get($toAccountId),$value);
+		$transactionService->earnMoney($service->get($toAccountId),$value,$comments);
 		
 		header("Location: /loadDefaultPageWithMsg/Earn_Successfully!");
+	}
+	
+	public function reportTransaction($vars)
+	{
+		$fromDate = $vars["fromDate"];
+		$toDate = $vars["toDate"];
+		
+		header("Location: /reports/range/0/$fromDate/$toDate");
 	}
 }
 ?>
