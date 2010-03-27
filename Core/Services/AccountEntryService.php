@@ -69,7 +69,7 @@ class AccountEntryService extends BaseService
 	{
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
-		$sql->setSQL("select ac.id,ac.name
+		$sql->setSQL("select ac.id,ac.name,ac.value
 					from accountentry ac 
 					where ac.rootId = $rootId
 					and ((select if(count(acc.id)=0,1,0) from accountentry acc where acc.parentId = ac.id and acc.active = 1))=1

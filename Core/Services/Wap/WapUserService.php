@@ -114,10 +114,35 @@ class WapUserService
 		$list = "<select name='$htmlName'>";
 			foreach($results as $row)
 			{
-				$list .= "<option value='{$row["id"]}'>{$row['name']}</option>";
+				$list .= "<option value='{$row["id"]}'>{$row['name']} - \${$row['value']}</option>";
 			}
 		$list .= "</select>";
 		return $list;
+	}
+	
+	public function spendMoney($vars)
+	{
+		$fromAccountId = $vars["fromAccountId"];
+		$toAccountId = $vars["toAccountId"];
+		$value = $vars["value"];
+		
+		$service = new AccountEntryService();
+		$transactionService = new TransactionService();
+		$transactionService->spendMoney($service->get($fromAccountId),$service->get($toAccountId),$value);
+		
+		header("Location: /loadDefaultPageWithMsg/Spend_Successfully!");
+	}
+	
+	public function earnMoney($vars)
+	{
+		$toAccountId = $vars["toAccountId"];
+		$value = $vars["value"];
+		
+		$service = new AccountEntryService();
+		$transactionService = new TransactionService();
+		$transactionService->earnMoney($service->get($toAccountId),$value);
+		
+		header("Location: /loadDefaultPageWithMsg/Earn_Successfully!");
 	}
 }
 ?>

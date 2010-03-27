@@ -1,7 +1,7 @@
 <?php
 class WapInterface
 {
-	public static function defaultPage($beforeLogin=true)
+	public static function defaultPage($beforeLogin=true,$info="")
 	{
 		if($beforeLogin)
 		{
@@ -48,17 +48,18 @@ class WapInterface
 							</tr>
 							<tr>
 								<td>
+									<b style='color:green'>$info</b><br />
 									<div style='padding:15px;'>
 										<fieldset>
 											<legend>Spend Money</legend>
-											<form action='' method='POST'>
+											<form action='/post/WapUserService/spendMoney' method='POST'>
 												<table width=\"100%\" style='background:#cccccc;'>
 													<tr>
 														<td width='100px'>
 															From:
 														</td>
 														<td>
-															".$wapService->getDropDownListForAccounts("fromAccount",1)."
+															".$wapService->getDropDownListForAccounts("fromAccountId",1)."
 														</td>
 													</tr>
 													<tr>
@@ -66,7 +67,7 @@ class WapInterface
 															To:
 														</td>
 														<td>
-															".$wapService->getDropDownListForAccounts("toAccount",4)."
+															".$wapService->getDropDownListForAccounts("toAccountId",4)."
 														</td>
 													</tr>
 													<tr>
@@ -111,7 +112,7 @@ class WapInterface
 															Into:
 														</td>
 														<td>
-															".$wapService->getDropDownListForAccounts("toAccount",3)."
+															".$wapService->getDropDownListForAccounts("toAccountId",3)."
 														</td>
 													</tr>
 													<tr>
@@ -151,6 +152,12 @@ class WapInterface
 							</tr>
 						</table>";
 		}
+	}
+	
+	public static function loadDefaultPageWithMsg($vars)
+	{
+		$info = html_entity_decode(isset($vars[2]) && $vars[2]!="" ? $vars[2] : "");
+		return self::defaultPage(!System::getUser() instanceof UserAccount,$info);
 	}
 	
 	public static function manageAccounts($vars)
