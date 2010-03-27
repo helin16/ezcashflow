@@ -51,7 +51,7 @@ class WapInterface
 									<b style='color:green'>$info</b><br />
 									<div style='padding:15px;'>
 										<fieldset>
-											<legend>Spend Money</legend>
+											<legend>Expense</legend>
 											<form action='/post/WapUserService/spendMoney' method='POST'>
 												<table width=\"100%\" style='background:#cccccc;'>
 													<tr>
@@ -104,7 +104,7 @@ class WapInterface
 								<td>
 									<div style='padding:15px;'>
 										<fieldset>
-											<legend>Earn Money</legend>
+											<legend>Income</legend>
 											<form action='/post/WapUserService/earnMoney' method='POST'>
 												<table width=\"100%\" style='background:#cccccc;'>
 													<tr>
