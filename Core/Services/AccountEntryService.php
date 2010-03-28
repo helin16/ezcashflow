@@ -10,7 +10,7 @@ class AccountEntryService extends BaseService
 	{
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
-		$sql->setSQL("select max(accountNumber) as max from accountentry where parentId = ".$parent->getId());
+		$sql->setSQL("select max(accountNumber) as max from AccountEntry where parentId = ".$parent->getId());
 		
 		$dao = new Dao();
 		$dao->execute($sql);
@@ -33,7 +33,7 @@ class AccountEntryService extends BaseService
 	
 	public function getChildrenValueSum(AccountEntry $parent,$includeAll=false)
 	{
-		$sql ="select sum(value) as sum from accountentry where active = 1";
+		$sql ="select sum(value) as sum from AccountEntry where active = 1";
 		if($includeAll)
 			$sql.=" and accountNumber like '".$parent->getAccountNumber()."%'";
 		else
@@ -41,7 +41,7 @@ class AccountEntryService extends BaseService
 			
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
-		$sql->setSQL("select max(accountNumber) as max from accountentry where parentId = ".$parent->getId());
+		$sql->setSQL("select max(accountNumber) as max from AccountEntry where parentId = ".$parent->getId());
 		
 		$dao = new Dao();
 		$dao->execute($sql);
@@ -55,8 +55,8 @@ class AccountEntryService extends BaseService
 		$sql->setDoResults(true);
 		$sql->setSQL("select ac.id,ac.name,ac.accountNumber,ac.value,ac.parentId,ac.rootId,
 					FLOOR(CHAR_LENGTH(ac.accountNumber)/4) as noOfSpaces,
-					(select count(acc.id) from accountentry acc where acc.parentId = ac.id and acc.active = 1) as countChildren 
-					from accountentry ac where ac.active = 1 and ac.rootId = $rootId
+					(select count(acc.id) from AccountEntry acc where acc.parentId = ac.id and acc.active = 1) as countChildren 
+					from AccountEntry ac where ac.active = 1 and ac.rootId = $rootId
 					order by ac.rootId asc, LCASE(ac.accountNumber) asc");
 		
 		$dao = new Dao();
@@ -70,11 +70,11 @@ class AccountEntryService extends BaseService
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
 		$sql->setSQL("select ac.id,concat(acr.name,' - ', ac.name) as name,ac.value
-					from accountentry ac 
-					inner join accountentry acr on (acr.id = ac.rootId and acr.active = 1)
+					from AccountEntry ac 
+					inner join AccountEntry acr on (acr.id = ac.rootId and acr.active = 1)
 					where ac.active = 1 
 					and ac.rootId = $rootId
-					and ((select if(count(acc.id)=0,1,0) from accountentry acc where acc.parentId = ac.id and acc.active = 1))=1
+					and ((select if(count(acc.id)=0,1,0) from AccountEntry acc where acc.parentId = ac.id and acc.active = 1))=1
 					order by name asc");
 		
 		$dao = new Dao();

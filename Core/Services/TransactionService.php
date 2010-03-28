@@ -64,8 +64,8 @@ class TransactionService extends BaseService
 	public function getSumOfExpenseYear($year)
 	{
 		$qry = "select sum(t.value) as sum 
-				from transaction t 
-				left join accountentry acc on (acc.id = t.toId)
+				from Transaction t 
+				left join AccountEntry acc on (acc.id = t.toId)
 				where t.active = 1
 				and acc.rootId = 4 
 				and YEAR(t.created)='$year'";
@@ -84,8 +84,8 @@ class TransactionService extends BaseService
 	public function getSumOfExpenseMonth($year,$month)
 	{
 		$qry = "select sum(t.value) as sum 
-				from transaction t 
-				left join accountentry acc on (acc.id = t.toId)
+				from Transaction t 
+				left join AccountEntry acc on (acc.id = t.toId)
 				where t.active = 1
 				and acc.rootId = 4 
 				and MONTH(t.created)='$month' and YEAR(t.created)='$year'";
@@ -104,8 +104,8 @@ class TransactionService extends BaseService
 	public function getSumOfExpenseWeek($year,$week)
 	{
 		$qry = "select sum(t.value) as sum 
-				from transaction t 
-				left join accountentry acc on (acc.id = t.toId)
+				from Transaction t 
+				left join AccountEntry acc on (acc.id = t.toId)
 				where t.active = 1
 				and acc.rootId = 4 
 				and  WEEK(t.created)='$week' and YEAR(t.created)='$year'";
@@ -124,8 +124,8 @@ class TransactionService extends BaseService
 	public function getSumOfExpenseDay($year,$month,$day)
 	{
 		$qry = "select sum(t.value) as sum 
-				from transaction t 
-				left join accountentry acc on (acc.id = t.toId)
+				from Transaction t 
+				left join AccountEntry acc on (acc.id = t.toId)
 				where t.active = 1
 				and acc.rootId = 4 
 				and  MONTH(t.created)=$month and YEAR(t.created)='$year' and DAYOFMONTH(t.created)='$day'";
