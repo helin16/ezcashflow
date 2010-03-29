@@ -713,7 +713,7 @@ class WapInterface
 		$title ="Transactions created between '".$fromDate->format("Y-m-d")."' and '".$toDate->format("Y-m-d")."'";
 		if($accountTypeId!="")
 		{
-			$where .=" AND toId in(select distinct id from accountentry where active=1 and rootId = $accountTypeId)";
+			$where .=" AND toId in(select distinct id from AccountEntry where active=1 and rootId = $accountTypeId)";
 			$accountService = new AccountEntryService();
 			$title .=" and Transaction for '".$accountService->get($accountTypeId)->getName()."'";
 		}
