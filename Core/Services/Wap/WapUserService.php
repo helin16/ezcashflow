@@ -123,13 +123,14 @@ class WapUserService
 	
 	public function earnMoney($vars)
 	{
+		$fromAccountId = $vars["fromAccountId"];
 		$toAccountId = $vars["toAccountId"];
 		$value = $vars["value"];
 		$comments = $vars["comments"];
 		
 		$service = new AccountEntryService();
 		$transactionService = new TransactionService();
-		$transactionService->earnMoney($service->get($toAccountId),$value,$comments);
+		$transactionService->earnMoney($service->get($fromAccountId),$service->get($toAccountId),$value,$comments);
 		
 		header("Location: /loadDefaultPageWithMsg/Earn_Successfully!");
 	}

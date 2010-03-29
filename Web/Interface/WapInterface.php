@@ -155,11 +155,19 @@ class WapInterface
 											<form action='/post/WapUserService/earnMoney' method='POST'>
 												<table width=\"100%\" style='background:#cccccc;'>
 													<tr>
-														<td>
+														<td width='100px'>
 															Into:
 														</td>
 														<td>
-															".self::getDropDownListForAccounts("toAccountId",array(3))."
+															".self::getDropDownListForAccounts("fromAccountId",array(3))."
+														</td>
+													</tr>
+													<tr>
+														<td>
+															Bank:
+														</td>
+														<td>
+															".self::getDropDownListForAccounts("toAccountId",array(1))."
 														</td>
 													</tr>
 													<tr>

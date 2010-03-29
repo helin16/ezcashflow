@@ -38,7 +38,7 @@ class TransactionService extends BaseService
 		$accountService->save($toAccount);
 	}
 	
-	public function earnMoney(AccountEntry $toAccount,$value,$comments="")
+	public function earnMoney(AccountEntry $fromAccount,AccountEntry $toAccount,$value,$comments="")
 	{
 		$comments = addslashes($comments);
 		$accountService = new AccountEntryService();
@@ -47,13 +47,17 @@ class TransactionService extends BaseService
 			throw new Exception("Invalid value to earn!");
 			
 		$transation = new Transaction();
-		$transation->setFrom(null);
+		$transation->setFrom($fromAccount);
 		$transation->setTo($toAccount);
 		$transation->setValue($value);
 		$transation->setComments($comments);
 		$transation->setCreatedBy(System::getUser());
 		$transation->setUpdatedBy(System::getUser());
 		$this->save($transation);
+		
+		$fromAccount->setValue($fromAccount->getValue()+ $value);
+		$fromAccount->setUpdatedBy(System::getUser());
+		$accountService->save($fromAccount);
 		
 		$toAccount->setValue($toAccount->getValue()+ $value);
 		$toAccount->setUpdatedBy(System::getUser());
