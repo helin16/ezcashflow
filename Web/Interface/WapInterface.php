@@ -576,10 +576,10 @@ class WapInterface
 							".$row["accountNumber"]."
 						</td>
 						<td>
-							$ ".self::getCurrency($row["value"])."
+							".(trim($row["value"])==""? "" : "$ ".self::getCurrency($row["value"]))."
 						</td>
 						<td width='8%'>
-							<a href='/reports/account/{$row["id"]}'>Trans.</a>&nbsp;
+							".(trim($row["value"])==""? "" : "<a href='/reports/account/{$row["id"]}'>Trans.</a>&nbsp;")."
 							".(
 									(
 										$row['countChildren']==0 
