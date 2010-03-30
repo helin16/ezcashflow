@@ -791,27 +791,36 @@ class WapInterface
 		$result = $transactionService->findByCriteria($where);
 		$table ="<b>$title</b><br />
 				<table width=\"100%\">";
-			$table .="<tr style='background:#000000;color:#ffffff;height:34px;'>";
-				$table .="<td width=\"10%\">Date</td>";
-				$table .="<td width=\"15%\">From Acc.</td>";
-				$table .="<td width=\"15%\">To Acc.</td>";
-				$table .="<td width=\"10%\">Value</td>";
-				$table .="<td>Description</td>";
-			$table .="</tr>";
-			$rowNo=0;
-			foreach($result as $transaction)
-			{
-				$table .="<tr ".($rowNo %2 ==0 ? "": " style='background:#cccccc;'" ).">";
-					$table .="<td>".$transaction->getCreated()."</td>";
-					$fromAccount = $transaction->getFrom();
-					$table .="<td><a href='/viewAccount/".($fromAccount instanceof AccountEntry ? $transaction->getFrom()->getId(): "")."'>".($fromAccount instanceof AccountEntry ? $transaction->getFrom()->getName() : "")."</a></td>";
-					$table .="<td><a href='/viewAccount/".$transaction->getTo()->getId()."'>".$transaction->getTo()->getName()."</a></td>";
-					$table .="<td>$".self::getCurrency($transaction->getValue())."</td>";
-					$table .="<td>".$transaction->getComments()."</td>";
-				$table .="</tr>";
-				$rowNo++;
-			}
-		$table.="</table>";
+					$table .="<tr style='background:#000000;color:#ffffff;height:34px;'>";
+						$table .="<td width=\"10%\">Date</td>";
+						$table .="<td width=\"15%\">From Acc.</td>";
+						$table .="<td width=\"15%\">To Acc.</td>";
+						$table .="<td width=\"10%\">Value</td>";
+						$table .="<td>Description</td>";
+					$table .="</tr>";
+					$rowNo=0;
+					$total =0;
+					foreach($result as $transaction)
+					{
+						$table .="<tr ".($rowNo %2 ==0 ? "": " style='background:#cccccc;'" ).">";
+							$table .="<td>".$transaction->getCreated()."</td>";
+							$fromAccount = $transaction->getFrom();
+							$table .="<td><a href='/viewAccount/".($fromAccount instanceof AccountEntry ? $transaction->getFrom()->getId(): "")."'>".($fromAccount instanceof AccountEntry ? $transaction->getFrom()->getName() : "")."</a></td>";
+							$table .="<td><a href='/viewAccount/".$transaction->getTo()->getId()."'>".$transaction->getTo()->getName()."</a></td>";
+							$table .="<td>$".self::getCurrency($transaction->getValue())."</td>";
+							$table .="<td>".$transaction->getComments()."</td>";
+						$table .="</tr>";
+						$rowNo++;
+						$total+=$transaction->getValue();
+					}
+					$table .="<tr style='background:#000000;color:#ffffff;height:34px;'>";
+						$table .="<td>Total</td>";
+						$table .="<td>&nbsp;</td>";
+						$table .="<td>&nbsp;</td>";
+						$table .="<td>$".self::getCurrency($total)."</td>";
+						$table .="<td>&nbsp;</td>";
+					$table .="</tr>";
+			$table.="</table>";
 		return $table;
 	}
 	
