@@ -38,7 +38,7 @@ class TransactionService extends BaseService
 		$accountService->save($toAccount);
 	}
 	
-	public function earnMoney(AccountEntry $fromAccount,AccountEntry $toAccount,$value,$comments="")
+	public function earnMoney(AccountEntry $toAccount,AccountEntry $fromAccount,$value,$comments="")
 	{
 		$comments = addslashes($comments);
 		$accountService = new AccountEntryService();
