@@ -73,9 +73,11 @@ class GenericDao
 		}
 	}
 	
-	public function findAll($page = null,$pagesize = 30,$searchActiveOnly=true)
+	public function findAll($page = null,$pagesize = 30,$searchActiveOnly=true,$orderBy=array("names"=>"","direction"=>"asc"))
 	{
 		$sql = new Select($this->entity,$page,$pagesize,$searchActiveOnly);
+		if(isset($orderBy["names"]) && $orderBy["names"]!="")
+			$sql->orderBy($orderBy["names"],$orderBy["direction"]);
 		$this->getDao()->execute($sql);
 		$this->setTotalRows();
 		return $sql->getResultSet();
@@ -107,19 +109,23 @@ class GenericDao
 			throw new Exception("FindById: Found multiple($size) enties for ".get_class($this->entity)."@$id");
 	}
 	
-	public function findByCriteria($where,$page = null,$pagesize = 30,$searchActiveOnly=true)
+	public function findByCriteria($where,$page = null,$pagesize = 30,$searchActiveOnly=true,$orderBy=array("names"=>"","direction"=>"asc"))
 	{
 		$sql = new Select($this->entity,$page,$pagesize,$searchActiveOnly);
 		$sql->setWhere($where);
+		if(isset($orderBy["names"]) && $orderBy["names"]!="")
+			$sql->orderBy($orderBy["names"],$orderBy["direction"]);
 		$this->getDao()->execute($sql);
 		$this->setTotalRows();
 		return $sql->getResultSet();		
 	}
 	
-	public function search($target,$page = null,$pagesize = 30,$searchActiveOnly=true)
+	public function search($target,$page = null,$pagesize = 30,$searchActiveOnly=true,$orderBy=array("names"=>"","direction"=>"asc"))
 	{
 		$sql = new Select($this->entity,$page,$pagesize,$searchActiveOnly);
 		$sql->search($target);
+		if(isset($orderBy["names"]) && $orderBy["names"]!="")
+			$sql->orderBy($orderBy["names"],$orderBy["direction"]);
 		$this->getDao()->execute($sql);
 		$this->setTotalRows();
 		return $sql->getResultSet();

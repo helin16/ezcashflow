@@ -771,24 +771,23 @@ class WapInterface
 				}
 		}
 		$transactionService = new TransactionService();
+		$accountService = new AccountEntryService();
 		
 		$where ="created >='".$fromDate->format("Y-m-d")."' and created < '".$toDate->format("Y-m-d")."'";
 		$title ="Transactions created between '".$fromDate->format("Y-m-d")."' and '".$toDate->format("Y-m-d")."'";
 		if($accountTypeId!="")
 		{
 			$where .=" AND toId in(select distinct id from AccountEntry where active=1 and rootId = $accountTypeId)";
-			$accountService = new AccountEntryService();
 			$title .=" and Transaction for '".$accountService->get($accountTypeId)->getName()."'";
 		}
 		
 		if($accountId!="")
 		{
 			$where .=" AND (toId=$accountId or fromId=$accountId)";
-			$accountService = new AccountEntryService();
 			$title .=" and Transaction for '".$accountService->get($accountId)->getName()."'";
 		}
 		
-		$result = $transactionService->findByCriteria($where);
+		$result = $transactionService->findByCriteria($where,true,null,30,array("names"=>"id","direction"=>"desc"));
 		$table ="<b>$title</b><br />
 				<table width=\"100%\">";
 					$table .="<tr style='background:#000000;color:#ffffff;height:34px;'>";

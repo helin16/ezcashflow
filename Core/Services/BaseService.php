@@ -44,16 +44,16 @@ class BaseService
 		$this->entityDao->save($entity);
 	}
 	
-	public function findAll($searchActiveOnly=true,$page = null,$pagesize = 30)
+	public function findAll($searchActiveOnly=true,$page = null,$pagesize = 30,$orderBy=array())
 	{
-		$temp =  $this->entityDao->findAll($page,$pagesize,$searchActiveOnly);
+		$temp =  $this->entityDao->findAll($page,$pagesize,$searchActiveOnly,$orderBy);
 		$this->totalNoOfRows = $this->entityDao->getTotalRows();
 		return $temp;
 	}
 	
-	public function findByCriteria($where,$searchActiveOnly=true,$page = null,$pagesize = 30)
+	public function findByCriteria($where,$searchActiveOnly=true,$page = null,$pagesize = 30,$orderBy=array())
 	{
-		$temp =  $this->entityDao->findByCriteria($where,$page,$pagesize,$searchActiveOnly);
+		$temp =  $this->entityDao->findByCriteria($where,$page,$pagesize,$searchActiveOnly,$orderBy);
 		$this->totalNoOfRows = $this->entityDao->getTotalRows();
 		return $temp;
 	}
