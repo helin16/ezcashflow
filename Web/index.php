@@ -1,7 +1,7 @@
 <?php
 require(dirname(__FILE__) . '/bootstrap.php');
 
-
+date_default_timezone_set('Australia/Melbourne');
 
 session_start();  
 if(isset($_SERVER["REQUEST_URI"]) && trim($_SERVER["REQUEST_URI"])!="/")

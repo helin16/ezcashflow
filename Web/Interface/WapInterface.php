@@ -39,10 +39,11 @@ class WapInterface
 		else
 		{
 			$transactionService = new TransactionService();
-			$today_day = date('d');
-			$today_month = date('m');
-			$today_year = date('Y');
-			$today_week = date('W');
+			$today = new DateTime();
+			$today_day = $today->format('d');
+			$today_month = $today->format('m');
+			$today_year = $today->format('Y');
+			$today_week = $today->format('W');
 			
 			
 			$income_day = $transactionService->getSumOfExpenseDay($today_year,$today_month,$today_day,3);

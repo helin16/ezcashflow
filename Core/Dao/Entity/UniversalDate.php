@@ -6,13 +6,12 @@ class UniversalDate
 	 */
 	private $dateTime;
 	
-	public function __construct($string = "now", $timeZone="")
+	public function __construct($string = "now", $timeZone="Australia/Melbourne")
 	{
 		if ($string == "0000-00-00 00:00:00")
 			$string = (string)$this->zeroDate();
 			
-		// Is there a difference between UTC and GMT?
-		date_default_timezone_set('UTC');
+		date_default_timezone_set('Australia/Melbourne');
 		
 		if($timeZone == "")
 			$this->dateTime = date_create($string);
@@ -45,7 +44,7 @@ class UniversalDate
 	 *
 	 * @var String
 	 */
-	public function setTimeZone($timeZone = 'UTC')
+	public function setTimeZone($timeZone = 'Australia/Melbourne')
 	{
 		date_timezone_set($this->dateTime,new DateTimeZone($timeZone));
 	}
