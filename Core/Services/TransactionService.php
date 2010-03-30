@@ -65,13 +65,13 @@ class TransactionService extends BaseService
 	}
 	
 	
-	public function getSumOfExpenseYear($year)
+	public function getSumOfExpenseYear($year,$accountTypeId=4)
 	{
 		$qry = "select sum(t.value) as sum 
 				from Transaction t 
 				left join AccountEntry acc on (acc.id = t.toId)
 				where t.active = 1
-				and acc.rootId = 4 
+				and acc.rootId = $accountTypeId 
 				and YEAR(t.created)='$year'";
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
@@ -85,14 +85,14 @@ class TransactionService extends BaseService
 		return $results[0]["sum"];
 	}
 	
-	public function getSumOfExpenseMonth($year,$month)
+	public function getSumOfExpenseMonth($year,$month,$accountTypeId=4)
 	{
 		$qry = "select sum(t.value) as sum 
 				from Transaction t 
 				left join AccountEntry acc on (acc.id = t.toId)
 				where t.active = 1
-				and acc.rootId = 4 
-				and MONTH(t.created)='$month' and YEAR(t.created)='$year'";
+				and acc.rootId = $accountTypeId 
+				and MONTH(t.created)=$month and YEAR(t.created)='$year'";
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
 		
@@ -105,13 +105,13 @@ class TransactionService extends BaseService
 		return $results[0]["sum"];
 	}
 	
-	public function getSumOfExpenseWeek($year,$week)
+	public function getSumOfExpenseWeek($year,$week,$accountTypeId=4)
 	{
 		$qry = "select sum(t.value) as sum 
 				from Transaction t 
 				left join AccountEntry acc on (acc.id = t.toId)
 				where t.active = 1
-				and acc.rootId = 4 
+				and acc.rootId = $accountTypeId 
 				and  WEEK(t.created)='$week' and YEAR(t.created)='$year'";
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
@@ -125,13 +125,13 @@ class TransactionService extends BaseService
 		return $results[0]["sum"];
 	}
 	
-	public function getSumOfExpenseDay($year,$month,$day)
+	public function getSumOfExpenseDay($year,$month,$day,$accountTypeId=4)
 	{
 		$qry = "select sum(t.value) as sum 
 				from Transaction t 
 				left join AccountEntry acc on (acc.id = t.toId)
 				where t.active = 1
-				and acc.rootId = 4 
+				and acc.rootId = $accountTypeId 
 				and  MONTH(t.created)=$month and YEAR(t.created)='$year' and DAYOFMONTH(t.created)='$day'";
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);

@@ -43,6 +43,23 @@ class WapInterface
 			$today_month = date('m');
 			$today_year = date('Y');
 			$today_week = date('W');
+			
+			
+			$income_day = $transactionService->getSumOfExpenseDay($today_year,$today_month,$today_day,3);
+			$income_week = $transactionService->getSumOfExpenseWeek($today_year,$today_week,3);
+			$income_month = $transactionService->getSumOfExpenseMonth($today_year,$today_month,3);
+			$income_year = $transactionService->getSumOfExpenseYear($today_year,3);
+			
+			$expense_day = $transactionService->getSumOfExpenseDay($today_year,$today_month,$today_day,4);
+			$expense_week = $transactionService->getSumOfExpenseWeek($today_year,$today_week,4);
+			$expense_month = $transactionService->getSumOfExpenseMonth($today_year,$today_month,4);
+			$expense_year = $transactionService->getSumOfExpenseYear($today_year,4);
+			
+			$diff_day=$income_day-$expense_day;
+			$diff_week=$income_week-$expense_week;
+			$diff_month=$income_month-$expense_month;
+			$diff_year=$income_year-$expense_year;
+			
 			return "
 					<table width=\"100%\">
 							<tr>
@@ -59,9 +76,12 @@ class WapInterface
 								<td>
 									<div style='padding:15px;'>
 										<fieldset>
-											<legend>Summary Of Expense</legend>
+											<legend>Summary Of Expense/Income</legend>
 												<table width=\"100%\">
 													<tr style='background:#000000;color:#ffffff;height:34px;'>
+														<td>
+															&nbsp;
+														</td>
 														<td>
 															Day
 														</td>
@@ -76,18 +96,41 @@ class WapInterface
 														</td>
 													</tr>
 													<tr>
+														<td>Income</td>
 														<td>
-															<a href='/reports/day/4'>$".self::getCurrency($transactionService->getSumOfExpenseDay($today_year,$today_month,$today_day))."</a>
+															<a href='/reports/day/3'>$".self::getCurrency($income_day)."</a>
 														</td>
 														<td>
-															<a href='/reports/week/4'>$".self::getCurrency($transactionService->getSumOfExpenseWeek($today_year,$today_week))."</a>
+															<a href='/reports/week/3'>$".self::getCurrency($income_week)."</a>
 														</td>
 														<td>
-															<a href='/reports/month/4'>$".self::getCurrency($transactionService->getSumOfExpenseMonth($today_year,$today_month,$today_day))."</a>
+															<a href='/reports/month/3'>$".self::getCurrency($income_month)."</a>
 														</td>
 														<td>
-															<a href='/reports/year/4'>$".self::getCurrency($transactionService->getSumOfExpenseYear($today_year))."</a>
+															<a href='/reports/year/3'>$".self::getCurrency($income_year)."</a>
 														</td>
+													</tr>
+													<tr style='background:#cccccc;'>
+														<td>Expense</td>
+														<td>
+															<a href='/reports/day/4'>$".self::getCurrency($expense_day)."</a>
+														</td>
+														<td>
+															<a href='/reports/week/4'>$".self::getCurrency($expense_week)."</a>
+														</td>
+														<td>
+															<a href='/reports/month/4'>$".self::getCurrency($expense_month)."</a>
+														</td>
+														<td>
+															<a href='/reports/year/4'>$".self::getCurrency($expense_year)."</a>
+														</td>
+													</tr>
+													<tr style='font-weight:bold;'>
+														<td>Diff</td>
+														<td>$".self::getCurrency($diff_day)."</td>
+														<td>$".self::getCurrency($diff_week)."</td>
+														<td>$".self::getCurrency($diff_month)."</td>
+														<td>$".self::getCurrency($diff_year)."</td>
 													</tr>
 												</table>
 										</fieldset>
@@ -471,7 +514,7 @@ class WapInterface
 				".($showWelcome ? "Welcome, ".System::getUser()."<br />" : "")."
 				<ul id='menu'>
 					<li><a href='/' ".self::showHightlight($i++,$heightlightIndex).">Home</a></li>
-					<li><a href='/manageAccounts/' ".self::showHightlight($i++,$heightlightIndex).">Manage Accounts</a></li>
+					<li><a href='/manageAccounts/' ".self::showHightlight($i++,$heightlightIndex).">Accounts</a></li>
 					<li><a href='/reports/' ".self::showHightlight($i++,$heightlightIndex).">Reports</a></li>
 					<li><a href='/post/WapUserService/logout' ".self::showHightlight($i++,$heightlightIndex).">Logout</a></li>
 				</ul>
@@ -534,13 +577,14 @@ class WapInterface
 						<td>
 							$ ".self::getCurrency($row["value"])."
 						</td>
-						<td width='5%'>
+						<td width='8%'>
+							<a href='/reports/account/{$row["id"]}'>Trans.</a>&nbsp;
 							".(
 									(
 										$row['countChildren']==0 
 										&& $row['parentId']!= NULL
 										&& $row['rootId']!= $row['id']
-									) ? "<a href='/deleteAccount/".$row["id"]."'> Delete </a>" : ""
+									) ? "<a href='/deleteAccount/".$row["id"]."'> Del</a>" : ""
 								)."
 						</td>
 					</tr>";
@@ -671,6 +715,8 @@ class WapInterface
 		if($searchType=="")
 			return "Invalid Search Type!";
 			
+		$accountId = "";
+			
 		$fromDate = new DateTime();
 		$toDate = new DateTime();
 		switch(strtolower($searchType))
@@ -714,6 +760,14 @@ class WapInterface
 					$toDate = new DateTime(trim($vars[5]));
 					break;
 				}
+			case 'account':
+				{
+					$fromDate = new DateTime("1990-01-01");
+					$toDate = new DateTime("3999-01-01");
+					$accountId=$accountTypeId;
+					$accountTypeId="";
+					break;
+				}
 		}
 		$transactionService = new TransactionService();
 		
@@ -724,6 +778,13 @@ class WapInterface
 			$where .=" AND toId in(select distinct id from AccountEntry where active=1 and rootId = $accountTypeId)";
 			$accountService = new AccountEntryService();
 			$title .=" and Transaction for '".$accountService->get($accountTypeId)->getName()."'";
+		}
+		
+		if($accountId!="")
+		{
+			$where .=" AND (toId=$accountId or fromId=$accountId)";
+			$accountService = new AccountEntryService();
+			$title .=" and Transaction for '".$accountService->get($accountId)->getName()."'";
 		}
 		
 		$result = $transactionService->findByCriteria($where);
@@ -741,7 +802,8 @@ class WapInterface
 			{
 				$table .="<tr ".($rowNo %2 ==0 ? "": " style='background:#cccccc;'" ).">";
 					$table .="<td>".$transaction->getCreated()."</td>";
-					$table .="<td><a href='/viewAccount/".$transaction->getFrom()->getId()."'>".$transaction->getFrom()->getName()."</a></td>";
+					$fromAccount = $transaction->getFrom();
+					$table .="<td><a href='/viewAccount/".($fromAccount instanceof AccountEntry ? $transaction->getFrom()->getId(): "")."'>".($fromAccount instanceof AccountEntry ? $transaction->getFrom()->getName() : "")."</a></td>";
 					$table .="<td><a href='/viewAccount/".$transaction->getTo()->getId()."'>".$transaction->getTo()->getName()."</a></td>";
 					$table .="<td>$".self::getCurrency($transaction->getValue())."</td>";
 					$table .="<td>".$transaction->getComments()."</td>";
