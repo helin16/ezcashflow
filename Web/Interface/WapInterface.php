@@ -39,22 +39,35 @@ class WapInterface
 		else
 		{
 			$transactionService = new TransactionService();
-			$today = new DateTime();
-			$today_day = $today->format('d');
-			$today_month = $today->format('m');
-			$today_year = $today->format('Y');
-			$today_week = $today->format('W');
+			$today =$temp= new DateTime();
+			$startOfToday = $today->format('Y-m-d');
+			$temp->modify("+1 day");
+			$endOfToday = $temp->format('Y-m-d');
+
+			$thisWeek = new DateTime(self::week_start_date($today->format('W'),$today->format('Y')));
+			$startOfWeek = $thisWeek->format("Y-m-d");
+			$thisWeek->modify("+1 week");
+			$endOfWeek = $thisWeek->format("Y-m-d");
 			
+			$thisMonth = new DateTime($today->format('Y-m')."-01");
+			$startOfMonth = $thisMonth->format("Y-m-d");
+			$thisMonth->modify("+1 month");
+			$endOfMonth = $thisMonth->format("Y-m-d");
 			
-			$income_day = $transactionService->getSumOfExpenseDay($today_year,$today_month,$today_day,3);
-			$income_week = $transactionService->getSumOfExpenseWeek($today_year,$today_week,3);
-			$income_month = $transactionService->getSumOfExpenseMonth($today_year,$today_month,3);
-			$income_year = $transactionService->getSumOfExpenseYear($today_year,3);
+			$thisYear = new DateTime($today->format('Y')."-01-01");
+			$startOfYear = $thisYear->format("Y-m-d");
+			$thisYear->modify("+1 year");
+			$endOfYear = $thisYear->format("Y-m-d");
 			
-			$expense_day = $transactionService->getSumOfExpenseDay($today_year,$today_month,$today_day,4);
-			$expense_week = $transactionService->getSumOfExpenseWeek($today_year,$today_week,4);
-			$expense_month = $transactionService->getSumOfExpenseMonth($today_year,$today_month,4);
-			$expense_year = $transactionService->getSumOfExpenseYear($today_year,4);
+			$income_day = $transactionService->getSumOfExpenseBetweenDates($startOfToday,$endOfToday,3);
+			$income_week = $transactionService->getSumOfExpenseBetweenDates($startOfWeek,$endOfWeek,3);
+			$income_month = $transactionService->getSumOfExpenseBetweenDates($startOfMonth,$endOfMonth,3);
+			$income_year = $transactionService->getSumOfExpenseBetweenDates($startOfYear,$endOfYear,3);
+			
+			$expense_day = $transactionService->getSumOfExpenseBetweenDates($startOfToday,$endOfToday,4);
+			$expense_week = $transactionService->getSumOfExpenseBetweenDates($startOfWeek,$endOfWeek,4);
+			$expense_month = $transactionService->getSumOfExpenseBetweenDates($startOfMonth,$endOfMonth,4);
+			$expense_year = $transactionService->getSumOfExpenseBetweenDates($startOfYear,$endOfYear,4);
 			
 			$diff_day=$income_day-$expense_day;
 			$diff_week=$income_week-$expense_week;

@@ -63,16 +63,16 @@ class TransactionService extends BaseService
 		$toAccount->setUpdatedBy(System::getUser());
 		$accountService->save($toAccount);
 	}
-	
-	
-	public function getSumOfExpenseYear($year,$accountTypeId=4)
+
+	public function getSumOfExpenseBetweenDates($startDate,$endDate,$accountTypeId=4)
 	{
 		$qry = "select sum(t.value) as sum 
 				from Transaction t 
 				left join AccountEntry acc on (acc.id = t.toId)
 				where t.active = 1
 				and acc.rootId = $accountTypeId 
-				and YEAR(t.created)='$year'";
+				and t.created >='$startDate' and t.created<'$endDate'";
+
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
 		
@@ -84,65 +84,6 @@ class TransactionService extends BaseService
 		
 		return $results[0]["sum"];
 	}
-	
-	public function getSumOfExpenseMonth($year,$month,$accountTypeId=4)
-	{
-		$qry = "select sum(t.value) as sum 
-				from Transaction t 
-				left join AccountEntry acc on (acc.id = t.toId)
-				where t.active = 1
-				and acc.rootId = $accountTypeId 
-				and MONTH(t.created)=$month and YEAR(t.created)='$year'";
-		$sql = new SqlStatement();
-		$sql->setDoResults(true);
-		
-		$sql->setSQL($qry);
-		
-		$dao = new Dao();
-		$dao->execute($sql);
-		$results = $sql->getResultSet();
-		
-		return $results[0]["sum"];
-	}
-	
-	public function getSumOfExpenseWeek($year,$week,$accountTypeId=4)
-	{
-		$qry = "select sum(t.value) as sum 
-				from Transaction t 
-				left join AccountEntry acc on (acc.id = t.toId)
-				where t.active = 1
-				and acc.rootId = $accountTypeId 
-				and  WEEK(t.created)='$week' and YEAR(t.created)='$year'";
-		$sql = new SqlStatement();
-		$sql->setDoResults(true);
-		
-		$sql->setSQL($qry);
-		
-		$dao = new Dao();
-		$dao->execute($sql);
-		$results = $sql->getResultSet();
-		
-		return $results[0]["sum"];
-	}
-	
-	public function getSumOfExpenseDay($year,$month,$day,$accountTypeId=4)
-	{
-		$qry = "select sum(t.value) as sum 
-				from Transaction t 
-				left join AccountEntry acc on (acc.id = t.toId)
-				where t.active = 1
-				and acc.rootId = $accountTypeId 
-				and  MONTH(t.created)=$month and YEAR(t.created)='$year' and DAYOFMONTH(t.created)='$day'";
-		$sql = new SqlStatement();
-		$sql->setDoResults(true);
-		
-		$sql->setSQL($qry);
-		
-		$dao = new Dao();
-		$dao->execute($sql);
-		$results = $sql->getResultSet();
-		
-		return $results[0]["sum"];
-	}
+
 }
 ?>
