@@ -44,10 +44,23 @@ class WapInterface
 			$temp->modify("+1 day");
 			$endOfToday = $temp->format('Y-m-d');
 
-			$thisWeek = new DateTime(self::week_start_date($today->format('W'),$today->format('Y')));
-			$startOfWeek = $thisWeek->format("Y-m-d");
-			$thisWeek->modify("+1 week");
-			$endOfWeek = $thisWeek->format("Y-m-d");
+//			$thisWeek = new DateTime(self::week_start_date($today->format('W'),$today->format('Y')));
+//			$startOfWeek = $thisWeek->format("Y-m-d");
+//			$thisWeek->modify("+1 week");
+//			$endOfWeek = $thisWeek->format("Y-m-d");
+			//change a week from Thursday to Thursday
+			$temp = new DateTime();
+			$today_dayOfWeek = $temp->format('w');
+			if($today_dayOfWeek<4)
+			{
+				$temp->modify("+".abs(4-$today_dayOfWeek)." day");
+				$temp->modify("-1 week");
+			}
+			else if($today_dayOfWeek>4)
+				$temp->modify("-".abs($today_dayOfWeek-4)." day");
+			$startOfWeek = $temp->format("Y-m-d");
+			$temp->modify("+1 week");
+			$endOfWeek = $temp->format("Y-m-d");
 			
 			$thisMonth = new DateTime($today->format('Y-m')."-01");
 			$startOfMonth = $thisMonth->format("Y-m-d");
@@ -112,31 +125,31 @@ class WapInterface
 													<tr>
 														<td>Income</td>
 														<td>
-															<a href='/reports/day/3'>$".self::getCurrency($income_day)."</a>
+															<a href='/reports/range/3/$startOfToday/$endOfToday'>$".self::getCurrency($income_day)."</a>
 														</td>
 														<td>
-															<a href='/reports/week/3'>$".self::getCurrency($income_week)."</a>
+															<a href='/reports/range/3/$startOfWeek/$endOfWeek'>$".self::getCurrency($income_week)."</a>
 														</td>
 														<td>
-															<a href='/reports/month/3'>$".self::getCurrency($income_month)."</a>
+															<a href='/reports/range/3/$startOfMonth/$endOfMonth'>$".self::getCurrency($income_month)."</a>
 														</td>
 														<td>
-															<a href='/reports/year/3'>$".self::getCurrency($income_year)."</a>
+															<a href='/reports/range/3/$startOfYear/$endOfYear'>$".self::getCurrency($income_year)."</a>
 														</td>
 													</tr>
 													<tr style='background:#cccccc;'>
 														<td>Expense</td>
 														<td>
-															<a href='/reports/day/4'>$".self::getCurrency($expense_day)."</a>
+															<a href='/reports/range/4/$startOfToday/$endOfToday'>$".self::getCurrency($expense_day)."</a>
 														</td>
 														<td>
-															<a href='/reports/week/4'>$".self::getCurrency($expense_week)."</a>
+															<a href='/reports/range/4/$startOfWeek/$endOfWeek'>$".self::getCurrency($expense_week)."</a>
 														</td>
 														<td>
-															<a href='/reports/month/4'>$".self::getCurrency($expense_month)."</a>
+															<a href='/reports/range/4/$startOfMonth/$endOfMonth'>$".self::getCurrency($expense_month)."</a>
 														</td>
 														<td>
-															<a href='/reports/year/4'>$".self::getCurrency($expense_year)."</a>
+															<a href='/reports/range/4/$startOfYear/$endOfYear'>$".self::getCurrency($expense_year)."</a>
 														</td>
 													</tr>
 													<tr style='font-weight:bold;'>
