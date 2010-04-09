@@ -29,13 +29,13 @@ class TransactionService extends BaseService
 		$transation->setUpdatedBy(System::getUser());
 		$this->save($transation);
 		
-		$fromAccount->setValue($fromAccount->getValue()- $value);
-		$fromAccount->setUpdatedBy(System::getUser());
-		$accountService->save($fromAccount);
-		
-		$toAccount->setValue($toAccount->getValue()+ $value);
-		$toAccount->setUpdatedBy(System::getUser());
-		$accountService->save($toAccount);
+//		$fromAccount->setValue($fromAccount->getValue()- $value);
+//		$fromAccount->setUpdatedBy(System::getUser());
+//		$accountService->save($fromAccount);
+//		
+//		$toAccount->setValue($toAccount->getValue()+ $value);
+//		$toAccount->setUpdatedBy(System::getUser());
+//		$accountService->save($toAccount);
 	}
 	
 	public function earnMoney(AccountEntry $toAccount,AccountEntry $fromAccount,$value,$comments="")
@@ -55,13 +55,13 @@ class TransactionService extends BaseService
 		$transation->setUpdatedBy(System::getUser());
 		$this->save($transation);
 		
-		$fromAccount->setValue($fromAccount->getValue()+ $value);
-		$fromAccount->setUpdatedBy(System::getUser());
-		$accountService->save($fromAccount);
-		
-		$toAccount->setValue($toAccount->getValue()+ $value);
-		$toAccount->setUpdatedBy(System::getUser());
-		$accountService->save($toAccount);
+//		$fromAccount->setValue($fromAccount->getValue()+ $value);
+//		$fromAccount->setUpdatedBy(System::getUser());
+//		$accountService->save($fromAccount);
+//		
+//		$toAccount->setValue($toAccount->getValue()+ $value);
+//		$toAccount->setUpdatedBy(System::getUser());
+//		$accountService->save($toAccount);
 	}
 
 	public function getSumOfExpenseBetweenDates($startDate,$endDate,$accountTypeId=4)

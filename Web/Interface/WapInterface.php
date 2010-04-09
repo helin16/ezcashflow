@@ -455,6 +455,38 @@ class WapInterface
 				</form>";
 	}
 	
+	public static function viewTransaction($vars)
+	{
+		$id = $vars[2];
+		$service = new TransactionService();
+		$transaction = $service->get($id);
+		if(!$transaction instanceof Transaction)
+			return "Invalid Transaction to Show!";
+			
+		$info = html_entity_decode(isset($vars[3]) && $vars[3]!="" ? $vars[3] : "");
+		return "
+				<table width=\"100%\">
+					<tr>
+						<td>
+							".self::getMenu(2)."
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<b style='color:green'>$info</b><br />
+							<a href='javascript:void(0);' OnClick='javascript:history.go(-1);'>Back</a> 
+							".self::getViewTransactionTable($transaction)."
+							<a href='javascript:void(0);' OnClick='javascript:history.go(-1);'>Back</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							".self::getMenu(2,false)."
+						</td>
+					</tr>
+				</table>";
+	}
+	
 	public static function reports($vars)
 	{
 		$searchType=(isset($vars[2]) ? $vars[2] : "");
@@ -687,6 +719,74 @@ class WapInterface
 		return $table;
 	}
 	
+	public function getViewTransactionTable(Transaction $transaction)
+	{
+		$service = new TransactionService();
+		
+		$id = $transaction->getId();
+		$date = $transaction->getCreated();
+		$from = $transaction->getFrom();
+		$to = $transaction->getTo();
+		$value = self::getCurrency($transaction->getValue());
+		$comments = $transaction->getComments();
+		
+		$table = "
+				<form action='/post/WapUserService/saveTransaction' method='POST'/>
+					<table width=\"100%\" style='background:#aaaaaa;'>
+						<tr>
+							<td width='110px'>
+								Date:
+							</td>
+							<td>
+								<input type='hidden' name='id' value='$id'/>
+								<input type='text' name='date' value='$date'/>
+							</td>
+						</tr>	
+						<tr>
+							<td>
+								From Account.:
+							</td>
+							<td>
+								".self::getDropDownListForAccounts("fromAccountId",array(1,2,3,4),$from->getId())."
+							</td>
+						</tr>	
+						<tr>
+							<td>
+								To Account.:
+							</td>
+							<td>
+								".self::getDropDownListForAccounts("toAccountId",array(1,2,3,4),$to->getId())."
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Value:
+							</td>
+							<td>
+								<input type='text' name='value' value='$value' style='width:90%;' />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Comments:
+							</td>
+							<td>
+								<input type='text' name='comments' value='$comments' style='width:100%;' />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								&nbsp;
+							</td>
+							<td>
+								<input type='submit' value='Save'/> &nbsp; &nbsp;
+							</td>
+						</tr>
+					</table>
+				</form>";
+		return $table;
+	}
+	
 	public static function getCurrency($value)
 	{
 		if(trim($value)=="")
@@ -719,7 +819,7 @@ class WapInterface
 		return $sign.strrev(implode(",",$newWholeNos)).".".$decimal;
 	}
 	
-	public static function getDropDownListForAccounts($htmlName,$typeIds=array())
+	public static function getDropDownListForAccounts($htmlName,$typeIds=array(),$selectedId="")
 	{
 		$service = new AccountEntryService();
 		$list = "<select name='$htmlName'>";
@@ -728,7 +828,7 @@ class WapInterface
 			$results = $service->getAllLeavesForType($typeId);
 			foreach($results as $row)
 			{
-				$list .= "<option value='{$row["id"]}'>{$row['name']} - \${$row['value']}</option>";
+				$list .= "<option value='{$row["id"]}' ".($selectedId==$row["id"] ? " selected='selected'" : "").">{$row['name']} - \${$row['value']}</option>";
 			}
 		}
 		$list .= "</select>";
@@ -828,7 +928,7 @@ class WapInterface
 					foreach($result as $transaction)
 					{
 						$table .="<tr ".($rowNo %2 ==0 ? "": " style='background:#cccccc;'" ).">";
-							$table .="<td>".$transaction->getCreated()."</td>";
+							$table .="<td><a href='/viewTransaction/".$transaction->getId()."'>".$transaction->getCreated()."</a></td>";
 							$fromAccount = $transaction->getFrom();
 							$table .="<td><a href='/viewAccount/".($fromAccount instanceof AccountEntry ? $transaction->getFrom()->getId(): "")."'>".($fromAccount instanceof AccountEntry ? $transaction->getFrom()->getName() : "")."</a></td>";
 							$table .="<td><a href='/viewAccount/".$transaction->getTo()->getId()."'>".$transaction->getTo()->getName()."</a></td>";

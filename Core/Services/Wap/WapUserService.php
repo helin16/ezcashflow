@@ -30,7 +30,7 @@ class WapUserService
 		$parentAccountId = $vars["accParentId"];
 		$accountId = $vars["accId"];
 		$accName = addslashes(trim($vars["accName"]));
-		$accValue = str_replace(",","",$vars["accValue"]);
+		$accValue = str_replace("$","",str_replace(",","",str_replace(" ","",$vars["accValue"])));
 		$accComments= addslashes(trim($vars["accComments"]));
 		
 		if($accName=="")
@@ -111,7 +111,7 @@ class WapUserService
 	{
 		$fromAccountId = $vars["fromAccountId"];
 		$toAccountId = $vars["toAccountId"];
-		$value = $vars["value"];
+		$value = str_replace("$","",str_replace(",","",str_replace(" ","",$vars["value"])));
 		$comments = $vars["comments"];
 		
 		$service = new AccountEntryService();
@@ -125,7 +125,7 @@ class WapUserService
 	{
 		$fromAccountId = $vars["fromAccountId"];
 		$toAccountId = $vars["toAccountId"];
-		$value = $vars["value"];
+		$value = str_replace("$","",str_replace(",","",str_replace(" ","",$vars["value"])));
 		$comments = $vars["comments"];
 		
 		$service = new AccountEntryService();
@@ -141,6 +141,35 @@ class WapUserService
 		$toDate = $vars["toDate"];
 		
 		header("Location: /reports/range/0/$fromDate/$toDate");
+	}
+	
+	public function saveTransaction($vars)
+	{
+		$id = $vars["id"];
+		$created = trim($vars["date"]);
+		if(!preg_match("/^\d{4}-\d{2}-\d{2} [0-2][0-3]:[0-5][0-9]:[0-5][0-9]$/",$created))
+		{
+			echo "Invalid format for Created Date!    --- correct format: YYYY-MM-DD HH:II:SS (2010-02-10 16:23:23)";
+			return;
+		}
+		
+		$fromAccountId = $vars["fromAccountId"];
+		$toAccountId = $vars["toAccountId"];
+		$value = str_replace("$","",str_replace(",","",str_replace(" ","",$vars["value"])));
+		$comments = $vars["comments"];
+		
+		$service = new AccountEntryService();
+		$transactionService = new TransactionService();
+		$transaction = $transactionService->get($id);
+		
+		$transaction->setCreated($created);
+		$transaction->setFrom($service->get($fromAccountId));
+		$transaction->setTo($service->get($toAccountId));
+		$transaction->setValue($value);
+		$transaction->setComments($comments);
+		$transactionService->save($transaction);
+		
+		header("Location: /viewTransaction/$id/Saved_Successfully!");
 	}
 }
 ?>

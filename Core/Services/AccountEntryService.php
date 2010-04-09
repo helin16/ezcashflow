@@ -53,7 +53,21 @@ class AccountEntryService extends BaseService
 	{
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
-		$sql->setSQL("select ac.id,ac.name,ac.accountNumber,ac.value,ac.parentId,ac.rootId,
+		$sql->setSQL("select ac.id,ac.name,ac.accountNumber,
+					(
+						if(ac.value='',0,ac.value)
+						+(
+							select if(sum(t.value) is null,0, sum(t.value))
+							from Transaction t 
+							where (t.active =1 and t.toId=ac.id)
+						)
+						-(
+						select if(sum(t.value) is null,0, sum(t.value))
+						from Transaction t 
+						where (t.active =1 and t.fromId=ac.id)
+						) 
+					) 'value',
+					ac.parentId,ac.rootId,
 					FLOOR(CHAR_LENGTH(ac.accountNumber)/4) as noOfSpaces,
 					(select count(acc.id) from AccountEntry acc where acc.parentId = ac.id and acc.active = 1) as countChildren 
 					from AccountEntry ac where ac.active = 1 and ac.rootId = $rootId
@@ -69,7 +83,20 @@ class AccountEntryService extends BaseService
 	{
 		$sql = new SqlStatement();
 		$sql->setDoResults(true);
-		$sql->setSQL("select ac.id,concat(acr.name,' - ', ac.name) as name,ac.value
+		$sql->setSQL("select ac.id,concat(acr.name,' - ', ac.name) as name,
+					(
+						if(ac.value='',0,ac.value)
+						+(
+							select if(sum(t.value) is null,0, sum(t.value))
+							from Transaction t 
+							where (t.active =1 and t.toId=ac.id)
+						)
+						-(
+						select if(sum(t.value) is null,0, sum(t.value))
+						from Transaction t 
+						where (t.active =1 and t.fromId=ac.id)
+						) 
+					) 'value'
 					from AccountEntry ac 
 					inner join AccountEntry acr on (acr.id = ac.rootId and acr.active = 1)
 					where ac.active = 1 
