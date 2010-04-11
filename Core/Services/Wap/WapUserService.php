@@ -147,7 +147,7 @@ class WapUserService
 	{
 		$id = $vars["id"];
 		$created = trim($vars["date"]);
-		if(!preg_match("/^\d{4}-\d{2}-\d{2} [0-2][0-3]:[0-5][0-9]:[0-5][0-9]$/",$created))
+		if(!preg_match("/^\d{4}-\d{2}-\d{2} [0-2][0-9]:[0-5][0-9]:[0-5][0-9]$/",$created))
 		{
 			echo "Invalid format for Created Date!    --- correct format: YYYY-MM-DD HH:II:SS (2010-02-10 16:23:23)";
 			return;
