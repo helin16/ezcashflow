@@ -87,6 +87,19 @@ class WapInterface
 			$diff_month=$income_month-$expense_month;
 			$diff_year=$income_year-$expense_year;
 			
+			$topFiveExpenses = $transactionService->getTopExpenses(4,5);
+			$array = array("name","id","sum");
+			for($i=0;$i<5;$i++)
+			{
+				foreach($array as $a)
+				{
+					$vaName = "_".$i."Ex_$a";
+					${$vaName}="";
+					if(isset($topFiveExpenses[$i]))
+						${$vaName} =$topFiveExpenses[$i][$a];
+				}
+				
+			}
 			return "
 					<table width=\"100%\">
 							<tr>
@@ -158,6 +171,31 @@ class WapInterface
 														<td>$".self::getCurrency($diff_week)."</td>
 														<td>$".self::getCurrency($diff_month)."</td>
 														<td>$".self::getCurrency($diff_year)."</td>
+													</tr>
+												</table>
+										</fieldset>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div style='padding:15px;'>
+										<fieldset>
+											<legend>Top Five Expense</legend>
+												<table width=\"100%\">
+													<tr style='background:#000000;color:#ffffff;height:34px;'>
+														<td width='20%'>$_0Ex_name</td>
+														<td width='20%'>$_1Ex_name</td>
+														<td width='20%'>$_2Ex_name</td>
+														<td width='20%'>$_3Ex_name</td>
+														<td>$_4Ex_name</td>
+													</tr>
+													<tr>
+														<td><a href='/reports/account/".$_0Ex_id."'>$".self::getCurrency($_0Ex_sum)."<a></td>
+														<td><a href='/reports/account/".$_1Ex_id."'>$".self::getCurrency($_1Ex_sum)."<a></td>
+														<td><a href='/reports/account/".$_2Ex_id."'>$".self::getCurrency($_2Ex_sum)."<a></td>
+														<td><a href='/reports/account/".$_3Ex_id."'>$".self::getCurrency($_3Ex_sum)."<a></td>
+														<td><a href='/reports/account/".$_4Ex_id."'>$".self::getCurrency($_4Ex_sum)."<a></td>
 													</tr>
 												</table>
 										</fieldset>

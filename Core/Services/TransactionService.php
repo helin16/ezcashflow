@@ -84,6 +84,30 @@ class TransactionService extends BaseService
 		
 		return $results[0]["sum"];
 	}
+	
+	public function getTopExpenses($rootId=4,$noOfItems=4,$startDate='1790-01-01 00:00:00',$endDate="9999-12-31 23:59:59")
+	{
+		$qry = "select sum(t.value) as sum,acc.name,acc.id
+				from Transaction t 
+				left join AccountEntry acc on (acc.id = t.toId)
+				where t.active = 1
+				and acc.rootId = $rootId 
+				and t.created >='$startDate' and t.created<'$endDate'
+				group by acc.id
+				order by sum desc
+				limit $noOfItems";
+
+		$sql = new SqlStatement();
+		$sql->setDoResults(true);
+		
+		$sql->setSQL($qry);
+		
+		$dao = new Dao();
+		$dao->execute($sql);
+		$results = $sql->getResultSet();
+		
+		return $results;
+	}
 
 }
 ?>
