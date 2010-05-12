@@ -1,6 +1,11 @@
 <?php
-class X_Person_Address extends ProjectEntity 
+class X_Person_Address extends HydraEntity 
 {
+	private $isDefault;
+	
+	protected $person;
+	protected $address;
+	
 	/**
 	 * getter Person
 	 *
@@ -8,7 +13,7 @@ class X_Person_Address extends ProjectEntity
 	 */
 	public function getPerson()
 	{
-		return $this->Person;
+		return $this->person;
 	}
 	
 	/**
@@ -18,7 +23,7 @@ class X_Person_Address extends ProjectEntity
 	 */
 	public function setPerson($Person)
 	{
-		$this->Person = $Person;
+		$this->person = $Person;
 	}
 	
 	/**
@@ -28,7 +33,7 @@ class X_Person_Address extends ProjectEntity
 	 */
 	public function getAddress()
 	{
-		return $this->Address;
+		return $this->address;
 	}
 	
 	/**
@@ -38,7 +43,7 @@ class X_Person_Address extends ProjectEntity
 	 */
 	public function setAddress($Address)
 	{
-		$this->Address = $Address;
+		$this->address = $Address;
 	}
 	
 	/**
@@ -48,7 +53,7 @@ class X_Person_Address extends ProjectEntity
 	 */
 	public function getIsDefault()
 	{
-		return $this->IsDefault;
+		return $this->isDefault;
 	}
 	
 	/**
@@ -58,16 +63,17 @@ class X_Person_Address extends ProjectEntity
 	 */
 	public function setIsDefault($IsDefault)
 	{
-		$this->IsDefault = $IsDefault;
+		$this->isDefault = $IsDefault;
 	}
 	
-	protected function __meta()
+	public function __loadDaoMap()
 	{
-		parent::__meta();
-		Map::setField($this,new TInt('IsDefault',1,1));
+		DaoMap::begin($this, 'xpa');
 		
-		Map::setField($this,new ManyToOne("Person","Person"));
-		Map::setField($this,new ManyToOne("Adress","Adress"));
+		DaoMap::setBoolType('isDefault');
+		DaoMap::setManyToOne("person","Person","p");
+		DaoMap::setManyToOne("adress","Adress","addr");
+		DaoMap::commit();
 	}
 }
 ?>

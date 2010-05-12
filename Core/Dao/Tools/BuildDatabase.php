@@ -76,9 +76,10 @@ else
 		<div Id='creatingTablesPanel' style='width:100%;height:700px;overflow:auto;border:2px solid #eeeeee;'\">
 			<pre>
 		";
-	$dbGen = new SchemaGenerator($path,$server,$database,$username,$password);
-	$dbGen->debug = true;
-	$dbGen->build();
+//	$dbGen = new SchemaGenerator($path,$server,$database,$username,$password);
+	
+	$var = new SchemaGenerator(dirname(__FILE__)."/../../Entity/", array(".svn"));
+	$var->setupDatabase($sampleDataFilePath,true,true);
 	echo "	</pre>";
 	echo "</div>";
 	
@@ -90,7 +91,7 @@ else
 			=================<br />
 			<div Id='importingDataPanel' style='width:100%;height:700px;overflow:auto;border:2px solid #eeeeee;display:none;'\">
 				<pre>";
-		$dbGen->importSql($sampleDataFilePath,false,true);
+//		$dbGen->importSql($sampleDataFilePath,false,true);
 		echo "	</pre>";
 		echo "==downloading data from WWW===<br />";
 		echo "</div>";

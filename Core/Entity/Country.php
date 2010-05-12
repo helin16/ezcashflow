@@ -1,7 +1,10 @@
 <?php
 
-class Country extends ProjectEntity
+class Country extends HydraEntity
 {
+	private $name;
+	protected $states;
+	
 	/**
 	 * getter Name
 	 *
@@ -9,7 +12,7 @@ class Country extends ProjectEntity
 	 */
 	public function getName()
 	{
-		return $this->Name;
+		return $this->name;
 	}
 	
 	/**
@@ -19,7 +22,7 @@ class Country extends ProjectEntity
 	 */
 	public function setName($Name)
 	{
-		$this->Name = $Name;
+		$this->name = $Name;
 	}
 	
 	public function __toString()
@@ -34,7 +37,8 @@ class Country extends ProjectEntity
 	 */
 	public function getStates()
 	{
-		return $this->States;
+		$this->loadOneToMany("states");
+		return $this->states;
 	}
 	
 	/**
@@ -44,16 +48,17 @@ class Country extends ProjectEntity
 	 */
 	public function setStates($States)
 	{
-		$this->States = $States;
+		$this->states = $States;
 	}
 	
-	protected function __meta()
+	public function __loadDaoMap()
 	{
-		parent::__meta();
-
-		Map::setField($this,new TString("Name"));
-		Map::setField($this,new OneToMany("States","State"));
-	}	
+		DaoMap::begin($this, 'c');
+		
+		DaoMap::setStringType('name','varchar');
+		DaoMap::setOneToMany("states","State","st");
+		DaoMap::commit();
+	}
 	
 }
 ?>

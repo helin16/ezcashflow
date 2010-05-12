@@ -1,6 +1,8 @@
 <?php
-class Role extends ProjectEntity 
+class Role extends HydraEntity 
 {
+	private $name;
+	protected $userAccounts;
 	/**
 	 * getter Name
 	 *
@@ -8,7 +10,7 @@ class Role extends ProjectEntity
 	 */
 	public function getName()
 	{
-		return $this->Name;
+		return $this->name;
 	}
 	
 	/**
@@ -18,7 +20,7 @@ class Role extends ProjectEntity
 	 */
 	public function setName($Name)
 	{
-		$this->Name = $Name;
+		$this->name = $Name;
 	}
 	
 	/**
@@ -28,7 +30,7 @@ class Role extends ProjectEntity
 	 */
 	public function getUserAccounts()
 	{
-		return $this->UserAccounts;
+		return $this->userAccounts;
 	}
 	
 	/**
@@ -38,23 +40,22 @@ class Role extends ProjectEntity
 	 */
 	public function setUserAccounts($UserAccounts)
 	{
-		$this->UserAccounts = $UserAccounts;
+		$this->userAccounts = $UserAccounts;
 	}
 	
 	
-	protected function __toString()
+	public function __toString()
 	{
 		return $this->getName();
 	}
 	
-	protected function __meta()
+	public function __loadDaoMap()
 	{
-		parent::__meta();
-
-		Map::setField($this,new TString("Name"));
-		Map::setField($this,new ManyToMany('UserAccounts',"UserAccount","Roles",ManyToMany::RIGHT));
+		DaoMap::begin($this, 'r');
 		
-		Map::setEagerFields($this,array('Role.UserAccounts'));		
+		DaoMap::setStringType('name','varchar');
+		DaoMap::setManyToMany("userAccounts","UserAccount",DaoMap::RIGHT_SIDE,"ua");
+		DaoMap::commit();
 	}
 }
 ?>

@@ -7,7 +7,7 @@ $incpaths = array(
 );
 
 set_include_path(implode(PATH_SEPARATOR, $incpaths));
-class Core
+class SystemCore
 {
 	public static function autoload($className)
 	{
@@ -24,11 +24,14 @@ class Core
 			$base . '/Dao/Tools/lib/',
 			$base . '/Dao/Types/',
 			$base . '/Entity/',
-			$base . '/Entity/Accounting/',
-			$base . '/Services/',
-			$base . '/Services/Wap/',
-			$base . '/Utils/',
+			$base . '/Entity/AssetServer/',
+			$base . '/Entity/Content/',
+			$base . '/Entity/Profiler/',
+			$base . '/Entity/Newsletter/',
+			$base . '/Entity/Banner/',
 			$base . '/Exception/',
+			$base . '/Services/',
+			$base . '/Utils/',
 			$base . '/'
 		);
 		
@@ -48,10 +51,10 @@ class Core
 	}
 }
 
-spl_autoload_register(array('Core','autoload'));
+spl_autoload_register(array('SystemCore','autoload'));
 
 
 // Bootstrap the Prado framework
-//require_once dirname(__FILE__) . '/Framework/prado.php';
+require_once dirname(__FILE__) . '/Framework/prado.php';
 
 ?>

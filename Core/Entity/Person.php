@@ -1,7 +1,10 @@
 <?php
 
-class Person extends ProjectEntity
+class Person extends HydraEntity
 {
+	private $firstName;
+	private $lastName;
+	protected $userAccounts;
 	/**
 	 * getter UserAccount
 	 *
@@ -9,7 +12,7 @@ class Person extends ProjectEntity
 	 */
 	public function getUserAccount()
 	{
-		return $this->UserAccount;
+		return $this->userAccounts;
 	}
 	
 	/**
@@ -19,7 +22,7 @@ class Person extends ProjectEntity
 	 */
 	public function setUserAccount($UserAccount)
 	{
-		$this->UserAccount = $UserAccount;
+		$this->userAccounts = $UserAccount;
 	}
 	
 	/**
@@ -29,7 +32,7 @@ class Person extends ProjectEntity
 	 */
 	public function getFirstName()
 	{
-		return $this->FirstName;
+		return $this->firstName;
 	}
 	
 	/**
@@ -39,7 +42,7 @@ class Person extends ProjectEntity
 	 */
 	public function setFirstName($FirstName)
 	{
-		$this->FirstName = $FirstName;
+		$this->firstName = $FirstName;
 	}
 	
 	/**
@@ -49,7 +52,7 @@ class Person extends ProjectEntity
 	 */
 	public function getLastName()
 	{
-		return $this->LastName;
+		return $this->lastName;
 	}
 	
 	/**
@@ -59,7 +62,7 @@ class Person extends ProjectEntity
 	 */
 	public function setLastName($LastName)
 	{
-		$this->LastName = $LastName;
+		$this->lastName = $LastName;
 	}
 	
 	public function getFullName()
@@ -67,20 +70,20 @@ class Person extends ProjectEntity
 		return $this->getFirstName()." ".$this->getLastName();
 	}
 		
-	protected function __toString()
+	public function __toString()
 	{
 		return $this->getFirstName()." ".$this->getLastName();
 	}
 	
-	protected function __meta()
+	public function __loadDaoMap()
 	{
-		parent::__meta();
-
-		Map::setField($this,new TString("FirstName"));
-		Map::setField($this,new TString("LastName"));
+		DaoMap::begin($this, 'r');
 		
-		Map::setField($this,new OneToOne("UserAccount","UserAccount","Person"));
-	}	
+		DaoMap::setStringType('firstName');
+		DaoMap::setStringType('lastName');
+		DaoMap::setOneToMany("userAccounts","UserAccount","ua");
+		DaoMap::commit();
+	}
 }
 
 ?>

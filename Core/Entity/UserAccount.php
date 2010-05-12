@@ -1,7 +1,13 @@
 <?php
 
-class UserAccount extends ProjectEntity 
+class UserAccount extends HydraEntity 
 {
+	private $userName;
+	private $password;
+	
+	protected $person;
+	protected $roles;
+	
 	/**
 	 * getter UserName
 	 *
@@ -9,7 +15,7 @@ class UserAccount extends ProjectEntity
 	 */
 	public function getUserName()
 	{
-		return $this->UserName;
+		return $this->userName;
 	}
 	
 	/**
@@ -19,7 +25,7 @@ class UserAccount extends ProjectEntity
 	 */
 	public function setUserName($UserName)
 	{
-		$this->UserName = $UserName;
+		$this->userName = $UserName;
 	}
 	
 	/**
@@ -29,7 +35,7 @@ class UserAccount extends ProjectEntity
 	 */
 	public function getPassword()
 	{
-		return $this->Password;
+		return $this->password;
 	}
 	
 	/**
@@ -39,7 +45,7 @@ class UserAccount extends ProjectEntity
 	 */
 	public function setPassword($Password)
 	{
-		$this->Password = $Password;
+		$this->password = $Password;
 	}
 	
 	/**
@@ -49,7 +55,8 @@ class UserAccount extends ProjectEntity
 	 */
 	public function getPerson()
 	{
-		return $this->Person;
+		$this->loadManyToOne("person");
+		return $this->person;
 	}
 	
 	/**
@@ -59,7 +66,7 @@ class UserAccount extends ProjectEntity
 	 */
 	public function setPerson($Person)
 	{
-		$this->Person = $Person;
+		$this->person = $Person;
 	}
 	
 	/**
@@ -69,7 +76,8 @@ class UserAccount extends ProjectEntity
 	 */
 	public function getRoles()
 	{
-		return $this->Roles;
+		$this->loadManyToMany("roles");
+		return $this->roles;
 	}
 	
 	/**
@@ -79,25 +87,25 @@ class UserAccount extends ProjectEntity
 	 */
 	public function setRoles($Roles)
 	{
-		$this->Roles = $Roles;
+		$this->roles = $Roles;
 	}
 	
-	protected function __toString()
+	public function __toString()
 	{
 		return $this->getUserName();
 	}
 		
-	protected function __meta()
-	{
-		parent::__meta();
 
-		Map::setField($this,new TString("UserName"));
-		Map::setField($this,new TString("Password",255));
-		Map::setField($this,new OneToOneOwner('Person',"Person"));
-		Map::setField($this,new ManyToMany("Roles","Role","UserAccounts"));
+	public function __loadDaoMap()
+	{
+		DaoMap::begin($this, 'ua');
 		
-		Map::setEagerFields($this,array('UserAccount.Person'));		
-	}		
+		DaoMap::setStringType('userName','varchar',256);
+		DaoMap::setStringType('password','varchar',256);
+		DaoMap::setOneToOne("person","Person",true,"p");
+		DaoMap::setManyToMany("roles","Role",DaoMap::LEFT_SIDE,"r",false);
+		DaoMap::commit();
+	}
 	
 }
 

@@ -1,7 +1,20 @@
 <?php
 
-class Address extends ProjectEntity
+class Address extends HydraEntity
 {
+	private $line1;
+	private $line2;
+	private $suburb;
+	private $postCode;
+	/**
+	 * @var State
+	 */
+	protected $state;
+	/**
+	 * @var Country
+	 */
+	protected $country;
+	
 	/**
 	 * getter Line1
 	 *
@@ -9,7 +22,7 @@ class Address extends ProjectEntity
 	 */
 	public function getLine1()
 	{
-		return $this->Line1;
+		return $this->line1;
 	}
 	
 	/**
@@ -19,7 +32,7 @@ class Address extends ProjectEntity
 	 */
 	public function setLine1($Line1)
 	{
-		$this->Line1 = $Line1;
+		$this->line1 = $Line1;
 	}	
 	
 	/**
@@ -29,7 +42,7 @@ class Address extends ProjectEntity
 	 */
 	public function getLine2()
 	{
-		return $this->Line2;
+		return $this->line2;
 	}
 	
 	/**
@@ -39,7 +52,7 @@ class Address extends ProjectEntity
 	 */
 	public function setLine2($Line2)
 	{
-		$this->Line2 = $Line2;
+		$this->line2 = $Line2;
 	}
 	
 	/**
@@ -49,7 +62,7 @@ class Address extends ProjectEntity
 	 */
 	public function getSuburb()
 	{
-		return $this->Suburb;
+		return $this->suburb;
 	}
 	
 	/**
@@ -59,7 +72,7 @@ class Address extends ProjectEntity
 	 */
 	public function setSuburb($Suburb)
 	{
-		$this->Suburb = $Suburb;
+		$this->suburb = $Suburb;
 	}
 
 	/**
@@ -69,7 +82,8 @@ class Address extends ProjectEntity
 	 */
 	public function getState()
 	{
-		return $this->State;
+		$this->loadManyToOne("state");
+		return $this->state;
 	}
 	
 	/**
@@ -79,7 +93,7 @@ class Address extends ProjectEntity
 	 */
 	public function setState($State)
 	{
-		$this->State = $State;
+		$this->state = $State;
 	}
 	
 	/**
@@ -89,7 +103,8 @@ class Address extends ProjectEntity
 	 */
 	public function getCountry()
 	{
-		return $this->Country;
+		$this->loadManyToOne("country");
+		return $this->country;
 	}
 	
 	/**
@@ -99,7 +114,7 @@ class Address extends ProjectEntity
 	 */
 	public function setCountry($Country)
 	{
-		$this->Country = $Country;
+		$this->country = $Country;
 	}
 		
 	/**
@@ -109,7 +124,7 @@ class Address extends ProjectEntity
 	 */
 	public function getPostCode()
 	{
-		return $this->PostCode;
+		return $this->postCode;
 	}
 	
 	/**
@@ -119,25 +134,27 @@ class Address extends ProjectEntity
 	 */
 	public function setPostCode($PostCode)
 	{
-		$this->PostCode = $PostCode;
+		$this->postCode = $PostCode;
 	}
 	
 	public function __toString()
 	{
-		return $this->getLine1()." ".$this->getLine2()." ".$this->getSuburb()." ".$this->getState()." ".$this->getCountry()." ".$this->getPostCode();
+		$line = trim($this->getLine1()." ".$this->getLine2());
+		return ($line==""? "" : ", ").$this->getSuburb().", ".$this->getState().", ".$this->getCountry()." ".$this->getPostCode();
 	}
 	
-	protected function __meta()
+	public function __loadDaoMap()
 	{
-		parent::__meta();
-
-		Map::setField($this,new TString("Line1"));
-		Map::setField($this,new TString("Line2"));
-		Map::setField($this,new TString("Suburb"));
-		Map::setField($this,new TString("PostCode"));
-		Map::setField($this,new ManyToOne("State","State"));
-		Map::setField($this,new ManyToOne("Country","Country"));
-	}	
+		DaoMap::begin($this, 'addr');
+		
+		DaoMap::setStringType('line1','varchar',255);
+		DaoMap::setStringType('line2','varchar');
+		DaoMap::setStringType('suburb','varchar');
+		DaoMap::setStringType('postCode','varchar');
+		DaoMap::setManyToOne("state","State","st");
+		DaoMap::setManyToOne("country","Country","con");
+		DaoMap::commit();
+	}
 }
 
 ?>
