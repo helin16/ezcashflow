@@ -46,7 +46,7 @@
 			</div>
 		</com:TPanel>
 		<com:TPanel ID="welcomePanel">
-			<%[welcome]%>, <com:TLabel ID="user" /> !
+			Welcome, <com:TLabel ID="user" /> !<br />
 		</com:TPanel>
 	</div>
 </com:TContent>

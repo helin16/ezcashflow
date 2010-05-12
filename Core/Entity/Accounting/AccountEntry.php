@@ -1,7 +1,15 @@
 <?php
 
-class AccountEntry extends ProjectEntity
+class AccountEntry extends HydraEntity
 {
+	private $name;
+	private $accountNumber;
+	private $comments;
+	private $value;
+	
+	protected $root;
+	protected $parent;
+	
 	/**
 	 * getter name
 	 *
@@ -129,17 +137,20 @@ class AccountEntry extends ProjectEntity
 		return $this->getName();
 	}
 	
-	protected function __meta()
+	public function __loadDaoMap()
 	{
-		parent::__meta();
-
-		Map::setField($this,new TString("name"));
-		Map::setField($this,new TInt("accountNumber",41));
-		Map::setField($this,new TString("comments",64000));
-		Map::setField($this,new TString("value"));
-		Map::setField($this,new ManyToOne("parent","AccountEntry",true));
-		Map::setField($this,new ManyToOne("root","AccountEntry",true));
-	}	
+		DaoMap::begin($this, 'etr');
+		
+		DaoMap::setStringType('name','varchar',255);
+		DaoMap::setIntType("accountNumber","int",41);
+		DaoMap::setStringType('comments','varchar',255);
+		DaoMap::setStringType('value','varchar');
+		
+		DaoMap::setManyToOne("parent","AccountEntry","petr");
+		DaoMap::setManyToOne("root","AccountEntry","petrr");
+		
+		DaoMap::commit();
+	}
 }
 
 ?>

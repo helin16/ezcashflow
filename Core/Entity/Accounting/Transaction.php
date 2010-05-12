@@ -1,6 +1,12 @@
 <?php
-class Transaction extends ProjectEntity 
+class Transaction extends HydraEntity 
 {
+	private $value;
+	private $comments;
+	protected $from;
+	protected $to;
+	
+	
 	/**
 	 * getter value
 	 *
@@ -81,14 +87,17 @@ class Transaction extends ProjectEntity
 	}
 	
 	
-	protected function __meta()
+	public function __loadDaoMap()
 	{
-		parent::__meta();
-
-		Map::setField($this,new TString("value"));
-		Map::setField($this,new ManyToOne("from","AccountEntry",true));
-		Map::setField($this,new ManyToOne("to","AccountEntry"));
-		Map::setField($this,new TString("comments",6400));
-	}	
+		DaoMap::begin($this, 'trans');
+		
+		DaoMap::setStringType('value');
+		DaoMap::setStringType('comments','varchar',6400);
+		
+		DaoMap::setManyToOne("from","AccountEntry","from");
+		DaoMap::setManyToOne("to","AccountEntry","to");
+		
+		DaoMap::commit();
+	}
 }
 ?>
