@@ -10,9 +10,9 @@ class Web
 	public static function autoload($className)
 	{
 		$autoloadPaths = array(
-			dirname(__FILE__) . '/Services/',
-			dirname(__FILE__) . '/Interface/',
-			dirname(__FILE__) . '/'
+			dirname(__FILE__) . '/protected/',
+			dirname(__FILE__) . '/protected/classes/',
+			dirname(__FILE__) . '/protected/pages/ContentLoader/'
 				);
 		
 		$found = false;

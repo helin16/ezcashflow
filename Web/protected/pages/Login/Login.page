@@ -1,0 +1,52 @@
+<com:TContent ID="MainContent">
+	<div class="bodyWrapper">
+		<com:TPanel ID="loginForm" DefaultButton="loginBtn">
+			<div style="width:100%;">
+			<center>
+				<div style="text-align:left;width:400px;border:10px solid #888888;">
+					<h3 style="margin:0px;">Please Login:</h3>
+					<table width="100%">
+						<tr>
+							<td colspan="2">
+								<com:TLabel ID="errorMessage" ForeColor="#ff0000"/>
+							</td>
+						</tr>
+						<tr valign="top">
+							<td><%[username]%>:</td>
+							<td>
+								<com:TTextBox ID="username" ValidationGroup="Group1"/>
+								<com:TRequiredFieldValidator
+								    ControlToValidate="username"
+								    ErrorMessage="<%[username]%>"
+								    ValidationGroup="Group1"
+								    Display="Dynamic" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<td><%[password]%>:</td>
+							<td>
+								<com:TTextBox ID="password" TextMode="Password" ValidationGroup="Group1"/>
+								<com:TRequiredFieldValidator
+									    ControlToValidate="password"
+									    ValidationGroup="Group1"
+									    ErrorMessage="Your entered an invalid password."
+									    Display="Dynamic"
+									    />
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>
+								<com:TButton ID="loginBtn" Text="Login" OnClick="validateUser" ValidationGroup="Group1"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</center>
+			</div>
+		</com:TPanel>
+		<com:TPanel ID="welcomePanel">
+			<%[welcome]%>, <com:TLabel ID="user" /> !
+		</com:TPanel>
+	</div>
+</com:TContent>

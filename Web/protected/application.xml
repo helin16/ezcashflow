@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<application id="KangTianProperty" mode="Normal">
+  <!-- alias definitions and namespace usings
+  <paths>
+    <alias id="myalias" path="./lib" />
+    <using namespace="Application.common.*" />
+  </paths>
+  -->
+
+	<paths>
+	    <using namespace="System.I18N.*" />
+	    <using namespace="System.Web.UI.ActiveControls.*" />
+	</paths>
+
+	<!-- configurations for modules -->
+	<modules>
+		<module id="security" class="TSecurityManager" EncryptionKey="KangTianPropertyCool" ValidationKey="KangTianPropertyCool" />
+		
+		<module id="request" class="THttpRequest" UrlManager="friendly-url" />
+		<module id="friendly-url" class="System.Web.TUrlMapping" EnableCustomUrl="true" UrlPrefix="/">	
+		
+			<url ServiceParameter="Login.Login" pattern="login.html" />
+		
+			<url ServiceParameter="FileLoader.FileLoaderController" pattern="asset/{assetId}/{param}" parameters.assetId="\w+"  parameters.param=".+" />
+			
+		</module>
+	
+		<module id="globalization" class="TGlobalization">
+		    <translation type="XLIFF"
+		        source="Application.messages"
+		        marker="@@"
+		        autosave="true" cache="true" />
+		</module>
+	</modules>
+
+	<!-- configuration for available services -->
+	<services>
+		<service id="page" class="TPageService" DefaultPage="Home">
+			<modules>
+			  <module id="auth" class="System.Security.TAuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.Login" AuthExpire="3600"/>
+			  <module id="users" class="Application.classes.WebUser.WebUserManager"/>
+			</modules>
+		</service>
+	</services>
+	<!-- application parameters -->
+	<parameters>
+	  <parameter id="AppTitle" value="Australian Realty Group (ARG)" />
+	  <parameter id="AppVersion" value="3.0.1"/>
+	</parameters>
+
+</application>
