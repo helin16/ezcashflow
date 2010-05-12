@@ -34,6 +34,7 @@ class Transaction extends HydraEntity
 	 */
 	public function getFrom()
 	{
+		$this->loadManyToOne("from");
 		return $this->from;
 	}
 	
@@ -54,6 +55,7 @@ class Transaction extends HydraEntity
 	 */
 	public function getTo()
 	{
+		$this->loadManyToOne("to");
 		return $this->to;
 	}
 	
@@ -94,7 +96,7 @@ class Transaction extends HydraEntity
 		DaoMap::setStringType('value');
 		DaoMap::setStringType('comments','varchar',6400);
 		
-		DaoMap::setManyToOne("from","AccountEntry","from");
+		DaoMap::setManyToOne("from","AccountEntry","from",true);
 		DaoMap::setManyToOne("to","AccountEntry","to");
 		
 		DaoMap::commit();

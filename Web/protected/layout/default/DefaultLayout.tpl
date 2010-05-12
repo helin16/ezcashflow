@@ -9,12 +9,12 @@
 	<meta name="keywords" content="Real,Estate,for,sale,Australia,property,real estate,for sale by owner,real estate online,Australian real estate,Property,real estate,For sale by owner,real estate in Australia,No commission,Sydney real estate,real estate in Sydney,Melbourne real estate,real estate in Melbourne,Australia Realty,Brisbane real estate,real estate in Brisbane,Adelaide real estate,real estate in Adelaide,Perth real estate,real estate for sale by owner,property,for sale by owner,real estate in Perth,Hobart real estate,real estate in Hobart,Gold coast real estate,real estate Gold Coast,real estate for sale by owner,Newcastle real estate,real estate in Newcastle,Northern Territory real estate,for sale by owner,real estate in Northern Territory,www.australiarealty.com,victoria real estate,queensland real estate, wa real estate,tasmania real estate,sa real estate,for sale by owner,www.australiarealty.com,www.australiarealty.com.au,victoria real estate,queensland real estate,real estate for sale by owner,farms for sale,properties for sale,australian properties for sale,sydney real estate,brisbane real estate, melbourne real estate,brisbane property, melbourne property,sydney property, real estate for sale,australian real estate">
 </com:THead>
 <body>
-	<center>
-		<com:TForm>
-			<div>
-				<com:TContentPlaceHolder ID="MainContent" />
-			</div>
-		</com:TForm>
-	<center>
+	<com:TForm>
+		<div>
+			<com:TActiveLabel Id="InfoMsg" ForeColor="green" />
+			<com:TActiveLabel Id="ErrorMsg" ForeColor="red" />
+			<com:TContentPlaceHolder ID="MainContent" />
+		</div>
+	</com:TForm>
 </body>
 </html>

@@ -32,7 +32,7 @@ class Home extends EshopPage
     	{
 			if($authManager->login($this->username->Text, $this->password->Text))
 			{
-				$this->Response->redirect('/admin/');
+				$this->Response->redirect('/');
 			}
     	}
     	catch(AuthenticationException $ex)

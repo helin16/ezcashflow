@@ -97,6 +97,7 @@ class AccountEntry extends HydraEntity
 	 */
 	public function getParent()
 	{
+		$this->loadManyToOne("parent");
 		return $this->parent;
 	}
 	
@@ -117,6 +118,7 @@ class AccountEntry extends HydraEntity
 	 */
 	public function getRoot()
 	{
+		$this->loadManyToOne("root");
 		return $this->root;
 	}
 	
@@ -146,7 +148,7 @@ class AccountEntry extends HydraEntity
 		DaoMap::setStringType('comments','varchar',255);
 		DaoMap::setStringType('value','varchar');
 		
-		DaoMap::setManyToOne("parent","AccountEntry","petr");
+		DaoMap::setManyToOne("parent","AccountEntry","petr",null,true);
 		DaoMap::setManyToOne("root","AccountEntry","petrr");
 		
 		DaoMap::commit();
