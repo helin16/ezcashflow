@@ -13,7 +13,10 @@
 		<div>
 			<com:TActiveLabel Id="InfoMsg" ForeColor="green" />
 			<com:TActiveLabel Id="ErrorMsg" ForeColor="red" />
+			<com:TLabel ID="user" /><br />
+			<com:Application.controls.Menu.Menu Id="topMenu"/>
 			<com:TContentPlaceHolder ID="MainContent" />
+			<com:Application.controls.Menu.Menu Id="bottomMenu" />
 		</div>
 	</com:TForm>
 </body>

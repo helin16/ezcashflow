@@ -7,14 +7,12 @@ class Home extends EshopPage
 		{
 			$this->loginForm->Visible=true;
 			$this->welcomePanel->Visible=false;
-			$this->user->Text="";
 			$this->username->focus();
 		}
 		else
 		{
 			$this->loginForm->Visible=false;
 			$this->welcomePanel->Visible=true;
-			$this->user->Text = Core::getUser()->getPerson()->getFullName();
 		}
 	}
 	

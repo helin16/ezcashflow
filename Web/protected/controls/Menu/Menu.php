@@ -22,7 +22,9 @@ class Menu extends TTemplateControl
 	{
 		$auth = $this->Application->Modules['auth'];
 
-		try{$auth->logout();}
+		try{
+			$auth->logout();
+		}
 		catch(Exception $ex){}
 		
 	   	$this->Response->Redirect("/");

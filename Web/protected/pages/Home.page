@@ -46,9 +46,6 @@
 			</div>
 		</com:TPanel>
 		<com:TPanel ID="welcomePanel">
-			Welcome, <com:TLabel ID="user" /> !<br />
-			<com:Application.controls.Menu.Menu Id="topMenu" />
-			<br />
 				<com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" 
 						GroupingText="Expense" 
 						FromAccountRootIds="1,2" 
@@ -67,8 +64,6 @@
 						FromAccountRootIds="1,2" 
 						ToAccountRootIds="2,1"
 						/>
-			<br />
-			<com:Application.controls.Menu.Menu Id="bottomMenu" />
 		</com:TPanel>
 	</div>
 </com:TContent>
