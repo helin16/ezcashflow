@@ -1,163 +1,488 @@
 <?php
 
-class GenericDao
+/**
+ * Generic DAO
+ *
+ * @package Core
+ * @subpackage Dao
+ */
+class GenericDAO
 {
-	protected static $dao = null;
-	protected $entityName = "";
-	protected $entity = null;
-	
-	protected $totalRows = 0;
-	
-	public function __construct($entity)
-	{
-		$this->setEntity($entity);
-	}
+	/**
+	 * The DaoQuery being queried by the Dao
+	 *
+	 * @var DaoQuery
+	 */
+	private $query;
 	
 	/**
-	 * getter entity
+	 * Temporary copy of the original DaoQuery
 	 *
-	 * @return String
+	 * @var DaoQuery
 	 */
-	public function getEntity()
-	{
-		return $this->entity;
-	}
+	private $tmpQuery;
+
+	/**
+	 * Last id inserted into this table
+	 *
+	 * @var int
+	 */
+	private $lastId = -1;
+
+	/**
+	 * Number of rows that were changed by the last query
+	 *
+	 * @var int
+	 */
+	private $affectedRows = -1;
+
+	/**
+	 * Total number of rows that would have been returned in a non paged query
+	 *
+	 * @var int
+	 */
+	private $totalRows = -1;
 	
 	/**
-	 * Setter entity
+	 * Total pages in the last paged query
 	 *
-	 * @param String entity
+	 * @var int
 	 */
-	public function setEntity($entity)
+	private $totalPages = -1;
+	
+	/**
+	 * Page size used in the last paged query
+	 *
+	 * @var int
+	 */
+	private $pageSize = 30;
+	
+	/**
+	 * Page number requested in the last paged query
+	 *
+	 * @var unknown_type
+	 */
+	private $pageNumber = -1;
+	
+	/**
+	 * @param string $namespace
+	 */
+	public function __construct($entityClassName)
 	{
-		if($this->entity instanceof Entity)
-		{
-			$this->entity = $entity;
-			$this->entityName = get_class($entity);
-		} else {
-			$this->entity = new $entity();
-			$this->entityName = $entity;
-		}
+		$this->tmpQuery = new DaoQuery($entityClassName);
+		$this->resetQuery();
 	}
 
 	/**
-	 * Get The shared Dao
+	 * Return the internal DaoQuery instance
 	 *
-	 * @return Dao
+	 * @return DaoQuery
 	 */
-	private function getDao()
+	public function getQuery()
 	{
-		if(self::$dao == null)
-		{
-			self::$dao = new Dao();
-		}
-		return self::$dao;
+		return $this->query;
+	}
+	
+	/**
+	 * Replace the internal DaoQuery
+	 *
+	 * @param DaoQuery $query
+	 */
+	public function setQuery(DaoQuery $query)
+	{
+		$this->query = $query;
+	}
+	
+	/**
+	 * Start a database transaction
+	 */
+	public static function beginTransaction()
+	{
+		Dao::beginTransaction();
 	}
 
-	protected function setTotalRows()
+	/**
+	 * Commit a transaction
+	 */
+	public static function commitTransaction()
 	{
-		$this->totalRows = $this->getDao()->getTotalRows();
+		Dao::commitTransaction();
+	}
+
+	/**
+	 * Rollback a transaction
+	 */
+	public static function rollbackTransaction()
+	{
+		Dao::rollbackTransaction();
 	}
 	
-	public function save(Entity $entity)
+	/**
+	 * Save an entity
+	 *
+	 * @param IHydraEntity $entity
+	 */
+	public function save(HydraEntity $entity)
 	{
-		if($entity->getId() == null)
+		if (is_array($messages = $entity->validateAll()))
 		{
-			$sql = new Insert($entity);
-			$this->getDao()->execute($sql);
-			return $entity;
-		} else {
-			$sql = new Update($entity);
-			$this->getDao()->execute($sql);
-			return $entity;			
+			throw new HydraEntityValidationException($messages);
 		}
+		
+		if (is_null($entity->getId()))
+		{
+			$this->lastId = Dao::save($entity);
+			$this->affectedRows = 1;
+			$retVal = $this->lastId;
+		}
+		else
+		{
+			$this->affectedRows = Dao::save($entity);
+			$this->lastId = -1;
+			$retVal = $this->affectedRows;
+		}
+		
+		$this->resetQuery();
 	}
-	
-	public function findAll($page = null,$pagesize = 30,$searchActiveOnly=true,$orderBy=array("names"=>"","direction"=>"asc"))
-	{
-		$sql = new Select($this->entity,$page,$pagesize,$searchActiveOnly);
-		if(isset($orderBy["names"]) && $orderBy["names"]!="")
-			$sql->orderBy($orderBy["names"],$orderBy["direction"]);
-		$this->getDao()->execute($sql);
-		$this->setTotalRows();
-		return $sql->getResultSet();
-	}
-	
-	protected function isInteger($input)
-	{
-    	return(ctype_digit(strval($input)));
-	}
-	
+
+	/**
+	 * Get a single instance of an entity by its database record id
+	 *
+	 * @param int $id
+	 * @return IHydraEntity
+	 */
 	public function findById($id)
 	{
-		
-		if(!$this->isInteger($id))
-			throw new Exception("Trying to find id of non-int");
-		
-		$sql = new Select($this->entity);
-		$sql->setWhere($this->entity->getMetaAlias().".id = $id");
-		$this->getDao()->execute($sql);
-		
-		$results = $sql->getResultSet();
-		$size = sizeof($results);
-		
-		if($size == 0)
-			return null;
-		else if($size == 1)
-			return $results[0];
-		else
-			throw new Exception("FindById: Found multiple($size) enties for ".get_class($this->entity)."@$id");
-	}
-	
-	public function findByCriteria($where,$page = null,$pagesize = 30,$searchActiveOnly=true,$orderBy=array("names"=>"","direction"=>"asc"))
-	{
-		$sql = new Select($this->entity,$page,$pagesize,$searchActiveOnly);
-		$sql->setWhere($where);
-		if(isset($orderBy["names"]) && $orderBy["names"]!="")
-			$sql->orderBy($orderBy["names"],$orderBy["direction"]);
-		$this->getDao()->execute($sql);
-		$this->setTotalRows();
-		return $sql->getResultSet();		
-	}
-	
-	public function search($target,$page = null,$pagesize = 30,$searchActiveOnly=true,$orderBy=array("names"=>"","direction"=>"asc"))
-	{
-		$sql = new Select($this->entity,$page,$pagesize,$searchActiveOnly);
-		$sql->search($target);
-		if(isset($orderBy["names"]) && $orderBy["names"]!="")
-			$sql->orderBy($orderBy["names"],$orderBy["direction"]);
-		$this->getDao()->execute($sql);
-		$this->setTotalRows();
-		return $sql->getResultSet();
-	}
-	
-	public function activate(Entity $entity)
-	{
-		$entity->setActive(1);
-		$this->save($entity);
-	}
-	
-	public function deactivate(Entity $entity)
-	{
-		$entity->setActive(0);
-		$this->save($entity);		
-	}
-	
-	public function executeStatement(BaseStatement $sql)
-	{
-		$this->getDao()->execute($sql);
-		$this->setTotalRows();
-		return $sql->getResultSet();		
+		HydraEntity::$keepLogs = false;
+		$results = Dao::findById($this->query, $id);
+		$this->resetQuery();
+		HydraEntity::$keepLogs = true;
+		return $results;
 	}
 
 	/**
-	 * getter TotalRows
+	 * Get a set of results that match a particular where clause
+	 *
+	 * @param string $criteria
+	 * @param array[]mixed $params
+ 	 * @param array[] $orderByParamsArray[Entity.Field] = 'direction' 
+	 * @return array(HydraEntity)
+	 */
+	public function findByCriteria($criteria, array $params=array(), $pageNumber=null, $pageSize=30, array $orderByParams=array())
+	{
+		HydraEntity::$keepLogs = false;
+		if (!is_null($pageNumber))
+		{
+			$this->query->getPage($pageNumber, $pageSize);
+		}
+		
+		$results = Dao::findByCriteria($this->query, $criteria, $params, $orderByParams);
+		$this->totalRows = Dao::getTotalRows();
+		$this->resetQuery();
+		HydraEntity::$keepLogs = true;
+		
+		return $results;
+	}
+
+	/**
+	 * Alias for GenericDAO::deactivate()
+	 *
+	 * @param HydraEntity $entity
+	 */
+	public function delete(HydraEntity $entity)
+	{
+		return $this->deactivate($entity);
+	}
+	
+	/**
+	 * Deactivate an entity instance
+	 *
+	 * @param HydraEntity $entity
+	 */
+	public function deactivate(HydraEntity $entity)
+	{
+		$this->affectedRows = Dao::deactivate($entity);
+		$this->lastId = -1;
+		$this->resetQuery();
+		
+		return $this->affectedRows;
+	}
+	
+	/**
+	 * Activate an entity instance
+	 *
+	 * @param HydraEntity $entity
+	 */
+	public function activate(HydraEntity $entity)
+	{
+		$this->affectedRows = Dao::activate($entity);
+		$this->lastId = -1;
+		$this->resetQuery();
+		
+		return $this->affectedRows;
+	}
+	
+	/**
+	 * Get a paged list of entities of a particular type
+	 *
+	 * @param int optional $pageNumber
+	 * @param int optional $pageSize 
+	 * @return array(HydraEntity)
+	 */
+	public function findAll($pageNumber=null, $pageSize=30)
+	{
+		HydraEntity::$keepLogs = false;
+		if (!is_null($pageNumber))
+		{
+			$this->query->getPage($pageNumber, $pageSize);
+		}
+		
+		$results = Dao::findAll($this->query);
+		$this->totalRows = Dao::getTotalRows();
+		$this->resetQuery();
+		HydraEntity::$keepLogs = true;
+		return $results;
+	}
+	
+	/**
+	 * Get all entities matching the search query
+	 *
+	 * @param string $searchQuery Boolean search string (eg. +apple -banana)
+	 * @param int optional $pageNumber
+	 * @param int optional $pageSize 
+	 * @return array(IHydraEntity)
+	 */
+	public function findBySearchString($searchString, $pageNumber=null, $pageSize=30,$doRLike=true)
+	{
+		HydraEntity::$keepLogs = false;
+		
+		if($searchString == '' && $doRLike)
+		{
+			$doRLike = false;
+		}
+		
+		if(is_null($pageNumber))
+		{
+			$pageNumber = 1;
+			$pageSize = 100;
+		}
+		$this->query->getPage($pageNumber, $pageSize);
+		
+		$results = Dao::search($this->query, $searchString,null,$doRLike);
+		$this->resetQuery();
+		HydraEntity::$keepLogs = true;
+		
+		return $results;
+	}
+
+	/**
+	 * Get total rows in a paginated query
 	 *
 	 * @return int
 	 */
 	public function getTotalRows()
 	{
 		return $this->totalRows;
+	}
+	
+	/**
+	 * Get the total number of pages available in the last paged query
+	 *
+	 * @return int
+	 */
+	public function getTotalPages()
+	{
+		return $this->totalPages;
+	}
+	
+	/**
+	 * Get the page number retrieved in the last paged query
+	 *
+	 * @return int
+	 */
+	public function getPageNumber()
+	{
+		return $this->pageNumber;
+	}
+	
+	/**
+	 * Get the page size used in the last paged query
+	 *
+	 * @return int
+	 */
+	public function getPageSize()
+	{
+		return $this->pageSize;
+	}
+	
+	/**
+	 * Last id inserted into this table
+	 *
+	 * @return int
+	 */
+	public function getLastId()
+	{
+		return $this->lastId;
+	}
+
+	/**
+	 * Number of rows that were changed by the last query
+	 *
+	 * @return int
+	 */
+	public function getAffectedRows()
+	{
+		return $this->affectedRows;
+	}
+
+	/**
+	 * Set the last id inserted value
+	 *
+	 * @param int id
+	 * @return void
+	 */
+	public function setLastId($id)
+	{
+		$this->lastId = $id;
+	}
+
+	/**
+	 * Set the number of rows that were changed by the last query
+	 *
+	 * @param int Number of rows
+	 * @return void
+	 */
+	public function setAffectedRows($numRows)
+	{
+		$this->affectedRows = $numRows;
+	}
+
+	/**
+	 * Add a join table record for many to many relationship
+	 *
+	 * @param HydraEntity $leftEntity
+	 * @param HydraEntity $rightEntity
+	 */
+	public function saveManyToManyJoin(HydraEntity $leftEntity, HydraEntity $rightEntity)
+	{
+		// Check if the left and right entities are the correct way around
+		$leftEntity->__loadDaoMap();
+		$rightEntity->__loadDaoMap();
+		
+		$leftClass = get_class($leftEntity);
+		$rightClass = get_class($rightEntity);
+		
+		$found = false;
+		foreach (DaoMap::$map[strtolower($leftClass)] as $field => $properties)
+		{
+			if (isset($properties['rel']) and $properties['rel'] == DaoMap::MANY_TO_MANY)
+			{
+				if ($properties['class'] == $rightClass)
+				{
+					if ($properties['side'] == DaoMap::LEFT_SIDE)
+					{
+						// Swap them around the right way
+						$tmp = $rightEntity;
+						$rightEntity = $leftEntity;
+						$leftEntity = $tmp;
+						$leftClass = get_class($leftEntity);
+						$rightClass = get_class($rightEntity);
+					}
+					
+					$found = true;
+				}
+			}
+		}
+		
+		if (!$found)
+		{
+			throw new HydraDaoException('Many-to-many relationship not found');
+		}
+
+		$sql = sprintf('insert into %s_%s (%sId, %sId, createdById) values (?, ?, ?)',
+			strtolower($leftClass),
+			strtolower($rightClass),
+			strtolower(substr($leftClass, 0, 1)) . substr($leftClass, 1),
+			strtolower(substr($rightClass, 0, 1)) . substr($rightClass, 1));
+			
+		if (Dao::execSql($sql, array($leftEntity->getId(), $rightEntity->getId(), Core::getUser()->getId())))
+		{
+			$this->affectedRows = 0;
+		}
+		else
+		{
+			$this->affectedRows = 1;
+		}
+		
+		$this->resetQuery();
+	}
+
+	/**
+	 * Remove a join table record for many to many relationship
+	 *
+	 * @param HydraEntity $leftEntity
+	 * @param HydraEntity $rightEntity
+	 */
+	public function deleteManyToManyJoin(HydraEntity $leftEntity, HydraEntity $rightEntity)
+	{
+		// Check if the left and right entities are the correct way around
+		$leftEntity->__loadDaoMap();
+		$rightEntity->__loadDaoMap();
+		
+		$leftClass = get_class($leftEntity);
+		$rightClass = get_class($rightEntity);
+		
+		$found = false;
+		foreach (DaoMap::$map[strtolower($leftClass)] as $field => $properties)
+		{
+			if (isset($properties['rel']) and $properties['rel'] == DaoMap::MANY_TO_MANY)
+			{
+				if ($properties['class'] == $rightClass)
+				{
+					if ($properties['side'] == DaoMap::LEFT_SIDE)
+					{
+						// Swap them around the right way
+						$tmp = $rightEntity;
+						$rightEntity = $leftEntity;
+						$leftEntity = $tmp;
+						$leftClass = get_class($leftEntity);
+						$rightClass = get_class($rightEntity);
+					}
+					
+					$found = true;
+				}
+			}
+		}
+		
+		if (!$found)
+		{
+			throw new HydraDaoException('Many-to-many relationship not found');
+		}
+
+		$sql = sprintf('delete from %s_%s where %sId=? and %sId=?',
+			strtolower($leftClass),
+			strtolower($rightClass),
+			strtolower(substr($leftClass, 0, 1)) . substr($leftClass, 1),
+			strtolower(substr($rightClass, 0, 1)) . substr($rightClass, 1));
+			
+		if (Dao::execSql($sql, array($leftEntity->getId(), $rightEntity->getId())))
+		{
+			$this->affectedRows = 0;
+		}
+		else
+		{
+			$this->affectedRows = 1;
+		}
+		
+		$this->resetQuery();
+	}
+
+	/**
+	 * Reset the internal DaoQuery back to its original state
+	 */
+	protected function resetQuery()
+	{
+		$this->query = clone $this->tmpQuery;
 	}
 }
 
