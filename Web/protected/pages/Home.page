@@ -46,6 +46,10 @@
 			</div>
 		</com:TPanel>
 		<com:TPanel ID="welcomePanel">
+				<com:Application.controls.ProfitPanel.ProfitPanel Id="Summary" 
+						GroupingText="Summary Of Expense/Income" 
+						/>
+				<br />
 				<com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" 
 						GroupingText="Expense" 
 						FromAccountRootIds="1,2" 

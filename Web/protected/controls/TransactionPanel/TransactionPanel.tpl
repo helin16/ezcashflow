@@ -3,7 +3,7 @@
 	<com:TActiveLabel Id="infoMsg" ForeColor="green"/>
 	<table style="background:#cccccc;padding:15px;" width="100%">
 		<tr>
-			<td width="10%">
+			<td width="60px" align="right">
 				From
 			</td>
 			<td>
@@ -12,7 +12,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td align="right">
 				To
 			</td>
 			<td>
@@ -22,7 +22,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td align="right">
 				Value:
 			</td>
 			<td>
@@ -31,7 +31,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>
+			<td align="right">
 				Description:
 			</td>
 			<td>
