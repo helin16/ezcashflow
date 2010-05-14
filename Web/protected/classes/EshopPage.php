@@ -1,6 +1,7 @@
 <?php
 class EshopPage extends TPage 
 {
+	public $menuItemName;
 	public function onPreInit($param)
 	{
 		parent::onPreInit($param);

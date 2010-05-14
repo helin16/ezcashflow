@@ -11,10 +11,10 @@
 <body>
 	<com:TForm>
 		<div>
-			<com:TActiveLabel Id="InfoMsg" ForeColor="green" />
-			<com:TActiveLabel Id="ErrorMsg" ForeColor="red" />
 			<com:TLabel ID="user" /><br />
 			<com:Application.controls.Menu.Menu Id="topMenu"/>
+			<com:TActiveLabel Id="InfoMsg" ForeColor="green" style="width:100%"/>
+			<com:TActiveLabel Id="ErrorMsg" ForeColor="red" style="width:100%"/>
 			<com:TContentPlaceHolder ID="MainContent" />
 			<com:Application.controls.Menu.Menu Id="bottomMenu" />
 		</div>

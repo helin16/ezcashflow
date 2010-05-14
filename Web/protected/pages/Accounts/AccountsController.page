@@ -1,5 +1,97 @@
 <com:TContent ID="MainContent">
-	<div class="bodyWrapper">
-		
+	<com:THiddenField ID="rootId" />
+	<style>
+		.item
+		{
+			text-decoration:none;
+		}
+		.item_active
+		{
+			text-decoration:underline;
+		}
+	</style>
+	<div style="padding: 20px 0 0 20px;">
+		Accounts: &nbsp;&nbsp;
+		 &nbsp;&nbsp;<com:TLinkButton CssClass="<%= $this->Page->getClassName('1') %>" OnCommand="loadAccount" Text="Assets" CommandParameter="1"/>
+		 &nbsp;&nbsp;| 
+		 &nbsp;&nbsp;<com:TLinkButton  CssClass="<%= $this->Page->getClassName('2') %>" OnCommand="loadAccount" Text="Liability" CommandParameter="2"/>
+		 &nbsp;&nbsp;| 
+		 &nbsp;&nbsp;<com:TLinkButton  CssClass="<%= $this->Page->getClassName('3') %>" OnCommand="loadAccount" Text="Income" CommandParameter="3"/>
+		 &nbsp;&nbsp;| 
+		 &nbsp;&nbsp;<com:TLinkButton  CssClass="<%= $this->Page->getClassName('4') %>" OnCommand="loadAccount" Text="Expense" CommandParameter="4"/>
 	</div>
+	<com:TDataList
+		     ID="DataList"
+		     DataKeyField="id"
+		     OnEditCommand="edit"
+		     OnUpdateCommand="save" OnCancelCommand="cancel"
+		     OnSelectedIndexChanged="selectItem"
+		     HeaderStyle.BackColor="black"
+		     HeaderStyle.ForeColor="white"
+		     ItemStyle.BackColor="#BFCFFF"
+		     AlternatingItemStyle.BackColor="#E6ECFF"
+		     EditItemStyle.BackColor="lightgreen"
+		     SelectedItemStyle.BackColor="lightyellow"
+		     width="100%">
+
+		<prop:HeaderTemplate>
+				<table width="100%">
+					<tr align="left">
+						<td>Account Name</td>
+						<td width="10%">Account No.</td>
+						<td width="10%" align="right">Value.</td>
+						<td width="10%">&nbsp;</td>
+					</tr>
+				</table>
+			</prop:HeaderTemplate>
+
+			<prop:ItemTemplate>
+				<table width="100%">
+					<tr>
+						<td>
+							<%# $this->DataItem['len']==0 ? "" : str_repeat("&nbsp;&nbsp;",($this->DataItem['len'])) %>
+							<com:TLinkButton Text="<%# $this->DataItem['name']%>"  CommandName="edit" />
+						</td>
+						<td width="10%"><%# $this->DataItem['accountNumber']%></td>
+						<td width="10%" align="right">$ <%# $this->Page->getValue($this->DataItem['id']) %></td>
+						<td width="10%">
+							&nbsp;
+						</td>
+					</tr>
+				</table>
+			</prop:ItemTemplate>
+			
+			<prop:EditItemTemplate>
+				<table width="100%">
+					<tr>
+						<td>
+							Name:<br />
+							<com:TTextBox Id="accountName" Text="<%# $this->DataItem['name']%>" ValidationGroup="Group1"/>
+							<com:TRequiredFieldValidator ControlToValidate="accountName"
+								ErrorMessage="*Required" ValidationGroup="Group1" EnableClientScript="true" 
+								Display="Dynamic"/>
+						</td>
+						<td width="10%">
+							Acc. No.:<br />
+							<%# $this->DataItem['accountNumber']%>
+						</td>
+						<td width="10%">
+							Name:<br />
+							<com:TTextBox Id="accountValue" Text="<%# $this->DataItem['value']%>" />
+							<com:TRegularExpressionValidator 
+								ControlToValidate="accountValue"
+								ErrorMessage="Digit Only" ValidationGroup="Group1" EnableClientScript="true"
+								RegularExpression="(\d{1,3}(\,\d{3})*|(\d+))(\.\d{2})?"
+								Display="Dynamic"/>
+						</td>
+						<td width="10%">
+							<com:TButton ID="EditButton" Text="Save" CommandName="update" ValidationGroup="Group1" />
+							<com:TButton ID="CancelEditButton" Text="Cancel" CommandName="cancel" />
+						</td>
+					</tr>
+				</table>
+			</prop:EditItemTemplate>
+							
+		    <prop:FooterTemplate />
+	</com:TDataList>
 </com:TContent>
