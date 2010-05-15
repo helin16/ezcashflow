@@ -21,6 +21,7 @@
 		<module id="friendly-url" class="System.Web.TUrlMapping" EnableCustomUrl="true" UrlPrefix="/">	
 		
 			<url ServiceParameter="Accounts.AccountsController" pattern="accounts.html" />
+			<url ServiceParameter="Reports.ReportsController" pattern="reports.html" />
 			
 			<url ServiceParameter="FileLoader.FileLoaderController" pattern="asset/{assetId}/{param}" parameters.assetId="\w+"  parameters.param=".+" />
 			

@@ -17,7 +17,7 @@
 								<com:TTextBox ID="username" ValidationGroup="Group1"/>
 								<com:TRequiredFieldValidator
 								    ControlToValidate="username"
-								    ErrorMessage="<%[username]%>"
+								    ErrorMessage="* required"
 								    ValidationGroup="Group1"
 								    Display="Dynamic" />
 							</td>
