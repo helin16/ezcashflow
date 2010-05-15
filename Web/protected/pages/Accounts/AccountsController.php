@@ -19,7 +19,7 @@ class AccountsController extends EshopPage
 	public function showAccounts()
 	{
 		$rootId = trim($this->rootId->Value);
-		$accountService = new accountentryService();
+		$accountService = new AccountEntryService();
 		$sql ="select 
 					(ceil((length(accountNumber)-1)/4)) len,
 					acc.id,

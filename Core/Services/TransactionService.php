@@ -54,8 +54,8 @@ class TransactionService extends BaseService
 	public function getSumOfExpenseBetweenDates($startDate,$endDate,$accountTypeId=4)
 	{
 		$qry = "select sum(t.value) as sum 
-				from Transaction t 
-				left join AccountEntry acc on (acc.id = t.toId)
+				from transaction t 
+				left join accountentry acc on (acc.id = t.toId)
 				where t.active = 1
 				and acc.rootId = $accountTypeId 
 				and t.created >='$startDate' and t.created<'$endDate'";
@@ -67,8 +67,8 @@ class TransactionService extends BaseService
 	public function getTopExpenses($rootId=4,$noOfItems=4,$startDate='1790-01-01 00:00:00',$endDate="9999-12-31 23:59:59")
 	{
 		$qry = "select sum(t.value) as sum,acc.name,acc.id
-				from Transaction t 
-				left join AccountEntry acc on (acc.id = t.toId)
+				from transaction t 
+				left join accountentry acc on (acc.id = t.toId)
 				where t.active = 1
 				and acc.rootId = $rootId 
 				and t.created >='$startDate' and t.created<'$endDate'

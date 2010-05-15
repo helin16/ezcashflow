@@ -142,22 +142,22 @@ class TransactionPanel extends TTemplateControl
 						if(ac.value='',0,round(ac.value,2))
 						+round((
 							select if(sum(t.value) is null,0, sum(t.value))
-							from Transaction t 
+							from transaction t 
 							where (t.active =1 and t.toId=ac.id)
 						),2)
 						-round((
 						select if(sum(t.value) is null,0, sum(t.value))
-						from Transaction t 
+						from transaction t 
 						where (t.active =1 and t.fromId=ac.id)
 						),2) 
 					)
 					) as name
 				
-				from AccountEntry ac 
-				inner join AccountEntry acr on (acr.id = ac.rootId and acr.active = 1)
+				from accountentry ac 
+				inner join accountentry acr on (acr.id = ac.rootId and acr.active = 1)
 				where ac.active = 1 
 				and ac.rootId  in (".implode(",",$accountRootIds).")
-				and ((select if(count(acc.id)=0,1,0) from AccountEntry acc where acc.parentId = ac.id and acc.active = 1))=1
+				and ((select if(count(acc.id)=0,1,0) from accountentry acc where acc.parentId = ac.id and acc.active = 1))=1
 				order by ac.rootId asc, name asc
 			";
 		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
@@ -169,7 +169,7 @@ class TransactionPanel extends TTemplateControl
 	{
 		$msg="";
 		$value = str_replace(",","",trim($this->transValue->Text));
-		if(preg_match("/^\d+$/", $value))
+		if(preg_match("/^(\d{1,3}(\,\d{3})*|(\d+))(\.\d{2})?$/", $value))
 		{
 			$function =trim($this->pageFunc);
 			if($function!="")
@@ -200,7 +200,7 @@ class TransactionPanel extends TTemplateControl
 		$this->errorMsg->Text="";
 		$this->infoMsg->Text="";
 		
-		$accountService = new accountentryService();
+		$accountService = new AccountEntryService();
 		$fromAccountId = $this->fromAccounts->getSelectedValue();
 		$fromAccount = $accountService->get($fromAccountId);
 		if(!$fromAccount instanceof AccountEntry)
