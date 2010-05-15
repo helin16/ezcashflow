@@ -152,7 +152,7 @@
 							Comments:
 						</td>
 						<td>
-							<com:TTextBox Id="comments" />
+							<com:TTextBox Id="comments" width="100%"/>
 						</td>
 					</tr>
 					<tr>

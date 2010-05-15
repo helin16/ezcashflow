@@ -48,6 +48,8 @@ class ReportsController extends EshopPage
 	
 	public function search($sender,$param)
 	{
+		$this->setErrorMsg("");
+		$this->setInfoMsg("");
 		$where = "1";
 		$fromDate = trim($this->fromDate->Text);
 			$where .= ($fromDate=="" ? "" : " AND created >='$fromDate'");
@@ -59,6 +61,13 @@ class ReportsController extends EshopPage
 		$toAccountId = trim($this->toAccount->getSelectedValue());
 			$where .= ($toAccountId=="" ? "" : " AND toId ='$toAccountId'");
 		
+		if($where=="1")
+		{
+			$this->DataList->DataSource = array();
+			$this->DataList->DataBind();
+			$this->setErrorMsg("Nothing to Search");
+			return;
+		}
 		$transactionService = new TransactionService();
 		$transactions = $transactionService->findByCriteria("$where",array(),null,30,array("Transaction.created"=>"desc"));
 		
@@ -74,6 +83,8 @@ class ReportsController extends EshopPage
 	
 	public function edit($sender,$param)
     {
+    	$this->setErrorMsg("");
+		$this->setInfoMsg("");
 	    if($param != null)
 			$itemIndex = $param->Item->ItemIndex;
 		else
@@ -102,12 +113,17 @@ class ReportsController extends EshopPage
     
 	public function cancel($sender,$param)
     {
+    	$this->setErrorMsg("");
+		$this->setInfoMsg("");
 		$this->DataList->EditItemIndex = -1;
 		$this->search(null,null);  	
     }
     
     public function save($sender,$param)
     {
+    	$this->setErrorMsg("");
+		$this->setInfoMsg("");
+		
     	$accountService = new AccountEntryService();
     	$transService= new TransactionService();
     	$params = $param->Item;
