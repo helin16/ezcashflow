@@ -25,20 +25,20 @@
 			</tr>
 			<tr>
 				<td>From Account</td>
-				<td><com:TDropDownList Id="fromAccount"
+				<td><com:TListBox Id="fromAccount"
 						DataTextField="name" 
 						DataValueField="id"
-						PromptText="All"
-						PromptValue=" "
+						SelectionMode="Multiple"
+						Rows="3"
 					/>
 			</tr>
 			<tr>
 				<td>To Account</td>
-				<td><com:TDropDownList Id="toAccount"
+				<td><com:TListBox Id="toAccount"
 						DataTextField="name" 
 						DataValueField="id"
-						PromptText="All"
-						PromptValue=" "
+						SelectionMode="Multiple"
+						Rows="3"
 					/>
 			</tr>
 			<tr>

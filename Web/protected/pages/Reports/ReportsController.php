@@ -13,6 +13,17 @@ class ReportsController extends EshopPage
 		{
 			$this->bindAccounts($this->fromAccount);
 			$this->bindAccounts($this->toAccount);
+			
+			$reportVars = isset($this->Request['reportVars']) ? unserialize($this->Request['reportVars']) : array();
+			if(count($reportVars)>0)
+			{
+				$this->fromDate->Text = $reportVars["fromDate"];
+				$this->toDate->Text = $reportVars["toDate"];
+				
+				$this->fromAccount->setSelectedValues($reportVars["fromAccountIds"]);
+				$this->toAccount->setSelectedValues($reportVars["toAccountIds"]);
+				$this->search(null,null);
+			}
 		}
 	}
 	
@@ -56,10 +67,10 @@ class ReportsController extends EshopPage
 		$toDate = trim($this->toDate->Text);
 			$where .= ($toDate=="" ? "" : " AND created <='$toDate'");
 		
-		$fromAccountId = trim($this->fromAccount->getSelectedValue());
-			$where .= ($fromAccountId=="" ? "" : " AND fromId ='$fromAccountId'");
-		$toAccountId = trim($this->toAccount->getSelectedValue());
-			$where .= ($toAccountId=="" ? "" : " AND toId ='$toAccountId'");
+		$fromAccountIds = $this->fromAccount->getSelectedValues();
+			$where .= (count($fromAccountIds)==0 ? "" : " AND fromId in (".implode(",",$fromAccountIds).")");
+		$toAccountIds = $this->toAccount->getSelectedValues();
+			$where .= (count($toAccountIds)==0 ? "" : " AND toId in (".implode(",",$toAccountIds).")");
 		
 		if($where=="1")
 		{
