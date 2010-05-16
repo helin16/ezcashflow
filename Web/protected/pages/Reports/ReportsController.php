@@ -1,10 +1,12 @@
 <?php
 class ReportsController extends EshopPage 
 {
+	public $totalValue;
 	public function __construct()
 	{
 		parent::__construct();
 		$this->menuItemName='reports';
+		$this->totalValue=0;
 	}
 	
 	public function onLoad($param)
@@ -61,26 +63,15 @@ class ReportsController extends EshopPage
 	{
 		$this->setErrorMsg("");
 		$this->setInfoMsg("");
-		$where = "1";
-		$fromDate = trim($this->fromDate->Text);
-			$where .= ($fromDate=="" ? "" : " AND created >='$fromDate'");
-		$toDate = trim($this->toDate->Text);
-			$where .= ($toDate=="" ? "" : " AND created <='$toDate'");
 		
-		$fromAccountIds = $this->fromAccount->getSelectedValues();
-			$where .= (count($fromAccountIds)==0 ? "" : " AND fromId in (".implode(",",$fromAccountIds).")");
-		$toAccountIds = $this->toAccount->getSelectedValues();
-			$where .= (count($toAccountIds)==0 ? "" : " AND toId in (".implode(",",$toAccountIds).")");
-		
-		if($where=="1")
+		$transactions = $this->getData();
+		if($transactions===null)
 		{
 			$this->DataList->DataSource = array();
 			$this->DataList->DataBind();
 			$this->setErrorMsg("Nothing to Search");
 			return;
 		}
-		$transactionService = new TransactionService();
-		$transactions = $transactionService->findByCriteria("$where",array(),null,30,array("Transaction.created"=>"desc"));
 		
 		if($sender instanceof TButton  && $sender->getId()=="searchBtn")
 		{
@@ -90,6 +81,26 @@ class ReportsController extends EshopPage
 		
 		$this->DataList->DataSource = $transactions;
 		$this->DataList->DataBind();
+	}
+	
+	private function getData()
+	{
+		$where = "1";
+		$fromDate = trim($this->fromDate->Text);
+			$where .= ($fromDate=="" ? "" : " AND created >='$fromDate'");
+		$toDate = trim($this->toDate->Text);
+			$where .= ($toDate=="" ? "" : " AND created <'$toDate'");
+		
+		$fromAccountIds = $this->fromAccount->getSelectedValues();
+			$where .= (count($fromAccountIds)==0 ? "" : " AND fromId in (".implode(",",$fromAccountIds).")");
+		$toAccountIds = $this->toAccount->getSelectedValues();
+			$where .= (count($toAccountIds)==0 ? "" : " AND toId in (".implode(",",$toAccountIds).")");
+		
+		if($where=="1")	return null;
+			
+		$transactionService = new TransactionService();
+		$transactions = $transactionService->findByCriteria("$where",array(),null,30,array("Transaction.created"=>"desc"));
+		return $transactions;
 	}
 	
 	public function edit($sender,$param)
@@ -152,5 +163,58 @@ class ReportsController extends EshopPage
 		$this->search(null,null);  	 
 		$this->setInfoMsg("Transaction Saved Successfully!"); 	
     } 
+    
+	public function addTotalValue($value)
+    {
+    	$this->totalValue +=$value;
+    	return $value;
+    }
+    
+    public function toExcel($sender,$param)
+    {
+    	$transactions = $this->getData();
+    	$html ="<table border='1'>";
+	    	$html .="<tr style='background:black;color:white;'>";
+		    	$html .="<td>Date Time</td>";
+		    	$html .="<td>From</td>";
+		    	$html .="<td>To</td>";
+		    	$html .="<td>Value</td>";
+		    	$html .="<td>Comments</td>";
+	    	$html .="</tr>";
+	    	foreach($transactions as $trans)
+	    	{
+	    		$created = $trans->getCreated();
+	    		$from = $trans->getFrom();
+	    		$to = $trans->getTo();
+	    		$value = $trans->getValue();
+	    		$comments = $trans->getComments();
+	    		$html .="<tr >";
+			    	$html .="<td>$created</td>";
+			    	$html .="<td>$from</td>";
+			    	$html .="<td>$to</td>";
+			    	$html .="<td>$value</td>";
+			    	$html .="<td>$comments</td>";
+	    		$html .="</tr>";
+	    	}
+    	$html .="</table>";
+    	
+    	$export_file = "cashflow_report.xls";
+	    ob_end_clean();
+	    ini_set('zlib.output_compression','Off');
+	   
+	    header('Pragma: public');
+	    header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");                  // Date in the past   
+	    header('Last-Modified: '.gmdate('D, d M Y H:i:s') . ' GMT');
+	    header('Cache-Control: no-store, no-cache, must-revalidate');     // HTTP/1.1
+	    header('Cache-Control: pre-check=0, post-check=0, max-age=0');    // HTTP/1.1
+	    header ("Pragma: no-cache");
+	    header("Expires: 0");
+	    header('Content-Transfer-Encoding: none');
+	    header('Content-Type: application/vnd.ms-excel;');                 // This should work for IE & Opera
+	    header("Content-type: application/x-msexcel");                    // This should work for the rest
+	    header('Content-Disposition: attachment; filename="'.basename($export_file).'"'); 
+	    echo $html;
+	    die;
+    }
 }
 ?>

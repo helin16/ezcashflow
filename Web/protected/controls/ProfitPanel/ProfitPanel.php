@@ -11,14 +11,6 @@ class ProfitPanel extends TPanel
 	
 	public function loadAccounts()
 	{
-		$html="<table width='100%'>";
-			$html.="<tr style='background:black;color:white;'>";
-				$html .="<td  width='60px'>&nbsp;</td>";
-				$html .="<td>Day</td>";
-				$html .="<td>Week</td>";
-				$html .="<td>Month</td>";
-				$html .="<td>Year</td>";
-			$html.="</tr>";
 		$transactionService = new TransactionService();
 		
 		$incomeAccountIds=array();
@@ -48,16 +40,20 @@ class ProfitPanel extends TPanel
 		
 		// week
 		$today = new HydraDate("now");
-		$weekDay = $today->getDateTime()->format('W');
-		$start = $today->getDateTime()->format("Y-m-01 00:00:00");
+		$weekDay = $today->getDateTime()->format('N');
+		if($weekDay>=4)
+			$today->modify("-".($weekDay-4)." day");
+		else
+			$today->modify("-".(3+$weekDay)." day");
+		$start = $today->getDateTime()->format("Y-m-d 00:00:00");
 		$today->modify("+1 week");
-		$end = $today->getDateTime()->format("Y-m-01 00:00:00");
+		$end = $today->getDateTime()->format("Y-m-d 00:00:00");
 		$week_start = $start;
 		$week_end = $end;
 		$week_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3);
 		$week_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4);
-		$week_income = (trim($day_income)=="") ? 0 :$day_income;
-		$week_expense = (trim($day_expense)=="") ? 0 :$day_expense;
+		$week_income = (trim($week_income)=="") ? 0 :$week_income;
+		$week_expense = (trim($week_expense)=="") ? 0 :$week_expense;
 		$week_diff=$week_income-$week_expense;
 		
 		// month
@@ -86,6 +82,26 @@ class ProfitPanel extends TPanel
 		$year_expense = (trim($year_expense)=="") ? 0 :$year_expense;
 		$year_diff=$year_income-$year_expense;
 		
+		$html="<table width='100%'>";
+			$html.="<tr style='background:black;color:white;'>";
+				$html .="<td  width='60px'>&nbsp;</td>";
+				$html .="<td>
+							Day<br />
+							<i style='font-size:9px'>$day_start ~ <br />$day_end </i>
+						</td>";
+				$html .="<td>
+							Week<br />
+							<i style='font-size:9px'>$week_start ~ <br />$week_end </i>
+						</td>";
+				$html .="<td>
+							Month<br />
+							<i style='font-size:9px'>$month_start ~ <br />$month_end </i>
+						</td>";
+				$html .="<td>
+							Year<br />
+							<i style='font-size:9px'>$year_start ~ <br />$year_end </i>
+						</td>";
+			$html.="</tr>";
 			$html.="<tr>";
 				$html .="<td>Income</td>";
 				$html .="<td>".$this->makeURLToReport("$ $day_income",array(),$incomeAccountIds,$day_start,$day_end)."</td>";
