@@ -95,6 +95,7 @@ class AccountsController extends EshopPage
 		$entity = $accountService->get($this->DataList->DataKeys[$params->ItemIndex]);
 		$entity->setName(trim($this->DataList->getEditItem()->accountName->Text));
 		$entity->setValue(trim($this->DataList->getEditItem()->accountValue->Text));
+		$entity->setComments(trim($this->DataList->getEditItem()->accountComments->Text));
 		$accountService->save($entity);
 	    
 		$this->DataList->EditItemIndex = -1;

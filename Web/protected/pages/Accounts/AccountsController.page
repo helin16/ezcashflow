@@ -33,7 +33,7 @@
 		     EditItemStyle.BackColor="lightgreen"
 		     SelectedItemStyle.BackColor="lightyellow"
 		     AllowPaging="false" AllowCustomPaging="false" PageSize="9999999" EnableViewState="true"
-		     width="100%">
+		     width="900px">
 
 		<prop:HeaderTemplate>
 				<table width="100%">
