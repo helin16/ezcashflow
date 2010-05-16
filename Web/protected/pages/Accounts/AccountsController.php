@@ -25,7 +25,8 @@ class AccountsController extends EshopPage
 					acc.id,
 					acc.name,
 					acc.accountNumber,
-					acc.value 
+					acc.value,
+					acc.comments
 				from accountentry acc
 				where acc.active = 1
 				and acc.rootId = $rootId
@@ -75,6 +76,9 @@ class AccountsController extends EshopPage
 		$this->showAccounts();
 		
 		$this->DataList->getEditItem()->accountName->focus();
+		$accountService = new AccountEntryService();
+		$array = $this->DataList->getEditItem()->getData();
+		$this->DataList->getEditItem()->subAccountno->Text = $accountService->getNextAccountNo($accountService->get($array["id"]));
     }
     
 	public function cancel($sender,$param)
@@ -111,6 +115,29 @@ class AccountsController extends EshopPage
     			);
     	$serial = serialize($vars);
 		return "<a href='/reports/$serial'> $text</a>";
+    }
+    
+    public function createNewAccount($sender,$param)
+    {
+    	$subAccountName = trim($this->DataList->getEditItem()->subAccountName->Text);
+    	$subAccountNo = trim($this->DataList->getEditItem()->subAccountno->Text);
+    	$subAccountValue = trim($this->DataList->getEditItem()->subAccountValue->Text);
+    	$subAccountComments = trim($this->DataList->getEditItem()->subAccountComments->Text);
+		$parentId = trim($param->CommandParameter);
+    	
+    	$accountService = new AccountEntryService();
+		$parent = $accountService->get($parentId);
+    	$subAccount = new AccountEntry();
+    	$subAccount->setName($subAccountName);
+    	$subAccount->setValue($subAccountValue);
+    	$subAccount->setAccountNumber($subAccountNo);
+    	$subAccount->setComments($subAccountComments);
+    	$subAccount->setParent($parent);
+    	$subAccount->setRoot($parent->getRoot());
+    	$accountService->save($subAccount);
+    	
+    	$this->setInfoMsg("new Account($subAccount) added successfully!");
+    	$this->showAccounts();
     }
 }
 ?>
