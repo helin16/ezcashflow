@@ -20,6 +20,8 @@
 		<module id="request" class="THttpRequest" UrlManager="friendly-url" />
 		<module id="friendly-url" class="System.Web.TUrlMapping" EnableCustomUrl="true" UrlPrefix="/">	
 		
+			<url ServiceParameter="Login.LoginController" pattern="login.html" />
+		
 			<url ServiceParameter="Accounts.AccountsController" pattern="accounts.html" />
 			<url ServiceParameter="Reports.ReportsController" pattern="reports.html" />
 			<url ServiceParameter="Reports.ReportsController" pattern="reports/{reportVars}" parameters.reportVars=".+" />
@@ -40,7 +42,7 @@
 	<services>
 		<service id="page" class="TPageService" DefaultPage="Home">
 			<modules>
-			  <module id="auth" class="System.Security.TAuthManager" UserManager="users" ReturnUrl="/" LoginPage="Home" AuthExpire="3600"/>
+			  <module id="auth" class="System.Security.TAuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.Login" AuthExpire="3600"/>
 			  <module id="users" class="Application.classes.WebUser.WebUserManager"/>
 			</modules>
 		</service>

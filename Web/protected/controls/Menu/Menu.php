@@ -27,7 +27,7 @@ class Menu extends TTemplateControl
 		}
 		catch(Exception $ex){}
 		
-	   	$this->Response->Redirect("/");
+	   	$this->Response->Redirect("/login.html");
 	}
 }
 

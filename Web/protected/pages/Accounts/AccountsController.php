@@ -97,5 +97,20 @@ class AccountsController extends EshopPage
 		$this->showAccounts();   
 		$this->setInfoMsg("Account Saved Successfully!"); 	
     } 
+    
+    public function makeURL($text,$fromAccountId="",$toAccountId="")
+    {
+    	if($fromAccountId=="" && $toAccountId=="")
+    		return;
+    		
+    	$vars = array(
+    				"fromAccountIds" => array($fromAccountId),
+    				"toAccountIds" => array($toAccountId),
+    				"fromDate" => "",
+    				"toDate" => ""
+    			);
+    	$serial = serialize($vars);
+		return "<a href='/reports/$serial'> $text</a>";
+    }
 }
 ?>

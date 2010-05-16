@@ -56,7 +56,8 @@
 						<td width="10%"><%# $this->DataItem['accountNumber']%></td>
 						<td width="10%" align="right">$ <%# $this->Page->getValue($this->DataItem['id']) %></td>
 						<td width="10%">
-							&nbsp;
+							<%# $this->Page->makeURL("From Acc.",$this->DataItem['id'],'') %>
+							<%# $this->Page->makeURL("To Acc.",'',$this->DataItem['id']) %>
 						</td>
 					</tr>
 				</table>
