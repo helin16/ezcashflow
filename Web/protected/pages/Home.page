@@ -5,6 +5,10 @@
 						GroupingText="Summary Of Expense/Income" 
 						/>
 				<br />
+				<com:Application.controls.TopExpensePanel.TopExpensePanel Id="Top5" 
+						GroupingText="Top 5 Expense" 
+						/>
+				<br />
 				<com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" 
 						GroupingText="Expense" 
 						FromAccountRootIds="1,2" 
