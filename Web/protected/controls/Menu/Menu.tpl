@@ -27,6 +27,9 @@
 				<a href="/reports.html" <%= $this->changeId('reports') %>>Reports</a>
 			</td>
 			<td class="topmenulink">
+				<a href="/statics.html" <%= $this->changeId('statics') %>>Statics</a>
+			</td>
+			<td class="topmenulink">
 				<com:TLinkButton ID="logout" OnClick="logout" Text="Logout" CssClass="menuItem" />
 			</td>
 		</tr>

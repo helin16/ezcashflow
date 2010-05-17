@@ -42,7 +42,7 @@
 						<td width="10%">Account No.</td>
 						<td width="10%" align="right">Value.</td>
 						<td>&nbsp;&nbsp;Comments</td>
-						<td width="10%">&nbsp;</td>
+						<td width="15%">&nbsp;</td>
 					</tr>
 				</table>
 			</prop:HeaderTemplate>
@@ -57,7 +57,7 @@
 						<td width="10%"><%# $this->DataItem['accountNumber']%></td>
 						<td width="10%" align="right">$ <%# $this->Page->getValue($this->DataItem['id']) %></td>
 						<td>&nbsp;&nbsp;<%# $this->DataItem['comments'] %></td>
-						<td width="10%">
+						<td width="15%">
 							<%# $this->Page->makeURL("From Acc.",$this->DataItem['id'],'') %>
 							<%# $this->Page->makeURL("To Acc.",'',$this->DataItem['id']) %>
 						</td>

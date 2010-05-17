@@ -1,0 +1,10 @@
+<com:TContent ID="MainContent">
+	<div class="bodyWrapper">
+		<com:TTabPanel ID="result">
+			<com:TTabView id="expense_bar" Caption="Expense"/>
+			<com:TTabView id="income_bar" Caption="Income" />
+		</com:TTabPanel>
+	</div>
+	<br clear="both" />
+	<br />
+</com:TContent>
