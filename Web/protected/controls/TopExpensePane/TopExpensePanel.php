@@ -60,7 +60,23 @@ class TopExpensePanel extends TPanel
 		
 		$excludingAccountIds=explode(",",$this->excludingAccountIds);
 		
-		$accounts = $transactionService->getTopExpenses(4,$this->noOfItems,$this->startDate,$this->endDate,$excludingAccountIds);
+		$sql ="select distinct acc.id,
+					acc.name,
+					acc.budget,
+					(
+						select if(sum(tt.value) is null,0,sum(tt.value)) 
+						from transaction tt 
+						inner join accountentry acc1 on (acc1.active = 1 and tt.toId=acc1.id)
+						where tt.active = 1
+						and acc1.accountNumber like concat(acc.accountNumber,'%')
+					) `sum`
+				from accountentry acc
+				where acc.rootId=4
+				and acc.budget!=0
+				and acc.id not in (".implode(",",$excludingAccountIds).")
+				order by round((`sum`-acc.budget)) desc
+				limit {$this->noOfItems}";
+		$accounts = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		
 		$html="<table width='100%'>";
 			//show all names
@@ -68,7 +84,7 @@ class TopExpensePanel extends TPanel
 			$html.="<tr style='background:black;color:white;'>";
 			foreach($accounts as $account)
 			{
-				$html .="<td>{$account["name"]}</td>";
+				$html .="<td>{$account["name"]}<br /><i style='font-size:10px'>$ {$account["budget"]} ~ $".($account["sum"]-$account["budget"])."</i></td>";
 			}
 			$html.="</tr>";
 			

@@ -1,7 +1,7 @@
 <?php
 class StaticsController extends EshopPage 
 {
-	public $onePercentageWidth=0.2;
+	public $onePercentageWidth=0.1;
 	
 	public function __construct()
 	{
