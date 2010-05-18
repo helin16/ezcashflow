@@ -40,9 +40,9 @@
 					<tr align="left">
 						<td width="30%">Account Name</td>
 						<td width="10%">Account No.</td>
-						<td width="10%" align="right">Value.</td>
-						<td>&nbsp;&nbsp;Comments</td>
-						<td width="130px">&nbsp;</td>
+						<td width="10%" align="right">Value</td>
+						<td width="10%" align="right">Budget</td>
+						<td>&nbsp;</td>
 					</tr>
 				</table>
 			</prop:HeaderTemplate>
@@ -56,8 +56,8 @@
 						</td>
 						<td width="10%"><%# $this->DataItem['accountNumber']%></td>
 						<td width="10%" align="right">$ <%# $this->Page->getValue($this->DataItem['id']) %></td>
-						<td>&nbsp;&nbsp;<%# $this->DataItem['comments'] %></td>
-						<td width="130px">
+						<td width="10%" align="right">$ <%# $this->DataItem['budget'] %></td>
+						<td>
 							<%# $this->Page->makeURL("From Acc.",$this->DataItem['id'],'') %>
 							<%# $this->Page->makeURL("To Acc.",'',$this->DataItem['id']) %>
 						</td>
@@ -88,11 +88,16 @@
 								RegularExpression="(\d{1,3}(\,\d{3})*|(\d+))(\.\d{2})?"
 								Display="Dynamic"/>
 						</td>
-						<td>
-							&nbsp;&nbsp;Comments:<br />
-							&nbsp;&nbsp;<com:TTextBox Id="accountComments" Text="<%# $this->DataItem['comments']%>"  width="90%"/>
-						</td>
 						<td width="10%">
+							Budget:<br />
+							<com:TTextBox Id="accountBudget" Text="<%# $this->DataItem['budget']%>"  width="90%"/>
+							<com:TRegularExpressionValidator 
+								ControlToValidate="accountBudget"
+								ErrorMessage="Digit Only" ValidationGroup="Group1" EnableClientScript="true"
+								RegularExpression="(\d{1,3}(\,\d{3})*|(\d+))(\.\d{2})?"
+								Display="Dynamic"/>
+						</td>
+						<td>
 							<com:TButton ID="EditButton" Text="Save" CommandName="update" ValidationGroup="Group1" />
 							<com:TButton ID="CancelEditButton" Text="Cancel" CommandName="cancel" />
 						</td>

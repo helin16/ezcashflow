@@ -26,7 +26,7 @@ class AccountsController extends EshopPage
 					acc.name,
 					acc.accountNumber,
 					acc.value,
-					acc.comments
+					acc.budget
 				from accountentry acc
 				where acc.active = 1
 				and acc.rootId = $rootId
@@ -94,8 +94,8 @@ class AccountsController extends EshopPage
     	
 		$entity = $accountService->get($this->DataList->DataKeys[$params->ItemIndex]);
 		$entity->setName(trim($this->DataList->getEditItem()->accountName->Text));
-		$entity->setValue(trim($this->DataList->getEditItem()->accountValue->Text));
-		$entity->setComments(trim($this->DataList->getEditItem()->accountComments->Text));
+		$entity->setValue(str_replace(" ","",str_replace(",","",trim($this->DataList->getEditItem()->accountValue->Text))));
+		$entity->setBudget(str_replace(" ","",str_replace(",","",trim($this->DataList->getEditItem()->accountBudget->Text))));
 		$accountService->save($entity);
 	    
 		$this->DataList->EditItemIndex = -1;
