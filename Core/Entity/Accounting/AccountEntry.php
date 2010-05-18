@@ -6,6 +6,7 @@ class AccountEntry extends HydraEntity
 	private $accountNumber;
 	private $comments;
 	private $value;
+	private $budget;
 	
 	protected $root;
 	protected $parent;
@@ -132,6 +133,26 @@ class AccountEntry extends HydraEntity
 		$this->root = $root;
 	}
 	
+	/**
+	 * getter budget
+	 *
+	 * @return budget
+	 */
+	public function getBudget()
+	{
+		return $this->budget;
+	}
+	
+	/**
+	 * setter budget
+	 *
+	 * @var budget
+	 */
+	public function setBudget($budget)
+	{
+		$this->budget = $budget;
+	}
+	
 	
 	
 	public function __toString()
@@ -147,6 +168,7 @@ class AccountEntry extends HydraEntity
 		DaoMap::setIntType("accountNumber","int",41);
 		DaoMap::setStringType('comments','varchar',255);
 		DaoMap::setStringType('value','varchar');
+		DaoMap::setStringType('budget','varchar');
 		
 		DaoMap::setManyToOne("parent","AccountEntry","petr",null,true);
 		DaoMap::setManyToOne("root","AccountEntry","petrr");
