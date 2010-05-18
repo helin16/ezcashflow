@@ -1,8 +1,12 @@
 <com:TContent ID="MainContent">
 	<div class="bodyWrapper">
 		<com:TTabPanel ID="result">
-			<com:TTabView id="expense_bar" Caption="Expense"/>
-			<com:TTabView id="income_bar" Caption="Income" />
+			<com:TTabView id="expense_bar" Caption="Expense / month">
+				<com:TButton Id="toExcelBtn_4" Text="To Excel" OnCommand="Page.toExcel" CommandParameter="4" />
+			</com:TTabView>
+			<com:TTabView id="income_bar" Caption="Income / month" >
+				<com:TButton Id="toExcelBtn_3" Text="To Excel" OnCommand="Page.toExcel" CommandParameter="3" />
+			</com:TTabView>
 		</com:TTabPanel>
 	</div>
 	<br clear="both" />

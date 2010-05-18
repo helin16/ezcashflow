@@ -18,7 +18,7 @@ class StaticsController extends EshopPage
 		}
 	}
 	
-	public function getBars(&$tabview,$rootId=4)
+	public function getBars($tabview=null,$rootId=4)
 	{
 		$sql ="select 
 					(ceil((length(accountNumber)-1)/4)) len,
@@ -27,7 +27,6 @@ class StaticsController extends EshopPage
 				from accountentry acc
 				where acc.active = 1
 				and acc.accountNumber like '$rootId%'
-				and acc.id!=$rootId
 				order by trim(acc.accountNumber)";
 		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		
@@ -52,16 +51,98 @@ class StaticsController extends EshopPage
 		$tabview->getControls()->add($html);
 	}
 	
+	
+	public function toExcel($sender,$param)
+	{
+		$rootId=trim($param->CommandParameter);
+		$sql ="select 
+					distinct acc.id,
+					acc.name
+				from accountentry acc
+				left join accountentry acc_children on (acc_children.parentId = acc.id and acc_children.active=1)
+				where acc.active = 1
+				and acc.accountNumber like '$rootId%'
+				and acc_children.id is null
+				order by trim(acc.accountNumber)
+				";
+		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
+		
+		$html ="<table border='1'>";
+	    	$html .="<tr style='background:black;color:white;'>";
+		    	$html .="<td>AccountName</td>";
+		    	$html .="<td>Value</td>";
+	    	$html .="</tr>";
+	    	foreach($result as $row)
+	    	{
+	    		$value = $this->getValue($row["id"]);
+	    		$name=$this->getAccountBreadcrumb($row["id"]);
+	    		$html .="<tr >";
+			    	$html .="<td>$name</td>";
+			    	$html .="<td>$value</td>";
+	    		$html .="</tr>";
+	    	}
+    	$html .="</table>";
+		
+		$export_file = "accounts.xls";
+	    ob_end_clean();
+	    ini_set('zlib.output_compression','Off');
+	   
+	    header('Pragma: public');
+	    header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");                  // Date in the past   
+	    header('Last-Modified: '.gmdate('D, d M Y H:i:s') . ' GMT');
+	    header('Cache-Control: no-store, no-cache, must-revalidate');     // HTTP/1.1
+	    header('Cache-Control: pre-check=0, post-check=0, max-age=0');    // HTTP/1.1
+	    header ("Pragma: no-cache");
+	    header("Expires: 0");
+	    header('Content-Transfer-Encoding: none');
+	    header('Content-Type: application/vnd.ms-excel;');                 // This should work for IE & Opera
+	    header("Content-type: application/x-msexcel");                    // This should work for the rest
+	    header('Content-Disposition: attachment; filename="'.basename($export_file).'"'); 
+	    echo $html;
+	    die;
+	}
+	
 	private function getValue($accountId)
 	{
-		$accountService = new AccountEntryService();
-		$sql="select count(distinct acc.id) `count` from accountentry acc where acc.active = 1 and acc.parentId = $accountId";
+		$sql="select acc.accountNumber,
+				(select count(distinct acc_c.id) from accountentry acc_c where acc_c.active = 1 and acc_c.parentId = acc.id) `count`
+				from accountentry acc 
+				where acc.active = 1 and acc.id = $accountId";
 		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		$count = $result[0]["count"];
-		$msg = $accountService->getChildrenValueSum($accountService->get($accountId));
+		$accounNumber = $result[0]["accountNumber"];
+		
+		$sql = "select if(sum(tt.value) is null,0,sum(tt.value)) `sum` 
+				from transaction tt 
+				inner join accountentry acc on (acc.active = 1 and acc.accountNumber like '$accounNumber%' and tt.toId=acc.id)
+				where tt.active = 1 ";
+		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
+		$msg = $result[0]["sum"];
+		
+		$sql = "select 	TIMESTAMPDIFF(second,min(t.created),max(t.created)) `diff_day` from transaction t where t.active=1";
+		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
+		$diff_days = $result[0]["diff_day"];
+		
+		$msg = round(($msg/$diff_days)*3600*24*365 /12,2);
 		if($count>0)
 			$msg = "<b>$msg</b>";
 		return $msg;
+	}
+	
+	private function getAccountBreadcrumb($accountId)
+	{
+		$name = "";
+		$sql="select acc.id,acc.name,acc.rootId,acc.parentId from accountentry acc where acc.id=$accountId";
+		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
+		if(count($result)==0)
+			return "";
+		
+		$row = $result[0];
+		if($row["id"]==$row["rootId"])
+			return $row["name"];
+			
+		$name = $this->getAccountBreadcrumb($row["parentId"])." - ".$row["name"];
+		return $name;
 	}
 }
 ?>
