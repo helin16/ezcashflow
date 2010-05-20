@@ -2,10 +2,8 @@
 
 class TopExpensePanel extends TPanel  
 {
-	public $noOfItems=5;
+	public $noOfItems=10;
 	public $excludingAccountIds="32,33,34";
-	public $startDate = "1790-01-01 00:00:00";
-	public $endDate = "9999-12-31 23:59:59";
 	
 	/**
 	 * getter noOfItems
@@ -59,12 +57,12 @@ class TopExpensePanel extends TPanel
 		$transactionService = new TransactionService();
 		
 		$excludingAccountIds=explode(",",$this->excludingAccountIds);
-		
+		$now = new HydraDate();
 		$sql ="select distinct acc.id,
 					acc.name,
 					acc.budget,
 					(
-						select if(sum(tt.value) is null,0,sum(tt.value)) 
+						select round(((if(sum(tt.value) is null,0,sum(tt.value))/((TIMESTAMPDIFF(second,acc.created,'$now')))) * 3600 * 24 *365 /12),2) 
 						from transaction tt 
 						inner join accountentry acc1 on (acc1.active = 1 and tt.toId=acc1.id)
 						where tt.active = 1
@@ -74,6 +72,8 @@ class TopExpensePanel extends TPanel
 				where acc.rootId=4
 				and acc.budget!=0
 				and acc.id not in (".implode(",",$excludingAccountIds).")
+				group by acc.id
+				having (`sum`-acc.budget)>0
 				order by round((`sum`-acc.budget)) desc
 				limit {$this->noOfItems}";
 		$accounts = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);

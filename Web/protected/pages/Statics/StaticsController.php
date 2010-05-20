@@ -104,13 +104,16 @@ class StaticsController extends EshopPage
 	
 	private function getValue($accountId)
 	{
+		$now = new HydraDate();
 		$sql="select acc.accountNumber,
+				(TIMESTAMPDIFF(second,acc.created,'$now')) `diff_day`,
 				(select count(distinct acc_c.id) from accountentry acc_c where acc_c.active = 1 and acc_c.parentId = acc.id) `count`
 				from accountentry acc 
 				where acc.active = 1 and acc.id = $accountId";
 		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		$count = $result[0]["count"];
 		$accounNumber = $result[0]["accountNumber"];
+		$diff_days = $result[0]["diff_day"];
 		
 		$sql = "select if(sum(tt.value) is null,0,sum(tt.value)) `sum` 
 				from transaction tt 
@@ -119,9 +122,6 @@ class StaticsController extends EshopPage
 		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		$msg = $result[0]["sum"];
 		
-		$sql = "select 	TIMESTAMPDIFF(second,min(t.created),max(t.created)) `diff_day` from transaction t where t.active=1";
-		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
-		$diff_days = $result[0]["diff_day"];
 		
 		$msg = round(($msg/$diff_days)*3600*24*365 /12,2);
 		if($count>0)
