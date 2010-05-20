@@ -23,7 +23,8 @@ class StaticsController extends EshopPage
 		$sql ="select 
 					(ceil((length(accountNumber)-1)/4)) len,
 					acc.id,
-					acc.name
+					acc.name,
+					acc.budget
 				from accountentry acc
 				where acc.active = 1
 				and acc.accountNumber like '$rootId%'
@@ -35,14 +36,19 @@ class StaticsController extends EshopPage
 			foreach($result as $row)
 			{
 				$value = $this->getValue($row["id"]);
+				$budget = $row["budget"];
+				$color = (intval($budget)!=0 && $budget < $value) ? "#ff0000" : "#00ff00";
+				
 				$html .="<tr ".($rowNo%2==0 ? "" : "style='background:#eeeeee;'").">";
 					$html .="<td width='150px'  style='font-size:12px;'>";
 						$html .=$row['len']==0 ? "" : str_repeat("&nbsp;&nbsp;",($row['len']));
 						$html .=$row["name"];
 					$html .="</td>";
 					$html .="<td  style='font-size:10px;'>";
-						$html .="<div style=\"float:left;position:relative;background:#00ff00; width:".round(((is_numeric($value) ? $value : 0)*$this->onePercentageWidth))."px; height:15px;\"></div>";
-						$html .="&nbsp;$value";
+						$html .="<div style=\"float:left;position:relative;background:$color; width:".round(((is_numeric($value) ? $value : 0)*$this->onePercentageWidth))."px; height:15px;\"></div>";
+						$html .="&nbsp;$ $value ";
+						if($budget!=0 && $budget<$value)
+							$html .= "($ $budget)";
 					$html .="</td>";
 				$html .="</tr>";
 				$rowNo++;
