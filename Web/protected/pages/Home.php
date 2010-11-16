@@ -8,5 +8,12 @@ class Home extends EshopPage
 			$this->Response->redirect("/login.html");
 		}
 	}
+	
+	public function reload()
+	{
+		$this->Expense->reload();
+		$this->Income->reload();
+		$this->Transfer->reload();
+	}
 }
 ?>
