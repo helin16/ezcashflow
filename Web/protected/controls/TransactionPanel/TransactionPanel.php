@@ -230,7 +230,7 @@ class TransactionPanel extends TTemplateControl
 			return;
 		}
 		
-		$this->reload();
+		$this->Page->reload();
 		$this->infoMsg->Text = $successMsg;
 		$this->fromAccounts->focus();
 	}
