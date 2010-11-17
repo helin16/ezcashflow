@@ -169,7 +169,7 @@ class TransactionPanel extends TTemplateControl
 	{
 		$msg="";
 		$value = str_replace(",","",trim($this->transValue->Text));
-		if(preg_match("/^(\d{1,3}(\,\d{3})*|(\d+))(\.\d{2})?$/", $value))
+		if(preg_match("/^(\d{1,3}(\,\d{3})*|(\d+))(\.\d{1,2})?$/", $value))
 		{
 			$function =trim($this->pageFunc);
 			if($function!="")
@@ -217,7 +217,7 @@ class TransactionPanel extends TTemplateControl
 			return;
 		}
 		
-		$value=trim($this->transValue->Text);
+		$value = str_replace(",","",trim($this->transValue->Text));
 		$description=trim($this->description->Text);
 		
 		try{
