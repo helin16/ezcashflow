@@ -78,21 +78,33 @@ class TopExpensePanel extends TPanel
 				limit {$this->noOfItems}";
 		$accounts = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		
-		$html="<table width='100%'>";
+		$html="<table>";
 			//show all names
 			$names = array();
-			$html.="<tr style='background:black;color:white;'>";
-			foreach($accounts as $account)
-			{
-				$html .="<td>{$account["name"]}<br /><i style='font-size:10px'>$ {$account["budget"]} ~ $".($account["sum"]-$account["budget"])."</i></td>";
-			}
+			$html.="<tr style='background:#555555;color:#dddddd;'>";
+				$html .="<td width='120px'>Name</td>";
+				$html .="<td width='80px'>Spend</td>";
+				$html .="<td width='80px'>Budget</td>";
+				$html .="<td width='80px'>Over</td>";
 			$html.="</tr>";
-			
-			$html.="<tr>";
+			$totalOverBudget = 0;
+			$row=0;
 			foreach($accounts as $account)
 			{
-				$html .="<td>".$this->makeURLToReport("$ ".$account["sum"],array(),array($account["id"]),"","")."</td>";
+				$html.="<tr ".( $row++ % 2!=0 ? "style='background:#cccccc;'" : "").">";
+					$overBudget =$account["sum"]-$account["budget"];
+					$html .="<td>{$account["name"]}</td>";
+					$html .="<td>".$this->makeURLToReport("$".$account["sum"],array(),array($account["id"]),"","")."</td>";
+					$html .="<td>{$account["budget"]}</td>";
+					$html .="<td>$overBudget</td>";
+					$totalOverBudget +=$overBudget;
+				$html.="</tr>";
 			}
+			$html.="<tr style='background:#555555;color:#dddddd;'>";
+				$html .="<td>Total</td>";
+				$html .="<td>&nbsp;</td>";
+				$html .="<td>&nbsp;</td>";
+				$html .="<td>$totalOverBudget</td>";
 			$html.="</tr>";
 		$html.="</table>";
 		

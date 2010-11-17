@@ -12,6 +12,7 @@ class EshopPage extends TPage
 	{
 		$this->getMaster()->InfoMsg->Text=$msg;
 	}
+	
 	public function setErrorMsg($msg)
 	{
 		$this->getMaster()->ErrorMsg->Text=$msg;

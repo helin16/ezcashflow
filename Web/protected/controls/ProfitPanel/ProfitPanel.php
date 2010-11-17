@@ -82,39 +82,58 @@ class ProfitPanel extends TPanel
 		$year_expense = (trim($year_expense)=="") ? 0 :$year_expense;
 		$year_diff=$year_income-$year_expense;
 		
-		$html="<table width='100%'>";
-			$html.="<tr style='background:black;color:white;'>";
+		// all
+		$today = new HydraDate("now");
+		$start = $today->getDateTime()->format("1791-01-01 00:00:00");
+		$today->modify("+1 year");
+		$end = $today->getDateTime()->format("9999-01-01 00:00:00");
+		$all_start = $start;
+		$all_end = $end;
+		$all_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3);
+		$all_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4);
+		$all_income = (trim($all_income)=="") ? 0 :$all_income;
+		$all_expense = (trim($all_expense)=="") ? 0 :$all_expense;
+		$all_diff=$all_income-$all_expense;
+		
+		$html="<table>";
+			$html.="<tr style='background:#555555;color:#dddddd;'>";
 				$html .="<td  width='60px'>&nbsp;</td>";
-				$html .="<td>
+				$html .="<td width='100px'>
 							Day<br />
 							<i style='font-size:9px'>$day_start ~ <br />$day_end </i>
 						</td>";
-				$html .="<td>
+				$html .="<td width='100px'>
 							Week<br />
 							<i style='font-size:9px'>$week_start ~ <br />$week_end </i>
 						</td>";
-				$html .="<td>
+				$html .="<td width='100px'>
 							Month<br />
 							<i style='font-size:9px'>$month_start ~ <br />$month_end </i>
 						</td>";
-				$html .="<td>
+				$html .="<td width='100px'>
 							Year<br />
 							<i style='font-size:9px'>$year_start ~ <br />$year_end </i>
+						</td>";
+				$html .="<td width='100px'>
+							All<br />
+							<i style='font-size:9px'>$all_start ~ <br />$all_end </i>
 						</td>";
 			$html.="</tr>";
 			$html.="<tr>";
 				$html .="<td>Income</td>";
-				$html .="<td>".$this->makeURLToReport("$ $day_income",array(),$incomeAccountIds,$day_start,$day_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("$ $week_income",array(),$incomeAccountIds,$week_start,$week_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("$ $month_income",array(),$incomeAccountIds,$month_start,$month_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("$ $year_income",array(),$incomeAccountIds,$year_start,$year_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$day_income",array(),$incomeAccountIds,$day_start,$day_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$week_income",array(),$incomeAccountIds,$week_start,$week_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$month_income",array(),$incomeAccountIds,$month_start,$month_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$year_income",array(),$incomeAccountIds,$year_start,$year_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$all_income",array(),$incomeAccountIds,$all_start,$all_end)."</td>";
 			$html.="</tr>";
 			$html.="<tr style='background:#cccccc;'>";
 				$html .="<td>Expense</td>";
-				$html .="<td>".$this->makeURLToReport("$ $day_expense",array(),$expenseAccountIds,$day_start,$day_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("$ $week_expense",array(),$expenseAccountIds,$week_start,$week_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("$ $month_expense",array(),$expenseAccountIds,$month_start,$month_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("$ $year_expense",array(),$expenseAccountIds,$year_start,$year_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$day_expense",array(),$expenseAccountIds,$day_start,$day_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$week_expense",array(),$expenseAccountIds,$week_start,$week_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$month_expense",array(),$expenseAccountIds,$month_start,$month_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$year_expense",array(),$expenseAccountIds,$year_start,$year_end)."</td>";
+				$html .="<td>".$this->makeURLToReport("\$$all_expense",array(),$expenseAccountIds,$all_start,$all_end)."</td>";
 			$html.="</tr>";
 			$html.="<tr style='font-weight:bold;'>";
 				$html .="<td>Diff</td>";
@@ -122,6 +141,7 @@ class ProfitPanel extends TPanel
 				$html .="<td>$ $week_diff</td>";
 				$html .="<td>$ $month_diff</td>";
 				$html .="<td>$ $year_diff</td>";
+				$html .="<td>$ $all_diff</td>";
 			$html.="</tr>";
 		$html.="</table>";
 		return $html;
