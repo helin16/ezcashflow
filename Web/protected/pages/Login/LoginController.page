@@ -1,4 +1,4 @@
-<%@ %>
+<%@MasterClass="Application.layout.default.DefaultLayout"%>
 <com:TContent ID="MainContent">
 	<div class="bodyWrapper">
 		<com:TPanel ID="loginForm" DefaultButton="loginBtn">

@@ -8,6 +8,15 @@ class EshopPage extends TPage
 		$this->getPage()->setMasterClass("Application.layout.default.DefaultLayout");
 	}
 	
+	public function __construct()
+	{
+		parent::__construct();
+		if(!Core::getUser() instanceof UserAccount)
+		{
+			$this->Response->redirect("/login.html");
+		}
+	}
+	
 	public function setInfoMsg($msg)
 	{
 		$this->getMaster()->InfoMsg->Text=$msg;

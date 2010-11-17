@@ -1,5 +1,5 @@
 <?php
-class LoginController extends EshopPage 
+class LoginController extends TPage  
 {
 	public function onLoad($param)
 	{
