@@ -163,6 +163,9 @@ class AccountsController extends EshopPage
     	Dao::execSql($sql);
     	$sql="update transaction set fromId = $toAccountId,updatedById =$userAccountId where fromId = $fromAccountId and active = 1";
     	Dao::execSql($sql);
+    	
+    	$this->setInfoMsg("All transactions have been updated from '$fromAccountId' to '$toAccountId'!");
+    	$this->showAccounts();
     }
 }
 ?>
