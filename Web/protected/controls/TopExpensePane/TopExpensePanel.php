@@ -95,8 +95,8 @@ class TopExpensePanel extends TPanel
 					$overBudget =$account["sum"]-$account["budget"];
 					$html .="<td>{$account["name"]}</td>";
 					$html .="<td>".$this->makeURLToReport("$".$account["sum"],array(),array($account["id"]),"","")."</td>";
-					$html .="<td>{$account["budget"]}</td>";
-					$html .="<td>$overBudget</td>";
+					$html .="<td>\${$account["budget"]}</td>";
+					$html .="<td>\$$overBudget</td>";
 					$totalOverBudget +=$overBudget;
 				$html.="</tr>";
 			}
