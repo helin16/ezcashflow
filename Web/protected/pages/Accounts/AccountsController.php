@@ -124,6 +124,7 @@ class AccountsController extends EshopPage
     	$subAccountNo = trim($this->DataList->getEditItem()->subAccountno->Text);
     	$subAccountValue = trim($this->DataList->getEditItem()->subAccountValue->Text);
     	$subAccountComments = trim($this->DataList->getEditItem()->subAccountComments->Text);
+    	$subBudget = str_replace(" ","",str_replace(",","",trim($this->DataList->getEditItem()->subAccountBudget->Text)));
 		$parentId = trim($param->CommandParameter);
     	
     	$accountService = new AccountEntryService();
@@ -134,6 +135,7 @@ class AccountsController extends EshopPage
     	$subAccount->setAccountNumber($subAccountNo);
     	$subAccount->setComments($subAccountComments);
     	$subAccount->setParent($parent);
+    	$subAccount->setBudget($subBudget);
     	$subAccount->setRoot($parent->getRoot());
     	$accountService->save($subAccount);
     	

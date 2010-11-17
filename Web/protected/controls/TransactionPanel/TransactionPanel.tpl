@@ -7,7 +7,7 @@
 				From
 			</td>
 			<td>
-				<com:TDropDownList Id="fromAccounts" DataValueField="id" DataTextField="name"/>&nbsp;&nbsp;
+				<com:TDropDownList Id="fromAccounts" DataValueField="id" DataTextField="longshot"/>&nbsp;&nbsp;
 				<com:TActiveLabel Id="fromAccountsMsg" ForeColor="red"/>
 			</td>
 		</tr>
@@ -16,7 +16,7 @@
 				To
 			</td>
 			<td>
-				<com:TDropDownList Id="toAccounts" DataValueField="id" DataTextField="name"/>
+				<com:TDropDownList Id="toAccounts" DataValueField="id" DataTextField="longshot"/>
 				&nbsp;&nbsp;
 				<com:TActiveLabel Id="toAccountsMsg" ForeColor="red"/>
 			</td>

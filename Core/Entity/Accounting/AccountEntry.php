@@ -153,7 +153,69 @@ class AccountEntry extends HydraEntity
 		$this->budget = $budget;
 	}
 	
+	public function getSum($includeChildren=false,$inclSelf=true)
+	{
+		$sql = "select sum(t.value) from transaction t 
+							where t.active =1 and t.fromId=".$this->getId();
+		$result = Dao::getResultsNative($sql);
+		$out = $result[0][0];
+		
+		$sql = "select sum(t.value) from transaction t 
+							where t.active =1 and t.toId=".$this->getId();
+		$result = Dao::getResultsNative($sql);
+		$in = $result[0][0];
+		
+		return $this->getValue() + $in - $out;
+	}
 	
+	public function getChildren($inclSelf=false)
+	{
+		$service = new BaseService(get_class($this));
+		$where = "accountNumber like '".$this->getAccountNumber()."%'";
+		if(!$inclSelf)
+			$where .=" AND id != ".$this->getId();
+		return $service->findByCriteria($where);
+	}
+	
+	public function getSnapshot()
+	{
+		return $this->getRoot()." - ".$this->getName()." - $".$this->getSum();
+	}
+	
+	public function getLongshot()
+	{
+		return $this->getBreadCrumbs()." - $".$this->getSum();
+	}
+	
+	public function getBreadCrumbs($inclSelf=true,$forId=false,$separator=" / ")
+	{
+		$return = array();
+		$parents = $this->getParents($inclSelf);
+		$parents = array_reverse($parents);
+		foreach($parents as $p)
+		{
+			if($forId)
+				$return[]  = $p->getId();
+			else
+				$return[]  = $p->getName();
+		}
+		return implode($separator,$return);
+	}
+	
+	public function getParents($inclSelf=false)
+	{
+		$parents = array();
+		if($inclSelf)
+			$parents[] = $this;
+			
+		$node = $this;
+		while(trim($node->getAccountNumber())!=trim($node->getRoot()->getAccountNumber()))
+		{
+			$node = $node->getParent();
+			$parents[] = $node;
+		}
+		return $parents;
+	}
 	
 	public function __toString()
 	{

@@ -126,9 +126,6 @@ class TransactionPanel extends TTemplateControl
 		$this->transType = $transType;
 	}
 	
-	
-	
-	
 	public function loadAccounts(TDropDownList &$list,$accountRootIds)
 	{
 		$accountRootIds = trim($accountRootIds);
@@ -136,32 +133,19 @@ class TransactionPanel extends TTemplateControl
 		$accountRootIds = explode(",",$accountRootIds);
 		if(count($accountRootIds)==0) return;
 		
-		$sql ="
-			select ac.id,concat(acr.name,' - ', ac.name, ' - $',
-					(
-						if(ac.value='',0,round(ac.value,2))
-						+round((
-							select if(sum(t.value) is null,0, sum(t.value))
-							from transaction t 
-							where (t.active =1 and t.toId=ac.id)
-						),2)
-						-round((
-						select if(sum(t.value) is null,0, sum(t.value))
-						from transaction t 
-						where (t.active =1 and t.fromId=ac.id)
-						),2) 
-					)
-					) as name
-				
-				from accountentry ac 
-				inner join accountentry acr on (acr.id = ac.rootId and acr.active = 1)
-				where ac.active = 1 
-				and ac.rootId  in (".implode(",",$accountRootIds).")
-				and ((select if(count(acc.id)=0,1,0) from accountentry acc where acc.parentId = ac.id and acc.active = 1))=1
-				order by ac.rootId asc, name asc
-			";
-		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
-		$list->DataSource = $result;
+		$array = array();
+		$service = new BaseService("AccountEntry");
+		foreach($accountRootIds as $rootId)
+		{
+			$result = $service->findByCriteria("rootId in ($rootId) and id not in (".implode(",",$accountRootIds).")");
+			foreach($result as $a)
+			{
+				if(count($a->getChildren())==0)
+					$array[strtolower(str_replace(" ","",$a->getBreadCrumbs()))] = $a;
+			}
+		}
+		krsort($array);
+		$list->DataSource = $array;
 		$list->DataBind();
 	}
 	
