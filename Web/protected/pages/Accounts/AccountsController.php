@@ -79,6 +79,16 @@ class AccountsController extends EshopPage
 		$accountService = new AccountEntryService();
 		$array = $this->DataList->getEditItem()->getData();
 		$this->DataList->getEditItem()->subAccountno->Text = $accountService->getNextAccountNo($accountService->get($array["id"]));
+		
+		$array = array();
+		foreach($accountService->findAll() as $a)
+		{
+			$array[strtolower(str_replace(" ","",$a->getBreadCrumbs()))] = $a;
+		}
+		krsort($array);
+		$array = array_reverse($array);
+		$this->DataList->getEditItem()->moveTransToAccountList->DataSource = $array;
+		$this->DataList->getEditItem()->moveTransToAccountList->DataBind();
     }
     
 	public function cancel($sender,$param)
@@ -141,6 +151,18 @@ class AccountsController extends EshopPage
     	
     	$this->setInfoMsg("new Account($subAccount) added successfully!");
     	$this->showAccounts();
+    }
+    
+    public function moveAllTransactions($sender,$param)
+    {
+    	$fromAccountId = trim($param->CommandParameter);
+    	$toAccountId = trim($this->DataList->getEditItem()->moveTransToAccountList->getSelectedValue());
+    	
+    	$userAccountId = Core::getUser()->getId();
+    	$sql="update transaction set toId = $toAccountId,updatedById =$userAccountId where toId = $fromAccountId and active = 1";
+    	Dao::execSql($sql);
+    	$sql="update transaction set fromId = $toAccountId,updatedById =$userAccountId where fromId = $fromAccountId and active = 1";
+    	Dao::execSql($sql);
     }
 }
 ?>

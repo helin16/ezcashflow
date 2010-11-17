@@ -145,6 +145,7 @@ class TransactionPanel extends TTemplateControl
 			}
 		}
 		krsort($array);
+		$array = array_reverse($array);
 		$list->DataSource = $array;
 		$list->DataBind();
 	}
