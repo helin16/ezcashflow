@@ -8,14 +8,17 @@ class AccountEntryService extends BaseService
 	
 	public function getNextAccountNo(accountentry $parent)
 	{
-		$sql ="select max(accountNumber) as max from accountentry where parentId = ".$parent->getId();
-		$results = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
-		if(count($results)==0)
-			return $parent->getAccountNumber()."0001";
-		else if($results[0]["max"]=="")
-			return $parent->getAccountNumber()."0001";
-		
-		return str_pad($results[0]["max"]+1,4,"0",STR_PAD_LEFT);
+		$i=1;
+		$parentAccountNumber = $parent->getAccountNumber();
+		$sql="select id from accountentry where accountNumber ='".$parent->getAccountNumber()."000$i'";
+		$result = Dao::getResultsNative($sql);
+		while(count($result)>0)
+		{
+			$sql="select id from accountentry where accountNumber ='".$parent->getAccountNumber()."000".($i++)."'";
+			$result = Dao::getResultsNative($sql);
+		}
+			
+		return $parentAccountNumber.str_pad($i,4,"0",STR_PAD_LEFT);
 	}
 	
 	public function getChildrenAccounts(accountentry $parent,$includeSelf=false,$includeAll=false)

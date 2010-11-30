@@ -29,13 +29,19 @@ class ReportsController extends EshopPage
 		}
 	}
 	
-	public function bindAccounts($list)
+	public function bindAccounts($list, $leafOnly=false)
 	{
 		$accountService = new AccountEntryService();
 		$array = array();
 		foreach($accountService->findAll() as $a)
 		{
-			$array[$a->getLongshot()] = $a;
+			if($leafOnly)
+			{
+				if(count($a->getChildren())==0)
+					$array[$a->getLongshot()] = $a;
+			}
+			else
+				$array[$a->getLongshot()] = $a;
 		}
 		ksort($array);
 		$list->DataSource = $array;
@@ -101,8 +107,8 @@ class ReportsController extends EshopPage
 		$this->search(null,null);
 		
 		$editItem = $this->DataList->getEditItem();
-		$this->bindAccounts($editItem->fromAccountList);
-		$this->bindAccounts($editItem->toAccountList);
+		$this->bindAccounts($editItem->fromAccountList,true);
+		$this->bindAccounts($editItem->toAccountList,true);
 		$editItem->date->Text=$editItem->getData()->getCreated();
 		$editItem->value->Text=$editItem->getData()->getValue();
 		$editItem->comments->Text=$editItem->getData()->getComments();
