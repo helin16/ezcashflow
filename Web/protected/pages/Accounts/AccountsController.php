@@ -81,14 +81,21 @@ class AccountsController extends EshopPage
 		$this->DataList->getEditItem()->subAccountno->Text = $accountService->getNextAccountNo($accountService->get($array["id"]));
 		
 		$array = array();
+		$moveAccounts = array();
 		foreach($accountService->findAll() as $a)
 		{
 			$array[strtolower(str_replace(" ","",$a->getBreadCrumbs()))] = $a;
+			if($a->getSum()==0)
+				$moveAccounts[strtolower(str_replace(" ","",$a->getBreadCrumbs()))] = $a;
 		}
 		krsort($array);
 		$array = array_reverse($array);
+		krsort($moveAccounts);
+		$moveAccounts = array_reverse($moveAccounts);
 		$this->DataList->getEditItem()->moveTransToAccountList->DataSource = $array;
 		$this->DataList->getEditItem()->moveTransToAccountList->DataBind();
+		$this->DataList->getEditItem()->moveToAccountList->DataSource = $moveAccounts;
+		$this->DataList->getEditItem()->moveToAccountList->DataBind();
     }
     
 	public function cancel($sender,$param)
@@ -165,6 +172,31 @@ class AccountsController extends EshopPage
     	Dao::execSql($sql);
     	
     	$this->setInfoMsg("All transactions have been updated from '$fromAccountId' to '$toAccountId'!");
+    	$this->showAccounts();
+    }
+    
+    public function moveAccount($sender,$param)
+    {
+    	$fromAccountId = trim($param->CommandParameter);
+    	$toAccountId = trim($this->DataList->getEditItem()->moveToAccountList->getSelectedValue());
+    	
+    	$accountService = new AccountEntryService();
+    	$fromAccount = $accountService->get($fromAccountId);
+    	$fromAccountNo = $fromAccount->getAccountNumber();
+    	$toAccount = $accountService->get($toAccountId);
+    	$toAccountNo = $toAccount->getAccountNumber();
+    	
+    	$newFromAccountNo = $accountService->getNextAccountNo($toAccount);
+    	$fromAccount->setAccountNumber($newFromAccountNo);
+    	$fromAccount->setParent($toAccount);
+    	$fromAccount->setRoot($toAccount->getRoot());
+    	$accountService->save($fromAccount);
+    	
+    	$userAccountId = Core::getUser()->getId();
+    	$sql="update accountentry set rootId = ".$toAccount->getRoot()->getId().",accountNumber = REPLACE(accountNumber,'$fromAccountNo','$newFromAccountNo'),updatedById =$userAccountId where accountNumber like '$fromAccountNo%' and active = 1";
+    	Dao::execSql($sql);
+    	
+    	$this->setInfoMsg("Account '".$fromAccount->getLongshot()."' have been updated to be under '".$toAccount->getLongshot()."'!");
     	$this->showAccounts();
     }
 }

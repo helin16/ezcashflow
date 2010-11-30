@@ -104,6 +104,8 @@
 					</tr>
 				</table>
 				<com:TCheckBox Text="Add Account Under this one" Attributes.OnClick="if(this.checked==true){$('<%= $this->subAccountPanel->getClientId() %>').show();}else{$('<%= $this->subAccountPanel->getClientId() %>').hide();}"/>
+				<com:TCheckBox Text="Move Account" 
+						Attributes.OnClick="if(this.checked==true){$('<%= $this->moveAccount->getClientId() %>').show();}else{$('<%= $this->moveAccount->getClientId() %>').hide();}"/>
 				<com:TCheckBox Text="Move All Transactions Another Account" 
 						Attributes.OnClick="if(this.checked==true){$('<%= $this->moveHistoryPanel->getClientId() %>').show();}else{$('<%= $this->moveHistoryPanel->getClientId() %>').hide();}"/>
 				<com:TPanel ID="subAccountPanel" GroupingText="New Account" style="display:none;">
@@ -173,6 +175,20 @@
 						<tr>
 							<td>
 								<com:TButton Text="Move All Transaction" OnCommand="Page.moveAllTransactions" CommandParameter="<%# $this->DataItem['id']%>" width="180px"/>
+							</td>
+						</tr>
+					</table>
+				</com:TPanel>
+				<com:TPanel ID="moveAccount" GroupingText="Move this account under" style="display:none;">
+					<table width="100%">
+						<tr>
+							<td>
+								Target Account:<com:TDropDownList Id="moveToAccountList" DataValueField="id" DataTextField="longshot"/>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<com:TButton Text="Move" OnCommand="Page.moveAccount" CommandParameter="<%# $this->DataItem['id']%>" width="180px"/>
 							</td>
 						</tr>
 					</table>
