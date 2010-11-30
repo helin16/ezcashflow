@@ -31,31 +31,14 @@ class ReportsController extends EshopPage
 	
 	public function bindAccounts($list)
 	{
-		$sql ="
-			select ac.id,concat(acr.name,' - ', ac.name, ' - $',
-					(
-						if(ac.value='',0,round(ac.value,2))
-						+round((
-							select if(sum(t.value) is null,0, sum(t.value))
-							from transaction t 
-							where (t.active =1 and t.toId=ac.id)
-						),2)
-						-round((
-						select if(sum(t.value) is null,0, sum(t.value))
-						from transaction t 
-						where (t.active =1 and t.fromId=ac.id)
-						),2) 
-					)
-					) as name
-				
-				from accountentry ac 
-				inner join accountentry acr on (acr.id = ac.rootId and acr.active = 1)
-				where ac.active = 1 
-				and ((select if(count(acc.id)=0,1,0) from accountentry acc where acc.parentId = ac.id and acc.active = 1))=1
-				order by ac.rootId asc, name asc
-			";
-		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
-		$list->DataSource = $result;
+		$accountService = new AccountEntryService();
+		$array = array();
+		foreach($accountService->findAll() as $a)
+		{
+			$array[$a->getLongshot()] = $a;
+		}
+		ksort($array);
+		$list->DataSource = $array;
 		$list->DataBind();
 	}
 	

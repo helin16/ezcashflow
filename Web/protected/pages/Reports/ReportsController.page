@@ -26,7 +26,7 @@
 			<tr>
 				<td>From Account</td>
 				<td><com:TListBox Id="fromAccount"
-						DataTextField="name" 
+						DataTextField="longshot" 
 						DataValueField="id"
 						SelectionMode="Multiple"
 						Rows="3"
@@ -35,7 +35,7 @@
 			<tr>
 				<td>To Account</td>
 				<td><com:TListBox Id="toAccount"
-						DataTextField="name" 
+						DataTextField="longshot" 
 						DataValueField="id"
 						SelectionMode="Multiple"
 						Rows="3"
@@ -80,8 +80,8 @@
 						<td width="150px">
 							<com:TLinkButton Text="<%# $this->DataItem->getCreated()%>"  CommandName="edit" />
 						</td>
-						<td width="14%"><%# $this->DataItem->getFrom()%></td>
-						<td width="14%"><%# $this->DataItem->getTo()%></td>
+						<td width="14%"><%# $this->DataItem->getFrom()->getLongshot()%></td>
+						<td width="14%"><%# $this->DataItem->getTo()->getLongshot()%></td>
 						<td width="80px" align="right">$ <%# $this->Page->addTotalValue($this->DataItem->getValue()) %></td>
 						<td>&nbsp;&nbsp;<%# $this->DataItem->getComments()%></td>
 					</tr>
@@ -112,7 +112,7 @@
 						</td>
 						<td>
 							<com:TDropDownList Id="fromAccountList"
-								DataTextField="name" 
+								DataTextField="longshot" 
 								DataValueField="id"
 								PromptValue=" "
 								PromptText="NONE"
@@ -125,7 +125,7 @@
 						</td>
 						<td>
 							<com:TDropDownList Id="toAccountList"
-								DataTextField="name" 
+								DataTextField="longshot" 
 								DataValueField="id"
 							/>
 						</td>
