@@ -58,6 +58,8 @@
 						<td width="10%" align="right">$ <%# $this->Page->getValue($this->DataItem['id']) %></td>
 						<td width="10%" align="right">$ <%# $this->DataItem['budget'] %></td>
 						<td align="right">
+							<com:TImageButton ToolTip="Move Up" ImageUrl="/contents/images/arrow-up.gif" ID="upBtn" OnCommand="Page.movePosition" CommandParameter="<%# $this->DataItem['id']%>:up" Visible="<%# $this->Page->showArrow($this->DataItem['accountNumber'],'up')%>"/>
+							<com:TImageButton ToolTip="Move Down" ImageUrl="/contents/images/arrow-down.gif" ID="downBtn" OnCommand="Page.movePosition" CommandParameter="<%# $this->DataItem['id']%>:down"  Visible="<%# $this->Page->showArrow($this->DataItem['accountNumber'],'down')%>"/>
 							<%# $this->Page->makeURL("From Acc.",$this->DataItem['id'],'') %>
 							<%# $this->Page->makeURL("To Acc.",'',$this->DataItem['id']) %>
 						</td>

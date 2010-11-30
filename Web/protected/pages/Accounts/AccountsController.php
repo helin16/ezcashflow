@@ -71,7 +71,12 @@ class AccountsController extends EshopPage
 		else
 			$itemIndex = 0;
 
-		$this->DataList->SelectedItemIndex = -1;
+		$this->populateEditItem($itemIndex);
+    }
+    
+    private function populateEditItem($itemIndex)
+    {
+    	$this->DataList->SelectedItemIndex = -1;
 		$this->DataList->EditItemIndex = $itemIndex;
 		$this->showAccounts();
 		
@@ -137,6 +142,7 @@ class AccountsController extends EshopPage
     
     public function createNewAccount($sender,$param)
     {
+    	$editIndex = $this->DataList->EditItemIndex;
     	$subAccountName = trim($this->DataList->getEditItem()->subAccountName->Text);
     	$subAccountNo = trim($this->DataList->getEditItem()->subAccountno->Text);
     	$subAccountValue = trim($this->DataList->getEditItem()->subAccountValue->Text);
@@ -156,12 +162,13 @@ class AccountsController extends EshopPage
     	$subAccount->setRoot($parent->getRoot());
     	$accountService->save($subAccount);
     	
-    	$this->setInfoMsg("new Account($subAccount) added successfully!");
-    	$this->showAccounts();
+    	$this->setInfoMsg("new Account(".$subAccount->getLongshot().") added successfully!");
+    	$this->populateEditItem($editIndex);
     }
     
     public function moveAllTransactions($sender,$param)
     {
+    	$editIndex = $this->DataList->EditItemIndex;
     	$fromAccountId = trim($param->CommandParameter);
     	$toAccountId = trim($this->DataList->getEditItem()->moveTransToAccountList->getSelectedValue());
     	
@@ -172,11 +179,12 @@ class AccountsController extends EshopPage
     	Dao::execSql($sql);
     	
     	$this->setInfoMsg("All transactions have been updated from '$fromAccountId' to '$toAccountId'!");
-    	$this->showAccounts();
+    	$this->populateEditItem($editIndex);
     }
     
     public function moveAccount($sender,$param)
     {
+    	$editIndex = $this->DataList->EditItemIndex;
     	$fromAccountId = trim($param->CommandParameter);
     	$toAccountId = trim($this->DataList->getEditItem()->moveToAccountList->getSelectedValue());
     	
@@ -197,7 +205,48 @@ class AccountsController extends EshopPage
     	Dao::execSql($sql);
     	
     	$this->setInfoMsg("Account '".$fromAccount->getLongshot()."' have been updated to be under '".$toAccount->getLongshot()."'!");
-    	$this->showAccounts();
+    	$this->populateEditItem($editIndex);
+    }
+    
+    public function showArrow($accountNo,$direction)
+    {
+    	if(strlen($accountNo)==1)
+    		return false;
+    	$nextNo = ($direction=="up" ? ($accountNo - 1) : ($accountNo + 1 ));
+    	$sql="select id from accountentry where accountNumber = '$nextNo' and active = 1 limit 1";
+    	$result = Dao::getResultsNative($sql);
+    	return count($result)>0;
+    }
+    
+    public function movePosition($sender,$param)
+    {
+    	$this->setErrorMsg("");
+    	$this->setInfoMsg("");
+    	list($accountId,$direction) = explode(":",trim($param->CommandParameter));
+    	
+    	$accountService = new AccountEntryService();
+    	$account = $accountService->get($accountId);
+    	$parentAccountNo = $account->getParent()->getAccountNumber();
+    	$accountNo = $account->getAccountNumber();
+    	$accountNoNext = (strtolower(trim($direction))=="up" ? ( $accountNo - 1) : ($accountNo + 1));
+    	
+    	$anotherAccount = $accountService->getAccountFromAccountNo($accountNoNext);
+    	if(!$anotherAccount instanceof AccountEntry)
+    	{
+    		$this->setErrorMsg("Invalid account!");
+    		return;
+    	}
+    	$account->setAccountNumber($parentAccountNo."000");
+    	$accountService->save($account);
+    	
+    	$anotherAccount->setAccountNumber($accountNo);
+    	$accountService->save($anotherAccount);
+    	
+    	$account->setAccountNumber($accountNoNext);
+    	$accountService->save($account);
+    	
+    	$this->setInfoMsg("Account '".$account->getLongshot()."' re-ordered!");
+    	$this->showAccounts();   
     }
 }
 ?>

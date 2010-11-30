@@ -44,4 +44,13 @@ class AccountEntryService extends BaseService
 		$results = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		return $results[0]["sum"];
 	}
+	
+	public function getAccountFromAccountNo($accountNo)
+	{
+		$accounts = $this->findByCriteria("accountNumber='$accountNo'");
+		if(count($accounts)==0)
+			return null;
+			
+		return $accounts[0];
+	}
 }
