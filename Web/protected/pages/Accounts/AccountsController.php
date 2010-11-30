@@ -210,12 +210,47 @@ class AccountsController extends EshopPage
     
     public function showArrow($accountNo,$direction)
     {
+    	$accountService = new AccountEntryService();
+    	$account = $accountService->getAccountFromAccountNo($accountNo);
+    	if(!$account instanceof AccountEntry)
+    		return false;
+    		
+    	if(count($account->getChildren())>0)
+    		return false;
+    		
     	if(strlen($accountNo)==1)
     		return false;
     	$nextNo = ($direction=="up" ? ($accountNo - 1) : ($accountNo + 1 ));
     	$sql="select id from accountentry where accountNumber = '$nextNo' and active = 1 limit 1";
     	$result = Dao::getResultsNative($sql);
     	return count($result)>0;
+    }
+    
+    public function showDelete($accountId)
+    {
+    	$accountService = new AccountEntryService();
+    	$account = $accountService->get($accountId);
+    	if(!$account instanceof AccountEntry)
+    		return false;
+    	return count($account->getChildren())==0;
+    }
+    
+    public function deleteAccount($sender,$param)
+    {
+    	$this->setErrorMsg("");
+    	$this->setInfoMsg("");
+    	$accountService = new AccountEntryService();
+    	$account = $accountService->get(trim($param->CommandParameter));
+    	if(!$account instanceof AccountEntry)
+    	{
+    		$this->setErrorMsg("Invalid account!");
+    		return;
+    	}
+    	
+    	$account->setActive(false);
+    	$accountService->save($account);
+    	$this->setInfoMsg("Account '".$account->getLongshot()."' deleted!");
+    	$this->showAccounts();   
     }
     
     public function movePosition($sender,$param)
@@ -244,6 +279,12 @@ class AccountsController extends EshopPage
     	
     	$account->setAccountNumber($accountNoNext);
     	$accountService->save($account);
+    	
+//    	$userAccountId = Core::getUser()->getId();
+//    	$sql="update accountentry set accountNumber = REPLACE(accountNumber,'$accountNo','".$account->getAccountNumber()."'),updatedById =$userAccountId where accountNumber like '$accountNo%' and active = 1";
+//    	Dao::execSql($sql);
+//    	$sql="update accountentry set accountNumber = REPLACE(accountNumber,'$accountNoNext','".$anotherAccount->getAccountNumber()."'),updatedById =$userAccountId where accountNumber like '$accountNoNext%' and active = 1";
+//    	Dao::execSql($sql);
     	
     	$this->setInfoMsg("Account '".$account->getLongshot()."' re-ordered!");
     	$this->showAccounts();   

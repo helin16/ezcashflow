@@ -50,18 +50,19 @@
 			<prop:ItemTemplate>
 				<table width="100%">
 					<tr>
-						<td width="30%">
+						<td width="25%">
 							<%# $this->DataItem['len']==0 ? "" : str_repeat("&nbsp;&nbsp;",($this->DataItem['len'])) %>
 							<com:TLinkButton Text="<%# $this->DataItem['name']%>"  CommandName="edit" />
 						</td>
-						<td width="10%"><%# $this->DataItem['accountNumber']%></td>
+						<td width="15%"><%# $this->DataItem['accountNumber']%></td>
 						<td width="10%" align="right">$ <%# $this->Page->getValue($this->DataItem['id']) %></td>
 						<td width="10%" align="right">$ <%# $this->DataItem['budget'] %></td>
 						<td align="right">
 							<com:TImageButton ToolTip="Move Up" ImageUrl="/contents/images/arrow-up.gif" ID="upBtn" OnCommand="Page.movePosition" CommandParameter="<%# $this->DataItem['id']%>:up" Visible="<%# $this->Page->showArrow($this->DataItem['accountNumber'],'up')%>"/>
 							<com:TImageButton ToolTip="Move Down" ImageUrl="/contents/images/arrow-down.gif" ID="downBtn" OnCommand="Page.movePosition" CommandParameter="<%# $this->DataItem['id']%>:down"  Visible="<%# $this->Page->showArrow($this->DataItem['accountNumber'],'down')%>"/>
-							<%# $this->Page->makeURL("From Acc.",$this->DataItem['id'],'') %>
-							<%# $this->Page->makeURL("To Acc.",'',$this->DataItem['id']) %>
+							<%# $this->Page->makeURL("From",$this->DataItem['id'],'') %>
+							<%# $this->Page->makeURL("To",'',$this->DataItem['id']) %>
+							<com:TImageButton ToolTip="Delete This Account" ImageUrl="/contents/images/delete.jpg" ID="deleteBtn" OnCommand="Page.deleteAccount" CommandParameter="<%# $this->DataItem['id']%>"  Visible="<%# $this->Page->showDelete($this->DataItem['id'])%>"/>
 						</td>
 					</tr>
 				</table>
