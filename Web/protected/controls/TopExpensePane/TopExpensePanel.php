@@ -3,7 +3,7 @@
 class TopExpensePanel extends TPanel  
 {
 	public $noOfItems=10;
-	public $excludingAccountIds="32,33,34";
+	public $excludingAccountIds="91";
 	
 	/**
 	 * getter noOfItems
@@ -57,6 +57,11 @@ class TopExpensePanel extends TPanel
 		$transactionService = new TransactionService();
 		
 		$excludingAccountIds=explode(",",$this->excludingAccountIds);
+		$notLike = array();
+		foreach(Dao::getResultsNative("select accountnumber from accountentry where active = 1 and id in (".implode(",",$excludingAccountIds).")") as $row)
+		{
+			$notLike[] = $row[0];
+		}
 		$now = new HydraDate();
 		$sql ="select distinct acc.id,
 					acc.name,
@@ -71,7 +76,7 @@ class TopExpensePanel extends TPanel
 				from accountentry acc
 				where acc.rootId=4
 				and acc.budget!=0
-				and acc.id not in (".implode(",",$excludingAccountIds).")
+				".(count($notLike)>0 ? "and (acc.accountNumber not like '".(implode("%' AND acc.accountNumber not like '",$notLike))."%')" : "")."
 				group by acc.id
 				having (`sum`-acc.budget)>0
 				order by round((`sum`-acc.budget)) desc
