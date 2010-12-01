@@ -13,12 +13,13 @@ class StaticsController extends EshopPage
 	{
 		if(!$this->IsPostBack)
 		{
-			$this->getBars($this->expense_bar,4);
+			$this->getBars($this->expense_bar,4,"40001");
+			$this->getBars($this->investment_bar,4,"40002");
 			$this->getBars($this->income_bar,3);
 		}
 	}
 	
-	public function getBars($tabview=null,$rootId=4)
+	public function getBars($tabview=null,$rootId=4,$likeAccountNo="")
 	{
 		$sql ="select 
 					(ceil((length(accountNumber)-1)/4)) len,
@@ -27,7 +28,7 @@ class StaticsController extends EshopPage
 					acc.budget
 				from accountentry acc
 				where acc.active = 1
-				and acc.accountNumber like '$rootId%'
+				".($likeAccountNo!="" ? "and acc.accountNumber like '$likeAccountNo%'" : "and acc.accountNumber like '$rootId%'")."
 				order by trim(acc.accountNumber)";
 		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		
@@ -110,28 +111,26 @@ class StaticsController extends EshopPage
 	
 	private function getValue($accountId)
 	{
+		$accountService = new AccountEntryService();
+		$account = $accountService->get($accountId);
+		if(!$account instanceof AccountEntry )
+			return 0;
 		$now = new HydraDate();
-		$sql="select acc.accountNumber,
-				(TIMESTAMPDIFF(second,acc.created,'$now')) `diff_day`,
-				(select count(distinct acc_c.id) from accountentry acc_c where acc_c.active = 1 and acc_c.parentId = acc.id) `count`
-				from accountentry acc 
-				where acc.active = 1 and acc.id = $accountId";
+		$sql="select Unix_timestamp(created) `created` from transaction order by created asc limit 1";
 		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
-		$count = $result[0]["count"];
-		$accounNumber = $result[0]["accountNumber"];
-		$diff_days = $result[0]["diff_day"];
+		$diff_secs = $now->getUnixTimeStamp() - $result[0]['created'];
 		
 		$sql = "select if(sum(tt.value) is null,0,sum(tt.value)) `sum` 
 				from transaction tt 
-				inner join accountentry acc on (acc.active = 1 and acc.accountNumber like '$accounNumber%' and tt.toId=acc.id)
-				where tt.active = 1 ";
+				where tt.active = 1 and tt.toId in 
+				(
+					select acc.id from accountentry acc where acc.active = 1 and acc.accountNumber like '{$account->getAccountNumber()}%'
+				)";
 		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		$msg = $result[0]["sum"];
 		
 		
-		$msg = round(($msg/$diff_days)*3600*24*365 /12,2);
-		if($count>0)
-			$msg = "<b>$msg</b>";
+		$msg = round(($msg/$diff_secs)*3600*24*365 /12,2);
 		return $msg;
 	}
 	
