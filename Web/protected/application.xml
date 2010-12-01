@@ -25,6 +25,7 @@
 			<url ServiceParameter="Accounts.AccountsController" pattern="accounts.html" />
 			<url ServiceParameter="Reports.ReportsController" pattern="reports.html" />
 			<url ServiceParameter="Statics.StaticsController" pattern="statics.html" />
+			<url ServiceParameter="System.BackupController" pattern="backup"/>
 			<url ServiceParameter="Reports.ReportsController" pattern="reports/{reportVars}" parameters.reportVars=".+" />
 			
 			<url ServiceParameter="FileLoader.FileLoaderController" pattern="asset/{assetId}/{param}" parameters.assetId="\w+"  parameters.param=".+" />
@@ -43,7 +44,7 @@
 	<services>
 		<service id="page" class="TPageService" DefaultPage="Home">
 			<modules>
-			  <module id="auth" class="System.Security.TAuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.Login" AuthExpire="3600"/>
+			  <module id="auth" class="System.Security.TAuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.LoginController" AuthExpire="3600"/>
 			  <module id="users" class="Application.classes.WebUser.WebUserManager"/>
 			</modules>
 		</service>

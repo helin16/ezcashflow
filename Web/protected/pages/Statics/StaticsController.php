@@ -150,29 +150,5 @@ class StaticsController extends EshopPage
 		$name = $this->getAccountBreadcrumb($row["parentId"])." - ".$row["name"];
 		return $name;
 	}
-	
-	public function backup($sender,$param)
-	{
-		$this->backupResult->Text="";
-		$this->setErrorMsg("");
-		try
-		{
-			$mysql = "mysqldump";
-			$host = trim(Config::get("Database","LoadBalancer"));
-			$username = trim(Config::get("Database","Username"));
-			$password = trim(Config::get("Database","Password"));
-			$database = trim(Config::get("Database","CoreDatabase"));
-			$backFile = "contents/download/backup.sql";
-			
-			system("rm -f $backFile");
-			$command =sprintf('%s -h\'%s\' -u\'%s\' -p\'%s\' \'%s\' > \'%s\'',$mysql,$host,$username,$password,$database,$backFile);
-			system($command,$return);
-			$this->backupResult->Text="<div style='width:300px;margin:10px;padding:15px;background:#cccccc;border: 1px #ff0000 dotted;'>Backup generated. <a href='$backFile' target='__blank'>click here to download</a></div>";
-		}
-		catch (Exception $ex)
-		{
-			$this->setErrorMsg($ex->getMessage());
-		}
-	}
 }
 ?>
