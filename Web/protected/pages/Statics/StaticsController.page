@@ -7,6 +7,15 @@
 			<com:TTabView id="income_bar" Caption="Income / month" >
 				<com:TButton Id="toExcelBtn_3" Text="To Excel" OnCommand="Page.toExcel" CommandParameter="3" />
 			</com:TTabView>
+			<com:TTabView id="backup" Caption="backup/restore" >
+				<com:TPanel GroupingText="Backup">
+					<com:TButton Id="backupBtn" Text="Backup" OnCommand="Page.backup"/>
+					<com:TLabel Id="backupResult" />
+				</com:TPanel>
+				<com:TPanel GroupingText="Restore">
+					<com:TButton Id="restoreBtn" Text="restore" OnCommand="Page.restore"/>
+				</com:TPanel>
+			</com:TTabView>
 		</com:TTabPanel>
 	</div>
 	<br clear="both" />
