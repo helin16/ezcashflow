@@ -80,7 +80,7 @@
 						<td width="150px">
 							<com:TLinkButton Text="<%# $this->DataItem->getCreated()%>"  CommandName="edit" />
 						</td>
-						<td width="14%"><%# $this->DataItem->getFrom()->getLongshot()%></td>
+						<td width="14%"><%# $this->DataItem->getFrom()%></td>
 						<td width="14%"><%# $this->DataItem->getTo()->getLongshot()%></td>
 						<td width="80px" align="right">$ <%# $this->Page->addTotalValue($this->DataItem->getValue()) %></td>
 						<td>&nbsp;&nbsp;<%# $this->DataItem->getComments()%></td>
