@@ -31,8 +31,8 @@
 					<com:TTabView id="Transfer_tab" Caption="Transfer">
 						<com:Application.controls.TransactionPanel.TransactionPanel Id="Transfer" 
 							GroupingText="Transfer" 
-							FromAccountRootIds="1,2" 
-							ToAccountRootIds="2,1"
+							FromAccountRootIds="1,2,3,4" 
+							ToAccountRootIds="1,2,3,4"
 							/>
 					</com:TTabView>
 				</com:TTabPanel>
