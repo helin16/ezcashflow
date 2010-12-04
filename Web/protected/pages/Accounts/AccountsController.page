@@ -51,7 +51,7 @@
 				<table width="100%">
 					<tr>
 						<td width="25%">
-							<%# $this->DataItem['len']==0 ? "" : str_repeat("&nbsp;&nbsp;",($this->DataItem['len'])) %>
+							<%# $this->DataItem['len']==0 ? "" : str_repeat("&nbsp;&nbsp;&nbsp;&nbsp;",($this->DataItem['len'])) %>
 							<com:TLinkButton Text="<%# $this->DataItem['name']%>"  CommandName="edit" />
 						</td>
 						<td width="15%"><%# $this->DataItem['accountNumber']%></td>
