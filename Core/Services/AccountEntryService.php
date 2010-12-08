@@ -10,12 +10,15 @@ class AccountEntryService extends BaseService
 	{
 		$i=1;
 		$parentAccountNumber = $parent->getAccountNumber();
-		$sql="select id from accountentry where accountNumber ='".$parent->getAccountNumber()."000$i'";
-		$result = Dao::getResultsNative($sql);
-		while(count($result)>0)
+		while(1)
 		{
-			$sql="select id from accountentry where accountNumber ='".$parent->getAccountNumber()."000".($i++)."'";
+			$sql="select id from accountentry where accountNumber ='".$parent->getAccountNumber()."000$i'";
 			$result = Dao::getResultsNative($sql);
+			if($i>=9999)
+				throw new Exception("account number over loaded (i=$i)!");
+			if(count($result)==0)
+				break;
+			$i++;
 		}
 			
 		return $parentAccountNumber.str_pad($i,4,"0",STR_PAD_LEFT);
