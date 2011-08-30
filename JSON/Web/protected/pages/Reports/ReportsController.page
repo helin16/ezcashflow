@@ -1,0 +1,178 @@
+<com:TContent ID="MainContent">
+	<com:TPanel GroupingText="Search Panel" DefaultButton="searchBtn">
+		<table>
+			<tr>
+				<td>From Date</td>
+				<td>
+					<com:TTextBox Id="fromDate" ValidationGroup="Group1" /> <i style="font-size:12px;">[inclusive]</i>
+					<com:TRegularExpressionValidator 
+								ControlToValidate="fromDate"
+								ErrorMessage="Invalid Format(YYYY-MM-DD HH:II:ss)" ValidationGroup="Group1" EnableClientScript="true"
+								RegularExpression="\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+								Display="Dynamic"/>
+				</td>
+			</tr>
+			<tr>
+				<td>To Date</td>
+				<td>
+					<com:TTextBox Id="toDate" ValidationGroup="Group1" /> <i style="font-size:12px;">[exclusive]</i>
+					<com:TRegularExpressionValidator 
+								ControlToValidate="toDate"
+								ErrorMessage="Invalid Format(YYYY-MM-DD HH:II:ss)" ValidationGroup="Group1" EnableClientScript="true"
+								RegularExpression="\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+								Display="Dynamic"/>
+				</td>
+			</tr>
+			<tr>
+				<td>From Account</td>
+				<td><com:TListBox Id="fromAccount"
+						DataTextField="longshot" 
+						DataValueField="id"
+						SelectionMode="Multiple"
+						Rows="3"
+					/>
+			</tr>
+			<tr>
+				<td>To Account</td>
+				<td><com:TListBox Id="toAccount"
+						DataTextField="longshot" 
+						DataValueField="id"
+						SelectionMode="Multiple"
+						Rows="3"
+					/>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<com:TButton Id="searchBtn" OnClick="search" Text="Search" width="100%" ValidationGroup="Group1" />
+				</td>
+			</tr>
+		</table>
+	</com:TPanel>
+	<com:TDataList
+		     ID="DataList"
+		     DataKeyField="id"
+		     OnEditCommand="edit"
+		     OnUpdateCommand="save" OnCancelCommand="cancel"
+		     OnSelectedIndexChanged="selectItem"
+		     ItemStyle.BackColor="#BFCFFF"
+		     AlternatingItemStyle.BackColor="#E6ECFF"
+		     EditItemStyle.BackColor="lightgreen"
+		     SelectedItemStyle.BackColor="lightyellow"
+		     AllowPaging="false" AllowCustomPaging="false" PageSize="9999999" EnableViewState="true"
+		     width="100%">
+
+			<prop:HeaderTemplate>
+				<com:TButton Id="toExcelBtn" Text="To Excel" OnClick="Page.toExcel"/><br />
+				<table width="100%" style="background:black;color:white;">
+					<tr align="left">
+						<td width="150px">Date Time</td>
+						<td width="14%">From</td>
+						<td width="14%">To</td>
+						<td width="80px" align="right">Value.</td>
+						<td>&nbsp;&nbsp;Comments.</td>
+					</tr>
+				</table>
+			</prop:HeaderTemplate>
+
+			<prop:ItemTemplate>
+				<table width="100%" >
+					<tr align="left">
+						<td width="150px">
+							<com:TLinkButton Text="<%# $this->DataItem->getCreated()%>"  CommandName="edit" />
+						</td>
+						<td width="14%"><%# $this->DataItem->getFrom()%></td>
+						<td width="14%"><%# $this->DataItem->getTo()->getLongshot()%></td>
+						<td width="80px" align="right">$ <%# $this->Page->addTotalValue($this->DataItem->getValue()) %></td>
+						<td>&nbsp;&nbsp;<%# $this->DataItem->getComments()%></td>
+					</tr>
+				</table>
+			</prop:ItemTemplate>
+			
+			<prop:EditItemTemplate>
+				<table width="100%">
+					<tr align="left">
+						<td width="150px">
+							Date & Time:
+						</td>
+						<td>
+							<com:TTextBox ID="date" ValidationGroup="Group2"/>
+							<com:TRegularExpressionValidator 
+								ControlToValidate="date"
+								ErrorMessage="Invalid Format(YYYY-MM-DD HH:II:ss)" ValidationGroup="Group2" EnableClientScript="true"
+								RegularExpression="\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+								Display="Dynamic"/>
+							<com:TRequiredFieldValidator ControlToValidate="date"
+								ErrorMessage="*Required" ValidationGroup="Group2" EnableClientScript="true" 
+								Display="Dynamic"/>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							From Account:
+						</td>
+						<td>
+							<com:TDropDownList Id="fromAccountList"
+								DataTextField="longshot" 
+								DataValueField="id"
+								PromptValue=" "
+								PromptText="NONE"
+							/>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							To Account:
+						</td>
+						<td>
+							<com:TDropDownList Id="toAccountList"
+								DataTextField="longshot" 
+								DataValueField="id"
+							/>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Value:
+						</td>
+						<td>
+							<com:TTextBox Id="value" />
+							<com:TRequiredFieldValidator ControlToValidate="value"
+								ErrorMessage="*Required" ValidationGroup="Group2" EnableClientScript="true" 
+								Display="Dynamic"/>
+							<com:TRegularExpressionValidator 
+								ControlToValidate="value"
+								ErrorMessage="Digit Only" ValidationGroup="Group2" EnableClientScript="true"
+								RegularExpression="(\d{1,3}(\,\d{3})*|(\d+))(\.\d{2})?"
+								Display="Dynamic"/>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Comments:
+						</td>
+						<td>
+							<com:TTextBox Id="comments" width="100%"/>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<com:TButton ID="EditButton" Text="Save" CommandName="update" ValidationGroup="Group2" />
+							<com:TButton ID="CancelEditButton" Text="Cancel" CommandName="cancel" />
+						</td>
+					</tr>
+				</table>
+			</prop:EditItemTemplate>
+							
+		    <prop:FooterTemplate>
+		    	<table width="100%"  style="background:black;color:white;">
+					<tr align="left">
+						<td width="150px">Total</td>
+						<td width="14%">&nbsp;</td>
+						<td width="14%">&nbsp;</td>
+						<td width="80px" align="right">$ <%# $this->Page->totalValue %></td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+		    </prop:FooterTemplate>
+	</com:TDataList>
+</com:TContent>
