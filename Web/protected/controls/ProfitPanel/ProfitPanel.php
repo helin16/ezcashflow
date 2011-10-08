@@ -2,6 +2,20 @@
 
 class ProfitPanel extends TPanel  
 {
+	private $ignoreInvest=false;
+	private $investExpensePos='40002';
+	private $investIncomePos='30003';
+	
+	public function setIgnoreInvest($ignoreInvest)
+	{
+		$this->ignoreInvest = $ignoreInvest;
+	}
+	
+	public function getIgnoreInvest($ignoreInvest)
+	{
+		return $this->ignoreInvest;
+	}
+	
 	public function renderEndTag($writer)
 	{
 		$html = $this->loadAccounts();
@@ -11,12 +25,14 @@ class ProfitPanel extends TPanel
 	
 	public function loadAccounts()
 	{
+		$excludeIncomePos = ($this->ignoreInvest ? $this->investIncomePos : "");
+		$excludeExpensePos = ($this->ignoreInvest ? $this->investExpensePos : "");
 		$transactionService = new TransactionService();
 		
 		$incomeAccountIds=array();
 		$expenseAccountIds=array();
 		
-		$sql = "select id,rootId from accountentry where active = 1 and rootId in (3,4)";
+		$sql = "select id,rootId from accountentry where active = 1 and rootId in (3,4) ".($this->ignoreInvest ? " and accountNumber not like '{$this->investIncomePos}%' and accountNumber not like '{$this->investExpensePos}%'" : "");
 		foreach(Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC) as $row)
 		{
 			if($row["rootId"]==3)
@@ -32,8 +48,8 @@ class ProfitPanel extends TPanel
 		$end = $today->getDateTime()->format('Y-m-d 00:00:00');
 		$day_start = $start;
 		$day_end = $end;
-		$day_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3);
-		$day_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4);
+		$day_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+		$day_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
 		$day_income = (trim($day_income)=="") ? 0 :$day_income;
 		$day_expense = (trim($day_expense)=="") ? 0 :$day_expense;
 		$day_diff=$day_income-$day_expense;
@@ -50,8 +66,8 @@ class ProfitPanel extends TPanel
 		$end = $today->getDateTime()->format("Y-m-d 00:00:00");
 		$week_start = $start;
 		$week_end = $end;
-		$week_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3);
-		$week_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4);
+		$week_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+		$week_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
 		$week_income = (trim($week_income)=="") ? 0 :$week_income;
 		$week_expense = (trim($week_expense)=="") ? 0 :$week_expense;
 		$week_diff=$week_income-$week_expense;
@@ -63,8 +79,8 @@ class ProfitPanel extends TPanel
 		$end = $today->getDateTime()->format("Y-m-01 00:00:00");
 		$month_start = $start;
 		$month_end = $end;
-		$month_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3);
-		$month_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4);
+		$month_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+		$month_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
 		$month_income = (trim($month_income)=="") ? 0 :$month_income;
 		$month_expense = (trim($month_expense)=="") ? 0 :$month_expense;
 		$month_diff=$month_income-$month_expense;
@@ -76,8 +92,8 @@ class ProfitPanel extends TPanel
 		$end = $today->getDateTime()->format("Y-01-01 00:00:00");
 		$year_start = $start;
 		$year_end = $end;
-		$year_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3);
-		$year_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4);
+		$year_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+		$year_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
 		$year_income = (trim($year_income)=="") ? 0 :$year_income;
 		$year_expense = (trim($year_expense)=="") ? 0 :$year_expense;
 		$year_diff=$year_income-$year_expense;
@@ -89,8 +105,8 @@ class ProfitPanel extends TPanel
 		$end = $today->getDateTime()->format("9999-01-01 00:00:00");
 		$all_start = $start;
 		$all_end = $end;
-		$all_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3);
-		$all_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4);
+		$all_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+		$all_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
 		$all_income = (trim($all_income)=="") ? 0 :$all_income;
 		$all_expense = (trim($all_expense)=="") ? 0 :$all_expense;
 		$all_diff=$all_income-$all_expense;

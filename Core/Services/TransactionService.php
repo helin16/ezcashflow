@@ -58,7 +58,7 @@ class TransactionService extends BaseService
 				left join accountentry acc on (acc.id = t.toId)
 				where t.active = 1
 				and acc.rootId = $accountTypeId 
-				".($excludePosition=='' ? '' : " and acc.position not like '$excludePosition%'")."
+				".($excludePosition=='' ? '' : " and acc.accountNumber not like '$excludePosition%'")."
 				and t.created >='$startDate' and t.created<'$endDate'";
 
 		$results = Dao::getResultsNative($qry,array(),PDO::FETCH_ASSOC);

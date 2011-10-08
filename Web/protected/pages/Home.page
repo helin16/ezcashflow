@@ -3,7 +3,11 @@
 		<com:TPanel ID="welcomePanel" style="margin:10px;background: #cccccc;width:95%;">
 				<com:TTabPanel ID="Overviewpanel">
 					<com:TTabView id="summaryTab" Caption="Summary Of Expense/Income">
-						<com:Application.controls.ProfitPanel.ProfitPanel Id="Summary" 
+						<com:Application.controls.ProfitPanel.ProfitPanel Id="Summary" IgnoreInvest="true"
+						/>
+					</com:TTabView>
+					<com:TTabView id="summaryTabInvest" Caption="Expense/Income with Invest">
+						<com:Application.controls.ProfitPanel.ProfitPanel Id="SummaryInvest" 
 						/>
 					</com:TTabView>
 					<com:TTabView id="overbudgetTab" Caption="Over budget Expenses">
