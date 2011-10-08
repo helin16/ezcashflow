@@ -51,13 +51,14 @@ class TransactionService extends BaseService
 		$this->save($transation1);
 	}
 
-	public function getSumOfExpenseBetweenDates($startDate,$endDate,$accountTypeId=4)
+	public function getSumOfExpenseBetweenDates($startDate,$endDate,$accountTypeId=4,$excludePosition='')
 	{
 		$qry = "select sum(t.value) as sum 
 				from transaction t 
 				left join accountentry acc on (acc.id = t.toId)
 				where t.active = 1
 				and acc.rootId = $accountTypeId 
+				".($excludePosition=='' ? '' : " and acc.position not like '$excludePosition%'")."
 				and t.created >='$startDate' and t.created<'$endDate'";
 
 		$results = Dao::getResultsNative($qry,array(),PDO::FETCH_ASSOC);
