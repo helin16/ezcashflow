@@ -1,0 +1,38 @@
+<!DOCTYPE html> 
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>BookKeeping</title>
+		<link rel="stylesheet" href="./common/css/jquery.mobile-1.1.0.min.css" />
+		<script src="./common/js/jquery.min.js"></script>
+		<script src="./common/js/jquery.mobile-1.1.0.min.js"></script>
+		<script src="./common/js/bookkeeping.js"></script>
+	</head>
+	<body>
+		<div data-role="page" id="loginPage">
+			<div data-role="header">
+				<h3>Bookkeeping</h3>
+			</div>
+			<div data-role="content" >	
+				<ul data-role="listview" data-inset="true">
+					<li data-role="fieldcontain" class="ui-hide-label" role="heading" data-role="list-divider" data-theme="a">
+						Login
+					</li>
+					<li data-role="fieldcontain" class="ui-hide-label" >
+						<label for="username">Username:</label>
+						<input type="text" name="username" id="username" value="" placeholder="Username"/>
+					</li>
+					<li data-role="fieldcontain" class="ui-hide-label">
+						<label for="password">Password:</label>
+						<input type="password" name="password" id="password" value="" placeholder="Password"/>
+					</li>
+					<li data-role="fieldcontain" class="ui-hide-label">
+						<div>
+							<input type="button" data-theme="b" onclick="pageJs.login($('#loginPage:jqmData(role=page) input#username'), $('#loginPage:jqmData(role=page) input#password'));" value="Login" />
+						</div>
+					</li>
+				</ul>	
+			</div>
+		</div>
+	</body>
+</html>
