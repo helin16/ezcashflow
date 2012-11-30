@@ -1,4 +1,4 @@
-<%@MasterClass="Application.layout.default.DefaultLayout"%>
+<%@MasterClass="Application.layout.BlankLayout"%>
 <com:TContent ID="MainContent">
     <div id="loginContainer">
             <div id="loginBox">

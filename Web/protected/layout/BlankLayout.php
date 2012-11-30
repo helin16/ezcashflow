@@ -1,24 +1,19 @@
 <?php
- 
 /**
- * class DefaultLayout
+ * class BlankLayout
+ *
+ * @package    Web
+ * @subpackage Layout
+ * @author     lhe
  */
-class DefaultLayout extends TTemplateControl
+class BlankLayout extends TTemplateControl
 {
-	public function onLoad()
+    /**
+     * (non-PHPdoc)
+     * @see TControl::onLoad()
+     */
+	public function onLoad($param)
 	{
-		if(Core::getUser() instanceof UserAccount)
-		{
-			$this->bottomMenu->Visible=true;
-			$this->topMenu->Visible=true;
-			$this->user->Text ="Welcome, ". Core::getUser()->getPerson()->getFullName()." !";
-		}
-		else
-		{
-			$this->bottomMenu->Visible=false;
-			$this->topMenu->Visible=false;
-			$this->user->Text ="";
-		}
 	}
 }
 ?>
