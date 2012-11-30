@@ -1,38 +1,199 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>BookKeeping</title>
-		<link rel="stylesheet" href="./common/css/jquery.mobile-1.1.0.min.css" />
-		<script src="./common/js/jquery.min.js"></script>
-		<script src="./common/js/jquery.mobile-1.1.0.min.js"></script>
-		<script src="./common/js/bookkeeping.js"></script>
-	</head>
-	<body>
-		<div data-role="page" id="loginPage">
-			<div data-role="header">
-				<h3>Bookkeeping</h3>
-			</div>
-			<div data-role="content" >	
-				<ul data-role="listview" data-inset="true">
-					<li data-role="fieldcontain" class="ui-hide-label" role="heading" data-role="list-divider" data-theme="a">
-						Login
-					</li>
-					<li data-role="fieldcontain" class="ui-hide-label" >
-						<label for="username">Username:</label>
-						<input type="text" name="username" id="username" value="" placeholder="Username"/>
-					</li>
-					<li data-role="fieldcontain" class="ui-hide-label">
-						<label for="password">Password:</label>
-						<input type="password" name="password" id="password" value="" placeholder="Password"/>
-					</li>
-					<li data-role="fieldcontain" class="ui-hide-label">
-						<div>
-							<input type="button" data-theme="b" onclick="pageJs.login($('#loginPage:jqmData(role=page) input#username'), $('#loginPage:jqmData(role=page) input#password'));" value="Login" />
-						</div>
-					</li>
-				</ul>	
+<head>
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>BookKeeping</title>
+	<link rel="stylesheet" href="./common/css/jquery.mobile-1.1.0.min.css" />
+	<script type="text/javascript" src="./common/js/jquery.min.js"></script>
+	<script type="text/javascript" src="./common/js/jquery-sha1.min.js"></script>
+	<script type="text/javascript" src="./common/js/jquery.mobile-1.1.0.min.js"></script>
+	<script type="text/javascript" src="./common/js/bookkeeping.js"></script>
+</head>
+<body>
+	<div data-role="page" id="loginPage">
+		<div data-role="header">
+			<h3>Bookkeeping</h3>
+		</div>
+		<div data-role="content">
+			<ul data-role="listview" data-inset="true">
+				<li data-role="fieldcontain" class="ui-hide-label" role="heading" data-role="list-divider" data-theme="a">Login</li>
+				<li data-role="fieldcontain" class="ui-hide-label">
+					<label for="username">Username:</label> 
+					<input type="text" name="username" id="username" value="" placeholder="Username" />
+				</li>
+				<li data-role="fieldcontain" class="ui-hide-label">
+					<label for="password">Password:</label>
+					<input type="password" name="password" id="password" value="" placeholder="Password" />
+				</li>
+				<li data-role="fieldcontain" class="ui-hide-label">
+					<div>
+						<input type="button" data-theme="b" onclick="pageJs.login($('#loginPage:jqmData(role=page) input#username'), $('#loginPage:jqmData(role=page) input#password'));" value="Login" />
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div data-role="page" id="mainMenuPage" class="authedPage">
+		<div data-role="header" data-fullscreen="true">
+			<h3>
+				<span id='user'>Main Menu</span>
+			</h3>
+			<div data-role="navbar">
+				<ul>
+					<li><a onclick="pageJs.changeActionType('Spend', true);">Spend</a></li>
+					<li><a onclick="pageJs.changeActionType('Income', true);">Income</a></li>
+					<li><a onclick="pageJs.changeActionType('Transfer', true);">Transfer</a></li>
+				</ul>
 			</div>
 		</div>
-	</body>
+		<div data-role="content" style="padding: 0 10px 0 10px;">
+			<ul id='actionrecordpanel' data-role="listview" data-inset="true">
+				<li id='fromAccount' class='accountListLi'>
+					<a onclick="pageJs.showAccounts('actionrecordpanel', 'fromAccount', $(this).find('#rootIds').val());" >
+						<h3>From: <span id='title' style='font-size: 12px;'></span></h3>
+						<p class='ui-li-desc' id='breadCrumbs'></p>
+						<input type='hidden' id='accountId' value='' />
+						<input type='hidden' id='rootIds' value='' />
+					</a>
+				</li>
+				<li id='toAccount' class='accountListLi'>
+					<a onclick="pageJs.showAccounts('actionrecordpanel', 'toAccount', $(this).find('#rootIds').val());" >
+						<h3>To: <span id='title' style='font-size: 12px;'></span></h3>
+						<p class='ui-li-desc' id='breadCrumbs'></p>
+						<input type='hidden' id='accountId' value='' />
+						<input type='hidden' id='rootIds' value='' />
+					</a>
+				</li>
+				<li data-role='fieldcontain' class='ui-hide-label'>
+					<label for='amount'>amount:</label>
+					<input type='text' name='amount' id='amount' value='' placeholder='How much?' class='ui-input-text ui-body-c ui-corner-all ui-shadow-inset'/>
+				</li>
+				<li data-role='fieldcontain' class='ui-hide-label'>
+					<label for='comments'>comments:</label>
+					<input type='text' name='comments' id='comments' value='' placeholder='Comments:' class='ui-input-text ui-body-c ui-corner-all ui-shadow-inset'/>
+				</li>
+				<li data-role='fieldcontain' class='ui-hide-label'>
+					<div>
+						<input data-theme='b' id='actionBtn' type='button' value='' onclick='pageJs.recordTrans(this);' />
+						<input type='hidden' id='transId' value='' />
+						<input type='hidden' id='backToPageId' value='' />
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div data-role="footer" data-position="fixed" data-fullscreen="true">		
+			<div data-role="navbar" data-iconpos="top">
+				<ul>
+					<li><a href="#transPage" data-icon='grid'>Transcations</a></li>
+					<li><a href="#accountsPage" data-icon='gear' onclick="pageJs.loadAccounts(1);">Accounts</a></li>
+					<li><a data-icon='alert' onclick="pageJs.logout();">Logout</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<div data-role="page" id="transPage" class="authedPage">
+		<div data-role="header" data-fullscreen="true">
+			<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
+			<h3>Transactions</h3>
+			<div data-role="navbar">
+				<ul>
+					<li><a onclick="pageJs.getTodayTrans();">Today</a></li>
+					<li><a onclick="pageJs.getWTDTrans();">WTD</a></li>
+					<li><a onclick="pageJs.getMTDTrans();">MTD</a></li>
+				</ul>
+			</div>
+		</div>
+		<div data-role="content"  style="padding: 0 10px 0 10px;">
+			<b id="transListTitle"></b>
+			<ul id='transList' data-role="listview" data-inset="true" data-divider-theme="d" data-theme="d" data-split-icon="delete">
+			</ul>
+		</div>
+	</div>
+	
+	<div data-role="page" id="accountsPage" class="authedPage">
+		<div data-role="header" data-fullscreen="true">
+			<a href="#" data-rel="back" data-icon="arrow-l">Back</a>
+			<h3>Accounts</h3>
+		</div>
+		<div data-role="content"  style="padding: 0 10px 0 10px;">
+			<div data-role="controlgroup" data-type="horizontal" style="margin-top: 10px;">
+				<a data-role="button" onclick="pageJs.showAccountListPane('listPan');">Accounts</a>
+				<a data-role="button" id="showEditPaneBtn" onclick="pageJs.showAccountListPane('editPane');">Edit</a>
+				<a data-role="button" onclick="pageJs.showAccountListPane('newPane');">Create New</a>
+			</div>
+			<div id='editPane' data-role="collapsible" class="accountListPane" data-collapsed="false" data-content-theme="d" data-theme="b" style="padding: 0 10px 0 10px; display: none;">
+				<h3>Details of <span class='accountTitle'></span></h3>
+   				<div data-role="fieldcontain" class="ui-hide-label">
+   					<label for="accountName">Account Name:</label> 
+					<input type="text" name="accountName" id="accountName" value="" placeholder="Account Name:" />
+   				</div> 
+   				<div data-role="fieldcontain" class="ui-hide-label">
+   					<label for="accountNumber">Account Number:</label> 
+					<input type="text" name="accountNumber" id="accountNumber" value="" placeholder="Account Number:" />
+   				</div> 
+   				<div data-role="fieldcontain" class="ui-hide-label">
+   					<label for="comments">comments:</label> 
+					<input type="text" name="comments" id="comments" value="" placeholder="comments:" />
+   				</div> 
+   				<div data-role="fieldcontain" class="ui-hide-label">
+   					<label for="accountValue">Value:</label> 
+					<input type="text" name="accountValue" id="accountValue" value="" placeholder="Value:" />
+   				</div>
+   				<div data-role="fieldcontain" class="ui-hide-label">
+   					<label for="accountBudget">Budget:</label> 
+					<input type="text" name="accountBudget" id="accountBudget" value="" placeholder="Budget:" />
+   				</div>
+   				<div data-role="fieldcontain" class="ui-hide-label">
+					<input type="hidden" id="accountId" value="" />
+					<input type="button" id="editAccountBtn" value="Update" data-theme="b" onclick="pageJs.saveAccount(this, $(this).parents('div[data-role=collapsible]').find('#accountId').val());"/>
+   				</div> 
+			</div>
+			<div id='newPane' data-role="collapsible" class="accountListPane" data-collapsed="false" data-content-theme="d" data-theme="b" style="padding: 0 10px 0 10px; display: none;">
+				<h3>Create New under <span class='accountTitle'></span></h3>
+   				<div data-role="fieldcontain" class="ui-hide-label">
+   					<label for="accountName">Account Name:</label> 
+					<input type="text" name="accountName" id="accountName" value="" placeholder="Account Name:" />
+   				</div> 
+   				<div data-role="fieldcontain" class="ui-hide-label">
+   					<label for="accountValue">Value:</label> 
+					<input type="text" name="accountValue" id="accountValue" value="" placeholder="Value:" />
+   				</div> 
+   				<div data-role="fieldcontain" class="ui-hide-label">
+   					<label for="accountBudget">Budget:</label> 
+					<input type="text" name="accountBudget" id="accountBudget" value="" placeholder="Budget:" />
+   				</div> 
+   				<div data-role="fieldcontain" class="ui-hide-label">
+   					<label for="comments">comments:</label> 
+					<input type="text" name="comments" id="comments" value="" placeholder="comments:" />
+   				</div> 
+   				<div data-role="fieldcontain" class="ui-hide-label">
+					<input type="hidden" name="accountNumber" id="accountNumber" value="" placeholder="Account Number:" />
+					<input type="hidden" id="parentId" value="" />
+					<input type="button" id="editAccountBtn" value="Create" data-theme="b" onclick="pageJs.saveAccount(this, null, $(this).parents('div[data-role=collapsible]').find('#parentId').val());"/>
+   				</div> 
+			</div>
+			<div id='listPan' data-role="collapsible" class="accountListPane" data-content-theme="d" data-theme="b" data-collapsed="false" style="padding: 0 10px 0 10px;">
+				<h3>Accounts <span class='accountTitle'></span></h3>
+   				<div>
+   					<ul id='accountsList' data-role="listview" data-inset="true" data-divider-theme="d" data-split-icon="delete">
+					</ul>
+   				</div> 
+			</div>
+		</div>
+		<div  data-role="footer" data-position="fixed" data-fullscreen="true">
+			<div data-role="navbar">
+				<ul>
+					<li><a onclick="pageJs.loadAccounts(1);">Asset</a></li>
+					<li><a onclick="pageJs.loadAccounts(2);">Liability</a></li>
+					<li><a onclick="pageJs.loadAccounts(3);">Income</a></li>
+					<li><a onclick="pageJs.loadAccounts(4);">Expense</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+</body>
 </html>
