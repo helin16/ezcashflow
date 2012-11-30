@@ -1,30 +1,37 @@
 <?php
+/**
+ * This is the loginpage
+ * 
+ * @author lhe
+ */
 class LoginController extends TPage  
 {
+    /**
+     * (non-PHPdoc)
+     * @see TControl::onLoad()
+     */
 	public function onLoad($param)
 	{
+	    $this->getPage()->getClientScript()->registerStyleSheetFile('loginCss', $this->publishAsset(__CLASS__ . '.css'));
 		$this->username->focus();
 	}
 	/**
      * Validates whether the username and password are correct.
      * This method responds to the TCustomValidator's OnServerValidate event.
-     * @param mixed event sender
-     * @param mixed event parameter
+     * 
+     * @param mixed $sender    The event sender
+     * @param mixed $parameter The event parameters
      */
     public function validateUser($sender,$param)
     {
-    	$this->errorMessage->Text="";
     	$authManager=$this->Application->getModule('auth');
     	try
     	{
 			if($authManager->login($this->username->Text, $this->password->Text))
-			{
 				$this->Response->redirect('/');
-			}
     	}
     	catch(AuthenticationException $ex)
     	{
-	    	$this->errorMessage->Text="Invalid User!";
     	}
     }
 }

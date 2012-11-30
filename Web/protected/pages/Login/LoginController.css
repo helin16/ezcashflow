@@ -1,0 +1,38 @@
+body{background-color: #aaaaaa;}
+.bodyWrapper{}
+.loginDiv{width: 350px;
+    background: -moz-linear-gradient(center top , #FFFFFF 0px, #cccccc 100%) repeat scroll 0 0 transparent;
+    border-bottom: 1px solid #cccccc;
+    border-left: 1px solid #EEEEEE;
+    border-right: 1px solid #EEEEEE;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding:5px;}
+.loginDiv .loginTitle{border-bottom: 1px solid #E2E2E2;
+    box-shadow: 0 1px 0 #FFFFFF;
+    color: #777777;
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    position: relative;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.loginDiv .loginRow{padding: 5px 0 5px 0;}
+.loginDiv .loginRow .loginText{padding: 5px; height: 20px; width: 300px; border-radius: 5px; border: 1px #cccccc solid;}
+.loginDiv .loginRow .loginText:focus{border: 1px solid #56B4EF;box-shadow: 0 1px 3px rgba(0,0,0,0.005) inset, 0 0 8px rgba(82,168,236,0.6);}
+.loginDiv .loginRow .loginBtn{
+    height: 30px; 
+    background-color: #019AD2;
+    background-image: -moz-linear-gradient(#33BCEF, #019AD2);
+    background-repeat: repeat-x;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+    color: #FFFFFF;
+    text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
+    font-weight: bold;
+    width: 300px;
+    border:1px #cccccc solid; 
+    broder-radius: 4px;
+    font-family: Arial,sans-serif;
+}
