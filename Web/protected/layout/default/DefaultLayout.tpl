@@ -9,14 +9,24 @@
 	<meta name="keywords" content="cashflow">
 </com:THead>
 <body>
-	<com:TForm>
-		<div>
-			<com:TLabel ID="user" /><br />
-			<com:Application.controls.Menu.Menu Id="topMenu"/>
-			<com:TActiveLabel Id="InfoMsg" ForeColor="green" style="width:100%"/>
-			<com:TActiveLabel Id="ErrorMsg" ForeColor="red" style="width:100%"/>
-			<com:TContentPlaceHolder ID="MainContent" />
-			<com:Application.controls.Menu.Menu Id="bottomMenu" />
+    <com:TForm>
+        <div id="bodyWrapper">
+            <div id="header">
+                <div class="widthWrapper">
+					<com:Application.controls.Menu.Menu Id="topMenu"/>
+				</div>
+            </div>
+            <div id="content">
+                <div class="widthWrapper">
+					<com:TActiveLabel Id="InfoMsg" ForeColor="green" style="width:100%"/>
+					<com:TActiveLabel Id="ErrorMsg" ForeColor="red" style="width:100%"/>
+					<com:TContentPlaceHolder ID="MainContent" />
+				</div>
+            </div>
+            <div id="footer">
+                <div class="widthWrapper">
+                </div>
+            </div>
 		</div>
 	</com:TForm>
 </body>
