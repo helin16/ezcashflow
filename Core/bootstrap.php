@@ -2,8 +2,6 @@
 
 $incpaths = array(
 	get_include_path(),
-	dirname(__FILE__),
-	dirname(__FILE__) . "/Framework/"
 );
 
 set_include_path(implode(PATH_SEPARATOR, $incpaths));
