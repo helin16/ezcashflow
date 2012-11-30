@@ -3,8 +3,11 @@ class App
 {
 	public static function autoload($className)
 	{
+		$base = dirname(__FILE__);
 		$autoloadPaths = array(
-			dirname(__FILE__) . '/service/'
+			$base . '/service/',
+			$base . '/service/User/',
+			$base . '/service/Trans/',
 		);
 	
 		$found = false;
@@ -24,22 +27,20 @@ class App
 	
 	public static function run()
 	{
-		if(($method = isset($_REQUEST['method']) ? trim($_REQUEST['method']) : '') === '')
-			throw new Exception("No method given");
-		
-		list($serviceName, $methodName) = explode(".", $_REQUEST['method']);
-		
-		$errors = $result = array();
+		$results = $errors = array();
 		try
 		{
-			$service = new 	$serviceName();
-			$result = $service->$methodName($_REQUEST);
+			$app = new AppService();
+			$results = $app->run();
 		}
-		catch(Exception $ex)
+		catch(Exception $e)
 		{
-			$errors[] = $ex->getMessage();
+			$errors[] = $e->getMessage();
 		}
-		return self::_getJson($result, $errors);
+		
+		$return = json_encode(array('errors'=>$errors, 'resultData' => $results));
+		file_put_contents('/tmp/test.json', $return, FILE_APPEND);
+		echo $return;
 	}
 	
 	private static function _getJson($result, $errors = array())
@@ -49,7 +50,5 @@ class App
 }
 
 spl_autoload_register(array('App','autoload'));
-
-require(dirname(__FILE__) . '/../bootstrap.php');
-
+require dirname(__FILE__).'/../bootstrap.php';
 App::run();
