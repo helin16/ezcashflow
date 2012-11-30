@@ -13,7 +13,7 @@ class LoginController extends TPage
 	public function onLoad($param)
 	{
 	    $this->getPage()->getClientScript()->registerStyleSheetFile('loginCss', $this->publishAsset(__CLASS__ . '.css'));
-		$this->username->focus();
+// 		$this->username->focus();
 	}
 	/**
      * Validates whether the username and password are correct.

@@ -1,32 +1,62 @@
 <%@MasterClass="Application.layout.default.DefaultLayout"%>
 <com:TContent ID="MainContent">
-    <center>
-    <div class="bodyWrapper">
-        <com:TPanel ID="loginForm" DefaultButton="loginBtn" CssClass="loginDiv">
-            <div class="loginTitle">
-                Please Login:
+    <div id="loginContainer">
+            <div id="loginBox">
+                <com:TPanel ID="loginForm" DefaultButton="loginBtn" CssClass="loginForm">
+                    <div id="login">
+                        <div id="loginblk">
+                            <div id="login_lbg">
+                                Please Login:                         
+                            </div>
+                            <div id="loginCredentials">
+                                <div class="loginField">
+                                    <label class="loginLabel left">Username</label>
+                                    <span class="inputWrapper left">
+                                        <com:TTextBox CssClass="loginInput customText" ID="username" ValidationGroup="Group1" Text=""
+                                            Attributes.placeholder="Username or email" 
+                                            Attributes.autofocus="autofocus"
+                                            Attributes.maxlength="50"/>
+                                    </span>
+                                    <div class="clearfix"></div>
+	                                <com:TRequiredFieldValidator
+					                    ControlToValidate="username"
+					                    ErrorMessage="* required"
+					                    ValidationGroup="Group1"
+					                    CssClass="loginError"
+					                    Display="Dynamic" />
+                                </div>
+                                <div class="loginField">
+                                    <label for="password" class="loginLabel left">Password</label>
+                                    <span class="inputWrapper left">
+                                        &nbsp;<com:TTextBox CssClass="loginInput customText" ID="password" TextMode="Password" ValidationGroup="Group1" Text=""
+                                            Attributes.placeholder="Password" 
+                                            Attributes.maxlength="50"/>
+                                    </span>
+                                    <div class="clearfix"></div>
+                                    <com:TRequiredFieldValidator
+					                    ControlToValidate="password"
+					                    ValidationGroup="Group1"
+					                    ErrorMessage="Your entered an invalid password."
+					                    CssClass="loginError"
+					                    Display="Dynamic"
+					                    />
+                                </div>
+                            </div>
+                            <div id="loginCommands">
+                                <div class="loginRemember">
+                                    <input type="checkbox" value="1" name="autologin" id="autologin">
+                                    <label id="autologinLabel" for="autologin">Remember&nbsp;Me</label>
+                                </div>
+                                <div class="loginButton">
+                                    <input type="hidden" value="yes" id="authenticate" name="authenticate">
+                                    <com:TLinkButton ID="loginBtn" Text="LOG IN" OnClick="validateUser" ValidationGroup="Group1" CssClass="button primary right"/>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </com:TPanel>
             </div>
-            <div class="loginRow">
-                <com:TTextBox CssClass="loginText" ID="username" ValidationGroup="Group1" Attributes.placeholder="Username"/>
-                <com:TRequiredFieldValidator
-                    ControlToValidate="username"
-                    ErrorMessage="<br />* required"
-                    ValidationGroup="Group1"
-                    Display="Dynamic" />
-            </div>
-            <div class="loginRow">
-                <com:TTextBox CssClass="loginText" ID="password" TextMode="Password" ValidationGroup="Group1" Attributes.placeholder="Password"/>
-                <com:TRequiredFieldValidator
-                    ControlToValidate="password"
-                    ValidationGroup="Group1"
-                    ErrorMessage="<br />Your entered an invalid password."
-                    Display="Dynamic"
-                    />
-            </div>
-            <div class="loginRow">
-                <com:TButton ID="loginBtn" Text="Login" OnClick="validateUser" ValidationGroup="Group1" CssClass="loginBtn"/>
-            </div>
-        </com:TPanel>
-    </div>
-    </center>
+        </div>
 </com:TContent>
