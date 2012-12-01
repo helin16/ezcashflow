@@ -10,9 +10,13 @@ div#header {background: -webkit-linear-gradient(top, #122249 0%,#13244E 24%,#192
 	width: 100%;
 	color:#eee;
 }
-div.menuWrapper{margin: 0 0 8px 0;display: block;}
+div.menuWrapper{margin: 0 0 6px 0;display: block;}
 div.menuWrapper .topMenuDiv{display: inline-block;width: 70%;}
-div.menuWrapper .topMenuDiv .logo{background:#0F1C3C;border-radius: 0 0 5px 5px;padding: 10px;}
+div.menuWrapper .topMenuDiv .logo{display: inline-block;
+	margin-bottom: 30px;
+	font-size: 30px;
+	padding: 8px 10px;
+}
 div.menuWrapper .topMenuUser{text-align: right;}
 div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;display: inline-block;}
 .topMenuDiv ul {list-style: none;margin:0px;padding: 0px;}
@@ -22,7 +26,7 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
 {
     text-decoration:none;
     color: #eee;
-	padding: 13px 25px 8px 25px;
+	padding: 8px 25px 6px 25px;
 }
 .topMenuDiv a#active
 {
