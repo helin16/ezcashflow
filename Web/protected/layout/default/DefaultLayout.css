@@ -4,8 +4,13 @@ div.widthWrapper{display: block;
     text-align: left;
     width: 980px;
 }
-div#header {background: #D2D2D2;}
-div.menuWrapper{margin: 0 0 15px 0;display: block;}
+div#header {background: -webkit-linear-gradient(top, #122249 0%,#13244E 24%,#192F62 82%,#193065 100%);
+	border-top: 6px solid #0F1C3C;
+	border-bottom: 7px solid #0F1C3C;
+	width: 100%;
+	color:white;
+}
+div.menuWrapper{margin: 0 0 8px 0;display: block;}
 div.menuWrapper .topMenuDiv{display: inline-block;width: 70%;}
 div.menuWrapper .topMenuUser{text-align: right;}
 div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;display: inline-block;}
@@ -15,11 +20,14 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
 .topMenuDiv a#active
 {
     text-decoration:none;
-    padding: 5px 25px;
+    padding: 13px 25px 8px 25px;
+    color:white;
+    border-radius: 5px 5px 0 0;
 }
 .topMenuDiv a#active
 {
-    background:blue;
-    color:white;
-    border-radius: 5px;
+    background: #7DCB39;
+	border: 1px solid #72BA33;
+	box-shadow: 0 1px #62A12C;
+	background: #0F1C3C;
 }
