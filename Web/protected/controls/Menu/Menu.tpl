@@ -1,7 +1,7 @@
 <div class="menuWrapper">
 	<div class="menuRow">
 		<span class="topMenuDiv"></span>
-	    <span class="topMenuUser"><com:TLabel ID="user" /></span>
+	    <span class="topMenuUser"><com:TLabel ID="user" CssClass="welcomeMsg"/></span>
 	</div>
 	<div class="menuRow">
 	    <span class="topMenuDiv">

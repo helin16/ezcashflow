@@ -8,6 +8,7 @@ div#header {background: #D2D2D2;}
 div.menuWrapper{margin: 0 0 15px 0;display: block;}
 div.menuWrapper .topMenuDiv{display: inline-block;width: 70%;}
 div.menuWrapper .topMenuUser{text-align: right;}
+div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;display: inline-block;}
 .topMenuDiv ul {list-style: none;margin:0 0 12px;padding: 0px;}
 .topMenuDiv ul li{display: inline-block;}
 .topMenuDiv .menuItem,
