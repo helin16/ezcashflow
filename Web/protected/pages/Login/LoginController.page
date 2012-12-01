@@ -43,8 +43,6 @@
                                 </div>
                             </div>
                             <div id="loginCommands">
-                                <span class="loginRemember">
-                                </span>
                                 <span class="loginButton">
                                     <com:TLinkButton ID="loginBtn" Text="LOG IN" OnClick="validateUser" ValidationGroup="Group1" CssClass="button primary right"/>
                                 </span>

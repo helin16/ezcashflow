@@ -116,24 +116,7 @@ label {
     display: block;
     margin: 0 auto;
     text-align: left;
-    width: 230px;
-}
-#loginCommands .loginRemember {
-    display: inline-block;
-    float: left;
-    height: 18px;
-    padding: 18px 0;
-    vertical-align: middle;
-    width: 230px;
-}
-#autologin {
-    margin: 0 0 0 6px;
-    padding: 0 3px 0 0;
-    vertical-align: middle;
-}
-#autologinLabel {
-    line-height: 13px;
-    vertical-align: middle;
+    width: 360px;
 }
 #loginCommands .loginButton {
     display: block;
