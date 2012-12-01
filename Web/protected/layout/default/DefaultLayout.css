@@ -10,6 +10,8 @@ div.widthWrapper{display: block;
     text-align: left;
     width: 980px;
 }
+
+/* header div */
 div#header {background: -webkit-linear-gradient(top, #122249 0%,#13244E 24%,#192F62 82%,#193065 100%);
 	border-top: 6px solid #0F1C3C;
 	border-bottom: 7px solid #0F1C3C;
@@ -46,6 +48,11 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
     border-radius: 5px 5px 0 0;
 }
 
+
+/* content div */
+#content {
+	padding: 8px 0 0 0;
+}
 .content-box {
 	background: white;
 	margin-bottom: 10px;

@@ -1,46 +1,50 @@
 <com:TContent ID="MainContent">
 	<div class="content-box">
 		<h3 class="box-title">Overview</h3>
-		<com:TTabPanel ID="Overviewpanel">
-			<com:TTabView id="summaryTab" Caption="Summary Of Expense/Income">
-				<com:Application.controls.ProfitPanel.ProfitPanel Id="Summary" IgnoreInvest="true"
-				/>
-			</com:TTabView>
-			<com:TTabView id="summaryTabInvest" Caption="Expense/Income with Invest">
-				<com:Application.controls.ProfitPanel.ProfitPanel Id="SummaryInvest" 
-				/>
-			</com:TTabView>
-			<com:TTabView id="overbudgetTab" Caption="Over budget Expenses">
-				<com:Application.controls.TopExpensePane.TopExpensePanel Id="Top5" 
-				/>
-			</com:TTabView>
-		</com:TTabPanel>
+		<div class="box-content">
+			<com:TTabPanel ID="Overviewpanel">
+				<com:TTabView id="summaryTab" Caption="Summary Of Expense/Income">
+					<com:Application.controls.ProfitPanel.ProfitPanel Id="Summary" IgnoreInvest="true"
+					/>
+				</com:TTabView>
+				<com:TTabView id="summaryTabInvest" Caption="Expense/Income with Invest">
+					<com:Application.controls.ProfitPanel.ProfitPanel Id="SummaryInvest" 
+					/>
+				</com:TTabView>
+				<com:TTabView id="overbudgetTab" Caption="Over budget Expenses">
+					<com:Application.controls.TopExpensePane.TopExpensePanel Id="Top5" 
+					/>
+				</com:TTabView>
+			</com:TTabPanel>
+		</div>
 	</div>	
 	<div class="content-box">
 		<h3 class="box-title">Recording</h3>
-		<com:TTabPanel ID="actionPanel" style="margin:10px;background: #cccccc;width:95%;">
-			<com:TTabView id="Expense_tab" Caption="Expense">
-				<com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" 
-					GroupingText="Expense" 
-					FromAccountRootIds="1,2" 
-					ToAccountRootIds="4"
-					/>
-			</com:TTabView>
-			<com:TTabView id="Income_tab" Caption="Income">
-				<com:Application.controls.TransactionPanel.TransactionPanel Id="Income" 
-						GroupingText="Income" 
-						FromAccountRootIds="3" 
-						ToAccountRootIds="1"
-						TransType="income"
+		<div class="box-content">
+			<com:TTabPanel ID="actionPanel">
+				<com:TTabView id="Expense_tab" Caption="Expense">
+					<com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" 
+						GroupingText="Expense" 
+						FromAccountRootIds="1,2" 
+						ToAccountRootIds="4"
 						/>
-			</com:TTabView>
-			<com:TTabView id="Transfer_tab" Caption="Transfer">
-				<com:Application.controls.TransactionPanel.TransactionPanel Id="Transfer" 
-					GroupingText="Transfer" 
-					FromAccountRootIds="1,2,3,4" 
-					ToAccountRootIds="1,2,3,4"
-					/>
-			</com:TTabView>
-		</com:TTabPanel>
+				</com:TTabView>
+				<com:TTabView id="Income_tab" Caption="Income">
+					<com:Application.controls.TransactionPanel.TransactionPanel Id="Income" 
+							GroupingText="Income" 
+							FromAccountRootIds="3" 
+							ToAccountRootIds="1"
+							TransType="income"
+							/>
+				</com:TTabView>
+				<com:TTabView id="Transfer_tab" Caption="Transfer">
+					<com:Application.controls.TransactionPanel.TransactionPanel Id="Transfer" 
+						GroupingText="Transfer" 
+						FromAccountRootIds="1,2,3,4" 
+						ToAccountRootIds="1,2,3,4"
+						/>
+				</com:TTabView>
+			</com:TTabPanel>
+		</div>	
 	</div>
 </com:TContent>
