@@ -12,6 +12,7 @@ div#header {background: -webkit-linear-gradient(top, #122249 0%,#13244E 24%,#192
 }
 div.menuWrapper{margin: 0 0 8px 0;display: block;}
 div.menuWrapper .topMenuDiv{display: inline-block;width: 70%;}
+div.menuWrapper .topMenuUser .logo{background:#0F1C3C;border-radius: 0 0 5px 5px;padding: 10px;}
 div.menuWrapper .topMenuUser{text-align: right;}
 div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;display: inline-block;}
 .topMenuDiv ul {list-style: none;margin:0px;padding: 0px;}
