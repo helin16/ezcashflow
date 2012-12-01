@@ -43,14 +43,11 @@
                                 </div>
                             </div>
                             <div id="loginCommands">
-                                <div class="loginRemember">
-                                    <input type="checkbox" value="1" name="autologin" id="autologin">
-                                    <label id="autologinLabel" for="autologin">Remember&nbsp;Me</label>
-                                </div>
-                                <div class="loginButton">
-                                    <input type="hidden" value="yes" id="authenticate" name="authenticate">
+                                <span class="loginRemember">
+                                </span>
+                                <span class="loginButton">
                                     <com:TLinkButton ID="loginBtn" Text="LOG IN" OnClick="validateUser" ValidationGroup="Group1" CssClass="button primary right"/>
-                                </div>
+                                </span>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="clearfix"></div>
