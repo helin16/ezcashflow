@@ -98,7 +98,7 @@ label {
 #loginCredentials .loginField .loginInput {
     -moz-box-sizing: border-box;
     border: 1px solid #CAD3DC;
-    border-radius: 3px 3px 3px 3px;
+    border-radius: 4px;
     box-shadow: none;
     font-size: 16px;
     height: auto;
