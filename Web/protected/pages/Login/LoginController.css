@@ -144,7 +144,7 @@ label {
     width: 130px;
 }
 .button.primary {
-    background: -moz-linear-gradient(center top , #7DCB39 0%, #60BA12 100%) repeat scroll 0 0 transparent;
+    background: #7DCB39;
     border: 1px solid #72BA33;
     box-shadow: 0 1px #62A12C;
     color: white;
@@ -153,5 +153,5 @@ label {
     width: auto !important;
 }
 .button.primary:hover {
-    background: -moz-linear-gradient(center top , #70CA22 0%, #58AF0B 100%) repeat scroll 0 0 transparent;
+    background: #70CA22;
 }
