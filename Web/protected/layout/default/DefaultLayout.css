@@ -8,26 +8,30 @@ div#header {background: -webkit-linear-gradient(top, #122249 0%,#13244E 24%,#192
 	border-top: 6px solid #0F1C3C;
 	border-bottom: 7px solid #0F1C3C;
 	width: 100%;
-	color:white;
+	color:#0F1C3C;
 }
 div.menuWrapper{margin: 0 0 8px 0;display: block;}
 div.menuWrapper .topMenuDiv{display: inline-block;width: 70%;}
 div.menuWrapper .topMenuUser{text-align: right;}
 div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;display: inline-block;}
-.topMenuDiv ul {list-style: none;margin:0 0 12px;padding: 0px;}
+.topMenuDiv ul {list-style: none;margin:0px;padding: 0px;}
 .topMenuDiv ul li{display: inline-block;}
-.topMenuDiv .menuItem,
+.topMenuDiv a.menuItem,
 .topMenuDiv a#active
 {
     text-decoration:none;
-    padding: 13px 25px 8px 25px;
-    color:white;
+    color: #0F1C3C;
     border-radius: 5px 5px 0 0;
 }
 .topMenuDiv a#active
 {
-    background: #7DCB39;
-	border: 1px solid #72BA33;
-	box-shadow: 0 1px #62A12C;
+	color: white;
 	background: #0F1C3C;
+	padding: 13px 25px 8px 25px;
+}
+.topMenuDiv a.menuItem:hover
+{
+	color: #F2F2F2;
+	background: #0F1C3C;
+	padding: 13px 25px 8px 25px;
 }
