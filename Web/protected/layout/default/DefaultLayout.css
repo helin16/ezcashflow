@@ -8,7 +8,7 @@ div#header {background: -webkit-linear-gradient(top, #122249 0%,#13244E 24%,#192
 	border-top: 6px solid #0F1C3C;
 	border-bottom: 7px solid #0F1C3C;
 	width: 100%;
-	color:#F2F2F2;
+	color:#eee;
 }
 div.menuWrapper{margin: 0 0 8px 0;display: block;}
 div.menuWrapper .topMenuDiv{display: inline-block;width: 70%;}
@@ -20,7 +20,7 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
 .topMenuDiv a#active
 {
     text-decoration:none;
-    color: #F2F2F2;
+    color: #eee;
 	padding: 13px 25px 8px 25px;
 }
 .topMenuDiv a#active
@@ -31,7 +31,6 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
 }
 .topMenuDiv a.menuItem:hover
 {
-	color: #cccccc;
 	background: #0F1C3C;
     border-radius: 5px 5px 0 0;
 }
