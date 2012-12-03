@@ -22,7 +22,7 @@ class RecentTrans extends TPanel
             $fromAcc = $tran->getFrom();
             $toAcc = $tran->getTo();
             $html .= '<li>';
-                $html .= "<a href='". $this->_makeURLToReport($fromAcc, $toAcc, $tran->getCreated().'') . "'>";
+                $html .= "<a href='". $this->_makeURLToReport($fromAcc, $toAcc, $tran->getCreated()) . "'>";
                     $html .= '<p class="link">$' . $tran->getValue() . '</p>';
                     $html .= '<p class="descr">'. $fromAcc->getName() . ' -> ' . $toAcc->getName() . '</p>';
                     $html .= '<p class="descr">'. $tran->getComments() . '</p>';
@@ -38,16 +38,19 @@ class RecentTrans extends TPanel
      * 
      * @param AccountEntry $fromAccount The from of the transaction
      * @param AccountEntry $toAccount   The to of the transaction
-     * @param string       $transTime   The date time of the transaction
+     * @param HydraDate    $transTime   The date time of the transaction
      * 
      * @return string The href string
      */
-    private function _makeURLToReport(AccountEntry $fromAccount, AccountEntry $toAccount, $transTime)
+    private function _makeURLToReport(AccountEntry $fromAccount, AccountEntry $toAccount, HydraDate $transTime)
     {
+        $fromDate = $transTime->__toString();
+        $transTime->modify('+1 second');
+        $toDate = $transTime->__toString();
         $vars = array("fromAccountIds" => array($fromAccount->getId()),
                 "toAccountIds" => array($toAccount->getId()),
-                "fromDate" => $transTime,
-                "toDate" => $transTime
+                "fromDate" => $fromDate,
+                "toDate" => $toDate
         );
         $serial = serialize($vars);
         return "/reports/$serial";
