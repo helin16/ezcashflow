@@ -25,6 +25,12 @@
 					</div>
 					<div id="content-right">
 					   <div class="box">
+						   <div class="title">Recent Trans</div>
+						   <div class="content">
+						      <com:Application.controls.RecentTrans.RecentTrans Id="recentTrans" HowMany="10"/>
+						  </div>
+					   </div>
+					   <div class="box">
 						   <div class="title">Links</div>
 						   <div class="content">
 						      <com:Application.controls.Links.Links Id="usefullLinks"/>
