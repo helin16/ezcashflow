@@ -161,7 +161,6 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
     border-bottom: 1px #eeeeee solid;
     text-decoration: none;
     text-transform: uppercase;
-    font-weight: bold;
     color: #cccccc;
 }
 #content-right .box .content ul li a:hover {
@@ -174,6 +173,7 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
 }
 #content-right .box .content ul li a p.link {
     color: #1E3A7D;
+    font-weight: bold;
 }
 #content-right .box .content ul li .descr {
     font-size: 11px;

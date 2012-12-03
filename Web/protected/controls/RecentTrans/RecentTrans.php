@@ -22,8 +22,8 @@ class RecentTrans extends TPanel
             $fromAcc = $tran->getFrom();
             $toAcc = $tran->getTo();
             $html .= '<li>';
-                $html .= '<a href="'. $this->_makeURLToReport($fromAcc, $toAcc, $tran->getCreated().'') . '">';
-                    $html .= '<p class="link">' . $tran->getValue() . '</p>';
+                $html .= "<a href='". $this->_makeURLToReport($fromAcc, $toAcc, $tran->getCreated().'') . "'>";
+                    $html .= '<p class="link">$' . $tran->getValue() . '</p>';
                     $html .= '<p class="descr">'. $fromAcc->getName() . ' -> ' . $toAcc->getName() . '</p>';
                     $html .= '<p class="descr">'. $tran->getComments() . '</p>';
                 $html .= '</a>';
