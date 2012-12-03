@@ -7,13 +7,13 @@
 	   <div class="row">
 	       <span class="title">From: <com:TActiveLabel Id="fromAccountsMsg" ForeColor="red"/></span>
 	       <span class="item">
-	           <com:TDropDownList Id="fromAccounts" DataValueField="id" DataTextField="longshot" Attributes.transpane="fromAccounts"/>
+	           <com:TDropDownList Id="fromAccounts" DataValueField="id" DataTextField="longshot" Attributes.transpane="fromAccounts" Cssclass="chzn-select"/>
 	       </span>
 	   </div>
 	   <div class="row">
 	       <span class="title">To: <com:TActiveLabel Id="toAccountsMsg" ForeColor="red"/></span>
 	       <span class="item">
-	           <com:TDropDownList Id="toAccounts" DataValueField="id" DataTextField="longshot" Attributes.transpane="toAccounts"/>
+	           <com:TDropDownList Id="toAccounts" DataValueField="id" DataTextField="longshot" Attributes.transpane="toAccounts" Cssclass="chzn-select"/>
 	       </span>
 	   </div>
 	   <div class="row">
@@ -32,7 +32,7 @@
 	   <div class="row">
 	       <span class="title"></span>
 	       <span class="item">
-               <com:TButton Id="submitBtn" Text="save" OnClick="save" Attributes.transpane="saveBtn"/>
+               <com:TButton Id="submitBtn" Text="save" OnClick="save" Attributes.transpane="saveBtn" CssClass="submitBtn"/>
 	       </span>
 	   </div>
 	</div>

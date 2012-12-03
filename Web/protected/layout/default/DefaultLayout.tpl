@@ -24,6 +24,12 @@
 	                   <com:TContentPlaceHolder ID="MainContent" />
 					</div>
 					<div id="content-right">
+					   <div class="box">
+						   <div class="title">Links</div>
+						   <div class="content">
+						      <com:Application.controls.Links.Links Id="usefullLinks"/>
+						  </div>
+					   </div>
 	                </div>
 				</div>
             </div>

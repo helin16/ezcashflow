@@ -12,8 +12,7 @@ class Home extends EshopPage
      * (non-PHPdoc)
      * @see TControl::onLoad()
      */
-	public function onLoad($param)
-	{}
+	public function onLoad($param) {}
 	/**
 	 * reload the page
 	 */
