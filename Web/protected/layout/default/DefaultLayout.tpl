@@ -18,9 +18,13 @@
             </div>
             <div id="content">
                 <div class="widthWrapper">
-					<com:TActiveLabel Id="InfoMsg" ForeColor="green" style="width:100%"/>
-					<com:TActiveLabel Id="ErrorMsg" ForeColor="red" style="width:100%"/>
-					<com:TContentPlaceHolder ID="MainContent" />
+	                <div id="content-main">
+	                   <com:TActiveLabel Id="InfoMsg" ForeColor="green" style="width:100%"/>
+	                   <com:TActiveLabel Id="ErrorMsg" ForeColor="red" style="width:100%"/>
+	                   <com:TContentPlaceHolder ID="MainContent" />
+					</div>
+					<div id="content-right">
+	                </div>
 				</div>
             </div>
             <div id="footer">

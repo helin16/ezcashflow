@@ -12,7 +12,9 @@ div.widthWrapper{display: block;
 }
 
 /* header div */
-div#header {background: -webkit-linear-gradient(top, #122249 0%,#13244E 24%,#192F62 82%,#193065 100%);
+div#header {
+	background: -webkit-linear-gradient(top, #122249 0%,#13244E 24%,#192F62 82%,#193065 100%);
+    background: -moz-linear-gradient(center top , #122249 0%, #13244E 24%, #192F62 82%, #193065 100%) repeat scroll 0 0 transparent;
 	border-top: 6px solid #0F1C3C;
 	border-bottom: 7px solid #0F1C3C;
 	width: 100%;
@@ -53,8 +55,25 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
 #content {
 	padding: 8px 0 0 0;
 }
+#content-main {
+	width: 70%;
+	display: inline-block;
+	float: left;
+}
+#content-right {
+	margin-left: 1%;
+	margin-top: 10px;
+	display: inline-block;
+	min-height: 400px;
+	width: 25%;
+	box-shadow: 0 0 13px #cccccc;
+	border-radius: 4px;
+	padding: 10px;
+	background: white;
+}
 .content-box {
-	margin-bottom: 10px;
+	margin: 6px;
+	box-shadow: 0 0 13px #cccccc;
     /*box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.65); not working with border-radius */
 }
 .content-box .box-title {
@@ -66,11 +85,39 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
 	color: white;
 	text-shadow: 0px -1px 1px #0F1C3C;
 }
+.listheader .box-title {
+	padding: 12px 13px 6px 13px;
+}
+.listheader .box-title ul{
+	list-style: none;
+	margin:0px; 
+	padding: 0px
+}
+.listheader .box-title ul li{
+	display: inline-block;
+}
+.listheader .box-title ul li a{
+	padding: 6px 8px 7px 8px;
+	color: white;
+	font-size: 10px;
+	text-decoration: none;
+	text-shadow:none;
+}
+.listheader .box-title ul li a:hover,
+.listheader .box-title ul li a[selected] {
+	background: white;
+	border-radius: 5px 5px 0 0;
+	color: #1E3A7D;
+}
 .content-box .box-content {
 	background: white;
 	border-radius: 0 0 5px 5px;
+	border-bottom: 1px #cccccc solid;
+	border-left: 1px #cccccc solid;
+	border-right: 1px #cccccc solid;
 	padding: 7px;
 }
 .content-box .box-content .tab-panel { /*hacking to get TTabPanel working here*/
 	float:none;
 }
+

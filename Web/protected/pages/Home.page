@@ -1,50 +1,52 @@
 <com:TContent ID="MainContent">
-	<div class="content-box">
-		<h3 class="box-title">Overview</h3>
-		<div class="box-content">
-			<com:TTabPanel ID="Overviewpanel">
-				<com:TTabView id="summaryTab" Caption="Summary Of Expense/Income">
-					<com:Application.controls.ProfitPanel.ProfitPanel Id="Summary" IgnoreInvest="true"
-					/>
-				</com:TTabView>
-				<com:TTabView id="summaryTabInvest" Caption="Expense/Income with Invest">
-					<com:Application.controls.ProfitPanel.ProfitPanel Id="SummaryInvest" 
-					/>
-				</com:TTabView>
-				<com:TTabView id="overbudgetTab" Caption="Over budget Expenses">
-					<com:Application.controls.TopExpensePane.TopExpensePanel Id="Top5" 
-					/>
-				</com:TTabView>
-			</com:TTabPanel>
+    <com:TClientScript>
+        function selectSummary(btn, detailsDiv) {
+            var tmp = {};
+            tmp.clickedBtn = $(btn);
+            tmp.clickedBtn.up('ul').getElementsBySelector('li').each(function(item){
+                item.down('a').removeAttribute('selected');
+            });
+            tmp.clickedBtn.writeAttribute('selected');
+            
+            tmp.clickedBtn.up('.content-box').down('.box-content').getElementsBySelector('[summary]').each(function(item){
+                item.hide();
+            });
+            $$('[summary=' + detailsDiv + ']').first().show();
+            return false;
+        }
+    </com:TClientScript>
+    <div class="content-box listheader">
+        <h3 class="box-title">
+            <ul>
+                <li><a href="#" selected onclick="return selectSummary(this, 'Summary');">Summary</a></li>
+                <li><a href="#" onclick="return selectSummary(this,'SummaryInvest');">Summary with Invest</a></li>
+                <li><a href="#" onclick="return selectSummary(this, 'Top5');">Over Budget Expenses</a></li>
+            </ul>
+        </h3>
+        <div class="box-content">
+            <com:Application.controls.ProfitPanel.ProfitPanel Id="Summary" IgnoreInvest="true" Attributes.summary='Summary'/>
+			<com:Application.controls.ProfitPanel.ProfitPanel Id="SummaryInvest" Style="display:none;" Attributes.summary='SummaryInvest'/>
+			<com:Application.controls.TopExpensePane.TopExpensePanel Id="Top5" Style="display:none;" Attributes.summary='Top5'/>
 		</div>
 	</div>	
-	<div class="content-box">
-		<h3 class="box-title">Recording</h3>
-		<div class="box-content">
-			<com:TTabPanel ID="actionPanel">
-				<com:TTabView id="Expense_tab" Caption="Expense">
-					<com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" 
-						GroupingText="Expense" 
-						FromAccountRootIds="1,2" 
-						ToAccountRootIds="4"
-						/>
-				</com:TTabView>
-				<com:TTabView id="Income_tab" Caption="Income">
-					<com:Application.controls.TransactionPanel.TransactionPanel Id="Income" 
-							GroupingText="Income" 
-							FromAccountRootIds="3" 
-							ToAccountRootIds="1"
-							TransType="income"
-							/>
-				</com:TTabView>
-				<com:TTabView id="Transfer_tab" Caption="Transfer">
-					<com:Application.controls.TransactionPanel.TransactionPanel Id="Transfer" 
-						GroupingText="Transfer" 
-						FromAccountRootIds="1,2,3,4" 
-						ToAccountRootIds="1,2,3,4"
-						/>
-				</com:TTabView>
-			</com:TTabPanel>
-		</div>	
+	<div class="content-box listheader">
+		<h3 class="box-title">
+            <ul>
+                <li><a href="#" selected onclick="return selectSummary(this, 'Expense');">Expense</a></li>
+                <li><a href="#" onclick="return selectSummary(this,'Income');">Income</a></li>
+                <li><a href="#" onclick="return selectSummary(this, 'Transfer');">Transfer</a></li>
+            </ul>
+        </h3>
+        <div class="box-content">
+            <div summary='Expense'>
+	            <com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" FromAccountRootIds="1,2"  ToAccountRootIds="4"/>
+	        </div>
+            <div summary='Income' Style="display:none;">
+	            <com:Application.controls.TransactionPanel.TransactionPanel Id="Income" FromAccountRootIds="3" ToAccountRootIds="1" TransType="income"/>
+	        </div>
+            <div summary='Transfer' Style="display:none;">
+	            <com:Application.controls.TransactionPanel.TransactionPanel Id="Transfer" FromAccountRootIds="1,2,3,4" ToAccountRootIds="1,2,3,4"/>
+	        </div>
+        </div>
 	</div>
 </com:TContent>

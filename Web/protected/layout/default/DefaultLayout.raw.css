@@ -1,23 +1,123 @@
-body{font-family: sans-serif; font-size: 14px; padding: 0;margin:0px;}
+body{ 
+    padding: 0;
+    margin:0px;
+    background: #F0F0F0;
+    font-family: 'Tahoma', sans-serif;
+    color: #333;
+}
 div.widthWrapper{display: block;
     margin: 0 auto 0;
     text-align: left;
-    width: 900px;
+    width: 980px;
 }
-div#header {background: #D2D2D2;}
-div.menuWrapper{margin: 0 0 15px 0;display: block;}
+
+/* header div */
+div#header {
+    background: -webkit-linear-gradient(top, #122249 0%,#13244E 24%,#192F62 82%,#193065 100%);
+    background: -moz-linear-gradient(center top , #122249 0%, #13244E 24%, #192F62 82%, #193065 100%) repeat scroll 0 0 transparent;
+    border-top: 6px solid #0F1C3C;
+    border-bottom: 7px solid #0F1C3C;
+    width: 100%;
+    color:#eee;
+}
+div.menuWrapper{margin: 0 0 6px 0;display: block;}
 div.menuWrapper .topMenuDiv{display: inline-block;width: 70%;}
+div.menuWrapper .topMenuDiv .logo{display: inline-block;
+    margin-bottom: 30px;
+    font-size: 30px;
+    padding: 8px 10px;
+}
 div.menuWrapper .topMenuUser{text-align: right;}
-.topMenuDiv ul {list-style: none;}
+div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;display: inline-block;}
+.topMenuDiv ul {list-style: none;margin:0px;padding: 0px;}
 .topMenuDiv ul li{display: inline-block;}
-.topMenuDiv .menuItem,
+.topMenuDiv a.menuItem,
 .topMenuDiv a#active
 {
     text-decoration:none;
-    padding: 3px 25px 2px 5px;
+    color: #eee;
+    padding: 8px 25px 6px 25px;
 }
 .topMenuDiv a#active
 {
-    background:blue;
-    color:white;
+    color: white;
+    border-radius: 5px 5px 0 0;
+    background: #0F1C3C;
 }
+.topMenuDiv a.menuItem:hover
+{
+    background: #0F1C3C;
+    border-radius: 5px 5px 0 0;
+}
+
+
+/* content div */
+#content {
+    padding: 8px 0 0 0;
+}
+#content-main {
+    width: 70%;
+    display: inline-block;
+    float: left;
+}
+#content-right {
+    margin-left: 1%;
+    margin-top: 10px;
+    display: inline-block;
+    min-height: 400px;
+    width: 25%;
+    box-shadow: 0 0 13px #cccccc;
+    border-radius: 4px;
+    padding: 10px;
+    background: white;
+}
+.content-box {
+    margin: 6px;
+    box-shadow: 0 0 13px #cccccc;
+    /*box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.65); not working with border-radius */
+}
+.content-box .box-title {
+    border-radius: 5px 5px 0 0;
+    background: #1E3A7D;
+    margin: 0;
+    padding: 9px 13px;
+    font-size: 13px;
+    color: white;
+    text-shadow: 0px -1px 1px #0F1C3C;
+}
+.listheader .box-title {
+    padding: 12px 13px 6px 13px;
+}
+.listheader .box-title ul{
+    list-style: none;
+    margin:0px; 
+    padding: 0px
+}
+.listheader .box-title ul li{
+    display: inline-block;
+}
+.listheader .box-title ul li a{
+    padding: 6px 8px 7px 8px;
+    color: white;
+    font-size: 10px;
+    text-decoration: none;
+    text-shadow:none;
+}
+.listheader .box-title ul li a:hover,
+.listheader .box-title ul li a[selected] {
+    background: white;
+    border-radius: 5px 5px 0 0;
+    color: #1E3A7D;
+}
+.content-box .box-content {
+    background: white;
+    border-radius: 0 0 5px 5px;
+    border-bottom: 1px #cccccc solid;
+    border-left: 1px #cccccc solid;
+    border-right: 1px #cccccc solid;
+    padding: 7px;
+}
+.content-box .box-content .tab-panel { /*hacking to get TTabPanel working here*/
+    float:none;
+}
+
