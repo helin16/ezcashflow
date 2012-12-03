@@ -9,6 +9,10 @@
  */
 class Links extends TPanel
 {
+    /**
+     * (non-PHPdoc)
+     * @see TPanel::renderEndTag()
+     */
     public function renderEndTag($writer)
     {
         $html = '<ul>';
