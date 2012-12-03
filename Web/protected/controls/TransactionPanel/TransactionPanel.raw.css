@@ -1,0 +1,24 @@
+.TransPanel{
+	margin:0px;
+	padding: 0px;
+}
+.TransPanel .transDiv .row {
+    padding: 4px 0 0 0;	
+}
+.TransPanel .transDiv [transpane=fromAccounts],
+.TransPanel .transDiv [transpane=toAccounts] {
+	width: 100%;
+	font-size: 16px;
+	padding: 4px;
+}
+
+.TransPanel .transDiv [transpane=value] {
+	font-size: 16px;
+    padding: 4px;
+    display: inline-block;
+}
+.TransPanel .transDiv [transpane=description] {
+	font-size: 16px;
+    padding: 4px;
+    width: 90%;
+}

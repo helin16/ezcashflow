@@ -1,48 +1,39 @@
-<com:TPanel ID="menu" GroupingText="<%= $this->groupingText %>" DefaultButton="submitBtn">
-	<com:TActiveLabel Id="errorMsg" ForeColor="red"/>
-	<com:TActiveLabel Id="infoMsg" ForeColor="green"/>
-	<table style="background:#cccccc;padding:15px;" width="100%">
-		<tr>
-			<td width="60px" align="right">
-				From
-			</td>
-			<td>
-				<com:TDropDownList Id="fromAccounts" DataValueField="id" DataTextField="longshot"/>&nbsp;&nbsp;
-				<com:TActiveLabel Id="fromAccountsMsg" ForeColor="red"/>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				To
-			</td>
-			<td>
-				<com:TDropDownList Id="toAccounts" DataValueField="id" DataTextField="longshot"/>
-				&nbsp;&nbsp;
-				<com:TActiveLabel Id="toAccountsMsg" ForeColor="red"/>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				Value:
-			</td>
-			<td>
-				$<com:TTextBox Id="transValue" style="width:80px;"/>&nbsp;&nbsp;
-				<com:TActiveLabel Id="valueMsg" ForeColor="red"/>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				Description:
-			</td>
-			<td>
-				<com:TTextBox Id="description"  width="100%"/>
-			</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td>
-				<com:TButton Id="submitBtn" Text="save" OnClick="save"/>
-			</td>
-		</tr>
-	</table>
+<com:TPanel ID="TransPanel" DefaultButton="submitBtn" CssClass="TransPanel">
+	<div class="transDiv">
+	   <div class="row">
+	       <com:TActiveLabel Id="errorMsg" ForeColor="red"/>
+	       <com:TActiveLabel Id="infoMsg" ForeColor="green"/>
+	   </div>
+	   <div class="row">
+	       <span class="title">From: <com:TActiveLabel Id="fromAccountsMsg" ForeColor="red"/></span>
+	       <span class="item">
+	           <com:TDropDownList Id="fromAccounts" DataValueField="id" DataTextField="longshot" Attributes.transpane="fromAccounts"/>
+	       </span>
+	   </div>
+	   <div class="row">
+	       <span class="title">To: <com:TActiveLabel Id="toAccountsMsg" ForeColor="red"/></span>
+	       <span class="item">
+	           <com:TDropDownList Id="toAccounts" DataValueField="id" DataTextField="longshot" Attributes.transpane="toAccounts"/>
+	       </span>
+	   </div>
+	   <div class="row">
+	       <span class="title">Value:</span>
+	       <span class="item">
+               $<com:TTextBox Id="transValue" Attributes.transpane="value"/>
+               <com:TActiveLabel Id="valueMsg" ForeColor="red"/>
+	       </span>
+	   </div>
+	   <div class="row">
+	       <span class="title">Description:</span>
+	       <span class="item">
+               <com:TTextBox Id="description" Attributes.transpane="description"/>
+	       </span>
+	   </div>
+	   <div class="row">
+	       <span class="title"></span>
+	       <span class="item">
+               <com:TButton Id="submitBtn" Text="save" OnClick="save" Attributes.transpane="saveBtn"/>
+	       </span>
+	   </div>
+	</div>
 </com:TPanel>
