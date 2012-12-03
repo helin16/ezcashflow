@@ -2,7 +2,9 @@
 /**
  * This is the loginpage
  * 
- * @author lhe
+ * @package    Web
+ * @subpackage Controller
+ * @author     lhe<helin16@gmail.com>
  */
 class LoginController extends TPage  
 {
