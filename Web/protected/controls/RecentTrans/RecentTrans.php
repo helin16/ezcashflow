@@ -44,9 +44,8 @@ class RecentTrans extends TPanel
      */
     private function _makeURLToReport(AccountEntry $fromAccount, AccountEntry $toAccount, $transTime)
     {
-        $vars = array(
-                "fromAccountIds" => $fromAccount->getId(),
-                "toAccountIds" => $toAccountIds,
+        $vars = array("fromAccountIds" => $fromAccount->getId(),
+                "toAccountIds" => $toAccount->getId(),
                 "fromDate" => $transTime,
                 "toDate" => $transTime
         );
