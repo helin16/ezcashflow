@@ -9,7 +9,7 @@
 	<body>
         <?php
             require dirname(__FILE__) . '/bootstrap.php';
-            $testRunner = new TestRunner(dirname(__FILE__), array('class', 'index.php', 'bootstrap.php', 'PHPUnitReport'), true, false);
+            $testRunner = new TestRunner(dirname(__FILE__), array('class', 'index.php', 'bootstrap.php', 'PHPUnitReport'), true, true);
             if (isset($_REQUEST['testpath']) && ($testPath = trim($_REQUEST['testpath'])) !== '') {
                 $testRunner->run($testPath);
             } else {

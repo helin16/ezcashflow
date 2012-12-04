@@ -132,7 +132,7 @@ class TestRunner
         if ($this->_genCoverageReport === true) 
         {
             $coverage = new PHP_CodeCoverage();
-            $coverage->start('HydraTestReport');
+            $coverage->start('TestReport');
         }
         $this->_findEmptyTables()
             ->_testAll($path);
