@@ -3,10 +3,10 @@
  *
  * Abstract Core Unit Test
  *
- * @package    Core
- * @subpackage Test
- * @since      2012-09-01
+ * @package    Test
+ * @subpackage class
  * @author     lhe<helin16@gmail.com>
+ * @since      2012-09-01
  *
  */
 abstract class CoreUnitTestAbstract extends PHPUnit_Framework_TestCase
@@ -79,111 +79,5 @@ abstract class CoreUnitTestAbstract extends PHPUnit_Framework_TestCase
         $html = '</div>';
         $html .= '</div>';
         return $html;
-    }
-    
-    /**
-     * Pass in empty site and worktype by reference
-     * 
-     * @param WorkType $workType The worktype object ref
-     * @param Site     $site     The Site object ref    
-     * 
-     * @return CoreEntityUnitTestAbstract
-     */
-    protected function getRandomSiteAndWorkType(WorkType &$workType, Site &$site)
-    {
-    	for($i = 0; $i < self::TOTAL_NO_RANDOM; $i++)
-    	{
-    		$workType = $this->_getRandomEntity("WorkType");
-    		if(!$workType instanceof WorkType || ($count = count($sites = $workType->getSites())) === 0)
-    		{
-    		    continue;
-    		}
-    		$site = $sites[rand(0, $count)];
-    		if($site instanceof Site)
-    		{
-    		    return;
-    		}
-    	}
-    	throw new Exception("No valid WorkType/Site object found!");
-    }
-    /**
-     * Get Random Warehouse that allows parts
-     *
-     * @param Array $excludingIds
-     * @return Warehouse
-     */
-    protected function getRandomWarehouse()
-    {    	
-    	return $this->_getRandomEntity("Warehouse");
-    }
-    /**
-     * Getting a Random Part Instance object
-     * 
-     * @param Int $aliasType : Providing this will ensure that the part retrieved includes an alias of that type
-     * 
-     * @return PartInstance
-     */
-    protected function getRandomPartInstanceByAliasType($aliasType = PartInstanceAliasType::ID_SERIAL_NO)
-    {    	
-    	$count = $this->_getCountForTable('partinstance');
-    	for($i = 0; $i < self::TOTAL_NO_RANDOM; $i++)
-    	{
-    		$pi = Dao::findById(new DaoQuery("PartInstance"), rand(1, $count));
-    		if($pi instanceof PartInstance && $pi->getActive() == 1 && $pi->getAlias($aliasType) !== '')
-    		{
-    		    return $pi;
-    		}
-    	}
-        throw new Exception("No valid PartInstance found for testing: " . __FUNCTION__);
-    }
-    /**
-     * Alias function call to getRandomPartInstanceByAliasType
-     *  
-     * @param Int $aliasType : Providing this will ensure that the part retrieved includes an alias of that type
-     * 
-     * @return Ambigous <PartInstance, IHydraEntity, HydraEntity, NULL, unknown, string>
-     */    
-    protected function getRandomPartInstanceByAlias($aliasType = PartInstanceAliasType::ID_CLIENT_ASSET_NUMBER)
-    {
-        return $this->getRandomPartInstanceByAliasType($aliasType);
-    }
-    /**
-     * Randomly getting an entity object
-     *
-     * @param string $entityName       The class name of the entity you are trying to get
-     * @param int    $noOfLoopingTimes The total number of times that this function is trying to get the object for
-     *
-     * @throws Exception
-     * @return Ambigous <unknown, HydraEntity, NULL, string>
-     */
-    protected function _getRandomEntity($entityName, $noOfLoopingTimes = self::TOTAL_NO_RANDOM)
-    {
-        $count = $this->_getCountForTable(strtolower($entityName));
-        for($i = 0; $i < $noOfLoopingTimes; $i++)
-        { 
-            $entity = Dao::findById(new DaoQuery($entityName), rand(1, $count));
-            if($entity instanceof $entityName)
-            {
-                return $entity;
-            }
-        }
-        throw new Exception("No valid $entityName object found!");
-    }
-    /**
-     * getting the count of an entity table
-     *
-     * @param string $tableName The table name that we are counting on
-     *
-     * @throws Exception
-     */
-    private function _getCountForTable($tableName)
-    {
-        $sql = "select count(id) from $tableName where active = 1";
-        $count = Dao::getResultsNative($sql);
-        if(count($count) === 0)
-        {
-            throw new Exception("None records found for $tableName!");
-        }
-        return $count[0][0];
     }
 }
