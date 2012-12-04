@@ -1,18 +1,29 @@
 <?php
+/**
+ * This is the accounts page
+ *
+ * @package    Web
+ * @subpackage Controller
+ * @author     lhe<helin16@gmail.com>
+ */
 class AccountsController extends EshopPage 
 {
+    /**
+     * constructor
+     */
 	public function __construct()
 	{
 		parent::__construct();
 		$this->menuItemName='accounts';
 	}
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see TControl::onLoad()
+	 */
 	public function onLoad($param)
 	{
 		if(!$this->IsPostBack)
 		{
-			$this->rootId->Value=1;
-			$this->showAccounts();
 		}
 	}
 	
@@ -279,12 +290,6 @@ class AccountsController extends EshopPage
     	
     	$account->setAccountNumber($accountNoNext);
     	$accountService->save($account);
-    	
-//    	$userAccountId = Core::getUser()->getId();
-//    	$sql="update accountentry set accountNumber = REPLACE(accountNumber,'$accountNo','".$account->getAccountNumber()."'),updatedById =$userAccountId where accountNumber like '$accountNo%' and active = 1";
-//    	Dao::execSql($sql);
-//    	$sql="update accountentry set accountNumber = REPLACE(accountNumber,'$accountNoNext','".$anotherAccount->getAccountNumber()."'),updatedById =$userAccountId where accountNumber like '$accountNoNext%' and active = 1";
-//    	Dao::execSql($sql);
     	
     	$this->setInfoMsg("Account '".$account->getLongshot()."' re-ordered!");
     	$this->showAccounts();   
