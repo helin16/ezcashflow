@@ -113,6 +113,7 @@ div.menuWrapper .topMenuUser .welcomeMsg{margin-top: 8px;vertical-align: top;dis
     background: white;
     border-radius: 5px 5px 0 0;
     color: #1E3A7D;
+    cursor: pointer;
 }
 .content-box .box-content {
     background: white;

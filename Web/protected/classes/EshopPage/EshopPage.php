@@ -36,8 +36,10 @@ abstract class EshopPage extends TPage
 	public function onInit($param)
 	{
 	    parent::onInit($param);
+        $this->getPage()->getClientScript()->registerScriptFile('ezCashflowJs', $this->publishAsset(__CLASS__ . '.js', __CLASS__));
 	    try
 	    {
+	        
 	        //loading controller.js
 	        $className = get_class($this);
 	        $class = new ReflectionClass($className);
