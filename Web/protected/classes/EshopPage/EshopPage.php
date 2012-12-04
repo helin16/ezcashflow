@@ -107,5 +107,17 @@ abstract class EshopPage extends TPage
     		$this->getMaster()->ErrorMsg->Text=$msg;
 	    return $this;
 	}
+	/**
+	 * getting the JSON string
+	 * 
+	 * @param array $data   The result data
+	 * @param array $errors The errors
+	 * 
+	 * @return string The json string
+	 */
+	protected function _getJson($data = array(), $errors = array())
+	{
+	    return json_encode(array('resultData' => $data, 'errors' => $errors, 'succ' => (count($errors) === 0 ? true : false)));
+	}
 }
 ?>

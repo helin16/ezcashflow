@@ -1,4 +1,5 @@
 <com:TContent ID="MainContent">
+    <com:TCallback ID="getAccountsBtn" OnCallback="Page.getAccounts"/>
     <div class="content-box listheader">
         <h3 class="box-title">
             <ul>
@@ -10,24 +11,11 @@
         </h3>
         <div class="box-content">
             <div id="accountList">
-                <div class="row odd">
-					<span class="accountname">Account Name</span>
-					<span class="value">$1.00</span>
-					<span class="accountno">Account No.</span>
-					<span class="budget">$1.00</span>
-					<span class="comments">fdlsafkdjsfl;dksajf;sdlafkjsd</span>
-				</div>
-                <div class="row even">
-					<span class="accountname">Account Name</span>
-					<span class="value">$1.00</span>
-					<span class="accountno">Account No.</span>
-					<span class="budget">$1.00</span>
-					<span class="comments">fdlsafkdjsfl;dksajf;sdlafkjsd</span>
-				</div>
             </div>
         </div>
     </div>
     <com:TClientScript>
-        var pageJs = new AccountsJs();
+        var pageJs = new AccountsJs('accountList', '<%= $this->getAccountsBtn->getUniqueId()%>');
+        $$(".content-box.listheader .box-title ul li a[selected]").first().click();
     </com:TClientScript>
 </com:TContent>

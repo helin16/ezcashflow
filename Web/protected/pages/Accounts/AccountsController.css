@@ -1,10 +1,11 @@
 #accountList {width: 100%;}
-#accountList .row {display:block;margin:0px;padding:0px;background: #E6ECFF;padding: 5px;margin-bottom:2px;}
+#accountList .row {display:block;margin:0px;padding:0px;background: #E6ECFF;padding: 5px;margin-bottom:2px; text-align: right;}
 #accountList .row.even {background: #BFCFFF;}
 #accountList .row .accountname,
-#accountList .row .accountno{font-weight:bold; display:inline-block; width: 80%;}
+#accountList .row .accountno{font-weight:bold; display:inline-block; width: 80%;text-align: left;}
 #accountList .row .value,
-#accountList .row .budget{display:inline-block; width: 15%; text-align: right; font-weight:bold;}
+#accountList .row .budget{display:inline-block; width: 18%; text-align: right; font-weight:bold;}
 #accountList .row .accountno,
 #accountList .row .budget{font-weight:normal; color: #888888; font-size: 12px;}
 #accountList .row .comments{display:block;width: 100%;font-size: 10px;color: #888888;}
+#accountList .row .rowDivd{display:inline-block;}
