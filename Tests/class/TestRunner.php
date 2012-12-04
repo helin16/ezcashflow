@@ -53,6 +53,7 @@ class TestRunner
         $this->_excludeFiles = array_merge($this->_excludeFiles, $exclFiles);
         $this->_htmlMode = ($htmlMode === true ? true : false);
         $this->_coverageReportPath = dirname(__FILE__) . $this->_coverageReportPath;
+        $this->_genCoverageReport = $genCoverageReport;
     }
     /**
      * Getting the test case file tree
