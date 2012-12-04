@@ -1,11 +1,31 @@
 <?php
+/**
+ * X_Person_Address Entity
+ *
+ * @package    Core
+ * @subpackage Entity
+ * @author     lhe<helin16@gmail.com>
+ */
 class X_Person_Address extends HydraEntity 
 {
+    /**
+     * Whether this is the default address for that person
+     * 
+     * @var bool
+     */
 	private $isDefault;
-	
+	/**
+	 * The person
+	 * 
+	 * @var Person
+	 */
 	protected $person;
+	/**
+	 * The address
+	 * 
+	 * @var Address
+	 */
 	protected $address;
-	
 	/**
 	 * getter Person
 	 *
@@ -15,17 +35,18 @@ class X_Person_Address extends HydraEntity
 	{
 		return $this->person;
 	}
-	
 	/**
 	 * setter Person
-	 *
-	 * @var Person
+	 * 
+	 * @param Person $Person The person
+	 * 
+	 * @return X_Person_Address
 	 */
-	public function setPerson($Person)
+	public function setPerson(Person $Person)
 	{
 		$this->person = $Person;
+		return $this;
 	}
-	
 	/**
 	 * getter Address
 	 *
@@ -35,44 +56,49 @@ class X_Person_Address extends HydraEntity
 	{
 		return $this->address;
 	}
-	
 	/**
 	 * setter Address
-	 *
-	 * @var Address
+	 * 
+	 * @param Address $Address The address
+	 * 
+	 * @return X_Person_Address
 	 */
-	public function setAddress($Address)
+	public function setAddress(Address $Address)
 	{
 		$this->address = $Address;
+		return $this;
 	}
-	
 	/**
 	 * getter IsDefault
 	 *
-	 * @return IsDefault
+	 * @return bool
 	 */
 	public function getIsDefault()
 	{
 		return $this->isDefault;
 	}
-	
 	/**
 	 * setter IsDefault
-	 *
-	 * @var IsDefault
+	 * 
+	 * @param bool $IsDefault Whether this is a default address
+	 * 
+	 * @return X_Person_Address
 	 */
 	public function setIsDefault($IsDefault)
 	{
 		$this->isDefault = $IsDefault;
+		return $this;
 	}
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see HydraEntity::__loadDaoMap()
+	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'xpa');
-		
 		DaoMap::setBoolType('isDefault');
 		DaoMap::setManyToOne("person","Person","p");
-		DaoMap::setManyToOne("adress","Adress","addr");
+		DaoMap::setManyToOne("address","Address","addr");
 		DaoMap::commit();
 	}
 }

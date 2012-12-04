@@ -1,10 +1,36 @@
 <?php
-
+/**
+ * Address Entity
+ *
+ * @package    Core
+ * @subpackage Entity
+ * @author     lhe<helin16@gmail.com>
+ */
 class Address extends HydraEntity
 {
+    /**
+     * The first line of the address
+     * 
+     * @var string
+     */
 	private $line1;
+    /**
+     * The 2nd line of the address
+     * 
+     * @var string
+     */
 	private $line2;
+	/**
+	 * The suburb of the address
+	 * 
+	 * @var string
+	 */
 	private $suburb;
+	/**
+	 * The postcode of the address
+	 * 
+	 * @var string
+	 */
 	private $postCode;
 	/**
 	 * @var State
@@ -24,17 +50,18 @@ class Address extends HydraEntity
 	{
 		return $this->line1;
 	}
-	
 	/**
 	 * Setter Line1
 	 *
-	 * @param String Line1
+	 * @param string Line1 The first line
+	 * 
+	 * @return Address
 	 */
 	public function setLine1($Line1)
 	{
 		$this->line1 = $Line1;
+		return $this;
 	}	
-	
 	/**
 	 * getter Line2
 	 *
@@ -44,17 +71,17 @@ class Address extends HydraEntity
 	{
 		return $this->line2;
 	}
-	
 	/**
 	 * Setter Line2
 	 *
-	 * @param String Line2
+	 * @param String Line2 The 2nd line of the address.
+	 * 
+	 * @return Address
 	 */
 	public function setLine2($Line2)
 	{
 		$this->line2 = $Line2;
 	}
-	
 	/**
 	 * getter Suburb
 	 *
@@ -64,17 +91,18 @@ class Address extends HydraEntity
 	{
 		return $this->suburb;
 	}
-	
 	/**
 	 * Setter Suburb
 	 *
-	 * @param String Suburb
+	 * @param String Suburb The new suburb
+	 * 
+	 * @return Address
 	 */
 	public function setSuburb($Suburb)
 	{
 		$this->suburb = $Suburb;
+		return $this;
 	}
-
 	/**
 	 * getter State
 	 *
@@ -85,17 +113,18 @@ class Address extends HydraEntity
 		$this->loadManyToOne("state");
 		return $this->state;
 	}
-	
 	/**
 	 * Setter State
 	 *
-	 * @param State State
+	 * @param State State The new State
+	 * 
+	 * @return Address
 	 */
-	public function setState($State)
+	public function setState(State $State = null)
 	{
 		$this->state = $State;
+		return $this;
 	}
-	
 	/**
 	 * getter Country
 	 *
@@ -106,17 +135,18 @@ class Address extends HydraEntity
 		$this->loadManyToOne("country");
 		return $this->country;
 	}
-	
 	/**
 	 * Setter Country
 	 *
-	 * @param Country Country
+	 * @param Country Country The new country
+	 * 
+	 * @return Address
 	 */
-	public function setCountry($Country)
+	public function setCountry(Country $Country = null)
 	{
 		$this->country = $Country;
+		return $this;
 	}
-		
 	/**
 	 * getter PostCode
 	 *
@@ -126,27 +156,34 @@ class Address extends HydraEntity
 	{
 		return $this->postCode;
 	}
-	
 	/**
 	 * Setter PostCode
 	 *
-	 * @param String PostCode
+	 * @param String PostCode The postcode of the suburb
+	 * 
+	 * @return Address
 	 */
 	public function setPostCode($PostCode)
 	{
 		$this->postCode = $PostCode;
+		return $this;
 	}
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see HydraEntity::__toString()
+	 */
 	public function __toString()
 	{
 		$line = trim($this->getLine1()." ".$this->getLine2());
 		return ($line==""? "" : ", ").$this->getSuburb().", ".$this->getState().", ".$this->getCountry()." ".$this->getPostCode();
 	}
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see HydraEntity::__loadDaoMap()
+	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'addr');
-		
 		DaoMap::setStringType('line1','varchar',255);
 		DaoMap::setStringType('line2','varchar');
 		DaoMap::setStringType('suburb','varchar');

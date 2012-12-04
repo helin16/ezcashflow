@@ -1,10 +1,24 @@
 <?php
-
+/**
+ * Country Entity
+ *
+ * @package    Core
+ * @subpackage Entity
+ * @author     lhe<helin16@gmail.com>
+ */
 class Country extends HydraEntity
 {
+    /**
+     * the name of the country
+     * @var string
+     */
 	private $name;
+	/**
+	 * The states
+	 * 
+	 * @var array
+	 */
 	protected $states;
-	
 	/**
 	 * getter Name
 	 *
@@ -14,22 +28,26 @@ class Country extends HydraEntity
 	{
 		return $this->name;
 	}
-	
 	/**
 	 * Setter Name
 	 *
-	 * @param Name Name
+	 * @param string Name The name of the country
+	 * 
+	 * @return Country
 	 */
 	public function setName($Name)
 	{
 		$this->name = $Name;
+		return $this;
 	}
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see HydraEntity::__toString()
+	 */
 	public function __toString()
 	{
 		return $this->getName();
 	}
-	
 	/**
 	 * getter States
 	 *
@@ -40,17 +58,22 @@ class Country extends HydraEntity
 		$this->loadOneToMany("states");
 		return $this->states;
 	}
-	
 	/**
 	 * Setter States
 	 *
-	 * @param States States
+	 * @param States[] States The states that belongs to this country
+	 * 
+	 * @return Country
 	 */
-	public function setStates($States)
+	public function setStates(array $States)
 	{
 		$this->states = $States;
+		return $this;
 	}
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see HydraEntity::__loadDaoMap()
+	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'c');

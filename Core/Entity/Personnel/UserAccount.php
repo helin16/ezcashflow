@@ -1,13 +1,37 @@
 <?php
-
+/**
+ * UserAccount Entity
+ *
+ * @package    Core
+ * @subpackage Entity
+ * @author     lhe<helin16@gmail.com>
+ */
 class UserAccount extends HydraEntity 
 {
+    /**
+     * The username
+     * 
+     * @var string
+     */
 	private $userName;
+	/**
+	 * The password
+	 * 
+	 * @var string
+	 */
 	private $password;
-	
+	/**
+	 * The person
+	 * 
+	 * @var Person
+	 */
 	protected $person;
+	/**
+	 * The roles that this person has
+	 * 
+	 * @var array
+	 */
 	protected $roles;
-	
 	/**
 	 * getter UserName
 	 *
@@ -17,17 +41,18 @@ class UserAccount extends HydraEntity
 	{
 		return $this->userName;
 	}
-	
 	/**
 	 * Setter UserName
 	 *
-	 * @param String UserName
+	 * @param String $UserName The username
+	 * 
+	 * @return UserAccount
 	 */
 	public function setUserName($UserName)
 	{
 		$this->userName = $UserName;
+		return $this;
 	}
-	
 	/**
 	 * getter Password
 	 *
@@ -37,17 +62,18 @@ class UserAccount extends HydraEntity
 	{
 		return $this->password;
 	}
-	
 	/**
 	 * Setter Password
-	 *
-	 * @param String Password
+	 * 
+	 * @param string $Password The password
+	 * 
+	 * @return UserAccount
 	 */
 	public function setPassword($Password)
 	{
 		$this->password = $Password;
+		return $this;
 	}
-	
 	/**
 	 * getter Person
 	 *
@@ -58,17 +84,18 @@ class UserAccount extends HydraEntity
 		$this->loadManyToOne("person");
 		return $this->person;
 	}
-	
 	/**
 	 * Setter Person
-	 *
-	 * @param Person Person
+	 * 
+	 * @param Person $Person The person that this useraccount belongs to
+	 * 
+	 * @return UserAccount
 	 */
-	public function setPerson($Person)
+	public function setPerson(Person $Person)
 	{
 		$this->person = $Person;
+		return $this;
 	}
-	
 	/**
 	 * getter Roles
 	 *
@@ -79,27 +106,33 @@ class UserAccount extends HydraEntity
 		$this->loadManyToMany("roles");
 		return $this->roles;
 	}
-	
 	/**
 	 * setter Roles
-	 *
-	 * @var Roles
+	 * 
+	 * @param array $Roles The roles that this user has
+	 * 
+	 * @return UserAccount
 	 */
-	public function setRoles($Roles)
+	public function setRoles(array $Roles)
 	{
 		$this->roles = $Roles;
+		return $this;
 	}
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see HydraEntity::__toString()
+	 */
 	public function __toString()
 	{
 		return $this->getUserName();
 	}
-		
-
+	/**
+	 * (non-PHPdoc)
+	 * @see HydraEntity::__loadDaoMap()
+	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'ua');
-		
 		DaoMap::setStringType('userName','varchar',256);
 		DaoMap::setStringType('password','varchar',256);
 		DaoMap::setOneToOne("person","Person",true,"p");
