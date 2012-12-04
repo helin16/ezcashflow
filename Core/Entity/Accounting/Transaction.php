@@ -1,104 +1,133 @@
 <?php
+/**
+ * Transaction Entity
+ *
+ * @package    Core
+ * @subpackage Entity
+ * @author     lhe<helin16@gmail.com>
+ */
 class Transaction extends HydraEntity 
 {
+    /**
+     * The value of the transaction
+     * 
+     * @var string
+     */
 	private $value;
+    /**
+     * The comments of the transaction
+     * 
+     * @var string
+     */
 	private $comments;
+    /**
+     * The from account
+     * 
+     * @var AccountEntry
+     */
 	protected $from;
+    /**
+     * The to account
+     * 
+     * @var AccountEntry
+     */
 	protected $to;
-	
-	
 	/**
 	 * getter value
 	 *
-	 * @return value
+	 * @return string
 	 */
 	public function getValue()
 	{
 		return $this->value;
 	}
-	
 	/**
 	 * setter value
-	 *
-	 * @var value
+	 * 
+	 * @param string $value The value of the transaction
+	 * 
+	 * @return Transaction
 	 */
 	public function setValue($value)
 	{
 		$this->value = $value;
+		return $this;
 	}
-	
 	/**
 	 * getter from
 	 *
-	 * @return from
+	 * @return AccountEntry
 	 */
 	public function getFrom()
 	{
 		$this->loadManyToOne("from");
 		return $this->from;
 	}
-	
 	/**
 	 * setter from
-	 *
-	 * @var from
+	 * 
+	 * @param AccountEntry $from The from account
+	 * 
+	 * @return Transaction
 	 */
-	public function setFrom($from)
+	public function setFrom(AccountEntry $from = null)
 	{
 		$this->from = $from;
+		return $this;
 	}
-	
 	/**
 	 * getter to
 	 *
-	 * @return to
+	 * @return AccountEntry
 	 */
 	public function getTo()
 	{
 		$this->loadManyToOne("to");
 		return $this->to;
 	}
-	
 	/**
 	 * setter to
 	 *
-	 * @var to
+	 * @param AccountEntry $from The to account
+	 * 
+	 * @return Transaction
 	 */
 	public function setTo($to)
 	{
 		$this->to = $to;
+		return $this;
 	}
 	/**
 	 * getter comments
 	 *
-	 * @return comments
+	 * @return string
 	 */
 	public function getComments()
 	{
 		return $this->comments;
 	}
-	
 	/**
 	 * setter comments
 	 *
-	 * @var comments
+	 * @param string $comments The new comments
+	 * 
+	 * @return Transaction
 	 */
 	public function setComments($comments)
 	{
 		$this->comments = $comments;
 	}
-	
-	
+	/**
+	 * (non-PHPdoc)
+	 * @see HydraEntity::__loadDaoMap()
+	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'trans');
-		
 		DaoMap::setStringType('value');
 		DaoMap::setStringType('comments','varchar',6400);
-		
 		DaoMap::setManyToOne("from","AccountEntry","from",true);
 		DaoMap::setManyToOne("to","AccountEntry","to");
-		
 		DaoMap::commit();
 	}
 }
