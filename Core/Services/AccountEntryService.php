@@ -27,7 +27,7 @@ class AccountEntryService extends BaseService
 	public function getChildrenAccounts(accountentry $parent,$includeSelf=false,$includeAll=false)
 	{
 		if($includeAll)
-			return $this->findByCriteria(($includeSelf==false ? "id!=".$parent->getId()." AND " : "")."accountNumber like '".$parent->getAccountNumber()."%'");
+			return $this->findByCriteria(($includeSelf==false ? "id!=".$parent->getId()." AND " : "")."accountNumber like '".$parent->getAccountNumber()."%'", true, null, 30, array("AccountEntry.accountNumber" => 'asc'));
 		else
 			return $this->findByCriteria("parentId=".$parent->getId());
 	}
