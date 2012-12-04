@@ -24,7 +24,7 @@ class RecentTrans extends TPanel
             $html .= '<li>';
                 $html .= "<a href='". $this->_makeURLToReport($fromAcc, $toAcc, $tran->getCreated()) . "'>";
                     $html .= '<p class="link">$' . $tran->getValue() . '</p>';
-                    $html .= '<p class="descr">'. $fromAcc->getName() . ' -> ' . $toAcc->getName() . '</p>';
+                    $html .= '<p class="descr">'. (!$fromAcc instanceof AccountEntry ? '' : $fromAcc->getName()) . ' -> ' . $toAcc->getName() . '</p>';
                     $html .= '<p class="descr">'. $tran->getComments() . '</p>';
                 $html .= '</a>';
             $html .= '</li>';
@@ -42,12 +42,12 @@ class RecentTrans extends TPanel
      * 
      * @return string The href string
      */
-    private function _makeURLToReport(AccountEntry $fromAccount, AccountEntry $toAccount, HydraDate $transTime)
+    private function _makeURLToReport(AccountEntry $fromAccount = null, AccountEntry $toAccount, HydraDate $transTime)
     {
         $fromDate = $transTime->__toString();
         $transTime->modify('+1 second');
         $toDate = $transTime->__toString();
-        $vars = array("fromAccountIds" => array($fromAccount->getId()),
+        $vars = array("fromAccountIds" => (!$fromAccount instanceof AccountEntry ? array() : array($fromAccount->getId())),
                 "toAccountIds" => array($toAccount->getId()),
                 "fromDate" => $fromDate,
                 "toDate" => $toDate
