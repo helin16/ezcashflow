@@ -21,7 +21,7 @@ class RecentTrans extends TPanel
         {
             $fromAcc = $tran->getFrom();
             $toAcc = $tran->getTo();
-            $html .= '<li>';
+            $html .= '<li class="row" transid="' . $tran->getId() . '">';
                 $html .= "<a href='". $this->_makeURLToReport($fromAcc, $toAcc, $tran->getCreated()) . "'>";
                     $html .= '<p class="value">$' . $tran->getValue() . '</p>';
                     $html .= '<p class="from">From: '. (!$fromAcc instanceof AccountEntry ? '' : $fromAcc->getName()) . '</p>';
