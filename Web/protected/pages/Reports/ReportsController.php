@@ -50,16 +50,52 @@ class ReportsController extends EshopPage
 	{
 		if(!$this->IsPostBack)
 		{
-		    $this->seachpage->getControls()->add($this->_getSeachPanel());
+		    $reportVars = isset($this->Request['reportVars']) ? unserialize($this->Request['reportVars']) : array();
+// 		    if(count($reportVars) > 0)
+// 		    {
+// 		        $this->fromDate->Text = $reportVars["fromDate"];
+// 		        $this->toDate->Text = $reportVars["toDate"];
+		    
+// 		        $this->fromAccount->setSelectedValues($reportVars["fromAccountIds"]);
+// 		        $this->toAccount->setSelectedValues($reportVars["toAccountIds"]);
+// 		        $this->search(null,null);
+// 		    }
+		    $this->seachpage->getControls()->add($this->_getSeachPanel($reportVars));
+		    $this->script->getControls()->add($this->_getJs(count($reportVars) > 0));
 		}
+	}
+	/**
+	 * generate the javascript
+	 * 
+	 * @param bool $clickSearch Whether we are cliking on the seach btn automatically
+	 * 
+	 * @return string
+	 */
+	private function _getJs($clickSearch = false)
+	{
+	    $js = "var pageJs = new ReportJs('transResults', '" . $this->searchBtn->getUniqueId() . "', '" . $this->editBtn->getUniqueId() . "', '" . $this->deleteBtn->getUniqueId() . "');";
+        $js .= "pageJs.initialDatePicker('input.searchdate');";
+        if($clickSearch === true)
+            $js .= "$('searchPanel').down('input.submitBtn').click();";
+        return $js;
 	}
 	/**
 	 * getting the search panel's html
 	 * 
+	 * @param array $reportVars The variables that passed in via url
+	 * 
 	 * @return string The html code
 	 */
-	private function _getSeachPanel() 
+	private function _getSeachPanel($reportVars = array()) 
 	{
+	    if(!isset($reportVars["fromDate"]) || ($fromDate = trim($reportVars["fromDate"])) === '')
+	        $fromDate = '';
+	    if(!isset($reportVars["toDate"]) || ($toDate = trim($reportVars["toDate"])) === '')
+	        $toDate = '';
+	    if(!isset($reportVars["fromAccountIds"]) || count($fromAccountIds = $reportVars["fromAccountIds"]) === 0)
+	        $fromAccountIds = array();
+	    if(!isset($reportVars["toAccountIds"]) || count($toAccountIds = $reportVars["toAccountIds"]) === 0)
+	        $toAccountIds = array();
 	    $accounts = $this->_accService->findByCriteria("active = 1", true, null, 30, array("AccountEntry.accountNumber" => "asc"));
 	    $html = '<div class="content-box searchPanel" ID="searchPanel">';
 	        $html .= '<h3 class="box-title">Search Transactions</h3>';
@@ -67,18 +103,18 @@ class ReportsController extends EshopPage
     	        $html .= '<div class="row">';
     	        $html .= '<span class="halfcut">';
         	        $html .= '<span class="label">From Date:</span>';
-        	        $html .= '<span class="input"><input type="text" searchpane="date_start" class="searchdate"/></span>';
+        	        $html .= '<span class="input"><input type="text" searchpane="date_start" class="searchdate" value="' . $fromDate . '"/></span>';
     	        $html .= '</span>';
     	        $html .= '<span class="halfcut">';
         	        $html .= '<span class="label">To Date:</span>';
-        	        $html .= '<span class="input"><input type="text" searchpane="date_end" class="searchdate"/></span>';
+        	        $html .= '<span class="input"><input type="text" searchpane="date_end" class="searchdate" value="' . $toDate . '"/></span>';
     	        $html .= '</span>';
     	        $html .= '</div>';
     	        $html .= '<div class="row">';
         	        $html .= '<span class="label">From Account:</span>';
         	        $html .= '<span class="input accountselection">';
             	        $html .= '<select multiple="multiple" searchpane="fromacc" >';
-            	            $html .= ($list = $this->_getAccountsList($accounts));
+            	            $html .= $this->_getAccountsList($accounts, $fromAccountIds);
             	        $html .= '</select>';
         	        $html .= '</span>';
     	        $html .= '</div>';
@@ -86,7 +122,7 @@ class ReportsController extends EshopPage
         	        $html .= '<span class="label">To Account:</span>';
         	        $html .= '<span class="input accountselection">';
             	        $html .= '<select multiple="multiple" searchpane="toacc" >';
-            	            $html .= $list;
+            	            $html .= $this->_getAccountsList($accounts, $toAccountIds);
             	        $html .= '</select>';
         	        $html .= '</span>';
     	        $html .= '</div>';
@@ -100,16 +136,20 @@ class ReportsController extends EshopPage
 	/**
 	 * getting all the list of item for the select dropdown box
 	 * 
-	 * @param array $accounts The array of account entries
+	 * @param array $accounts       The array of account entries
+	 * @param array $selectedValues The selected values
 	 * 
 	 * @return string The html
 	 */
-	private function _getAccountsList(array $accounts)
+	private function _getAccountsList(array $accounts, $selectedValues = array())
 	{
 	    $html = '';
 	    foreach($accounts as $account)
 	    {
-	        $html .= "<option value='" . $account->getId() . "'>" . $account->getLongshot() . "</option>";
+	        $selected = '';
+	        if(in_array(($id = trim($account->getId())), $selectedValues))
+	            $selected = 'selected';
+	        $html .= "<option value='" . $id . "' $selected>" . $account->getLongshot() . "</option>";
 	    }
 	    return $html;
 	}

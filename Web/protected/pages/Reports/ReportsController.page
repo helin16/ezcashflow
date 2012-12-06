@@ -10,8 +10,5 @@
 	        </div>
 	    </div>
 	</div>
-    <com:TClientScript>
-        var pageJs = new ReportJs('transResults', '<%= $this->searchBtn->getUniqueId()%>', '<%= $this->editBtn->getUniqueId()%>', '<%= $this->deleteBtn->getUniqueId()%>' );
-        pageJs.initialDatePicker('input.searchdate');
-    </com:TClientScript>
+    <com:TClientScript ID="script"></com:TClientScript>
 </com:TContent>
