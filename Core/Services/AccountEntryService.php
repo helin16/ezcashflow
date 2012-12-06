@@ -12,7 +12,8 @@ class AccountEntryService extends BaseService
 		$parentAccountNumber = $parent->getAccountNumber();
 		while(1)
 		{
-			$sql="select id from accountentry where accountNumber ='".$parent->getAccountNumber()."000$i'";
+    		$childrenPos = str_pad($i, 4, "0", STR_PAD_LEFT);
+			$sql="select id from accountentry where accountNumber ='".$parent->getAccountNumber() . $childrenPos . "'";
 			$result = Dao::getResultsNative($sql);
 			if($i>=9999)
 				throw new Exception("account number over loaded (i=$i)!");
@@ -21,7 +22,7 @@ class AccountEntryService extends BaseService
 			$i++;
 		}
 			
-		return $parentAccountNumber.str_pad($i,4,"0",STR_PAD_LEFT);
+		return $parentAccountNumber . $childrenPos;
 	}
 	
 	public function getChildrenAccounts(accountentry $parent,$includeSelf=false,$includeAll=false)
