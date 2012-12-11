@@ -46,7 +46,9 @@ class Country extends HydraEntity
 	 */
 	public function __toString()
 	{
-		return $this->getName();
+	    if(($name = trim($this->getName())) !== '')
+		    return $name;
+	    return parent::__toString();
 	}
 	/**
 	 * getter States

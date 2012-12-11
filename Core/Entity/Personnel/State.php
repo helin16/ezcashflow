@@ -47,7 +47,14 @@ class State extends HydraEntity
 	 */
 	public function __toString()
 	{
-		return $this->getName();
+		$return = $this->name;
+		try
+		{
+			if(($country = $this->getCountry()) instanceof Country)
+			    $return .= ' (' . $country->getName() . ') ';
+		}
+		catch(Exception $ex){}
+		return $return;
 	}
 	/**
 	 * getter Country
