@@ -174,8 +174,15 @@ class Address extends HydraEntity
 	 */
 	public function __toString()
 	{
-		$line = trim($this->getLine1()." ".$this->getLine2());
-		return ($line==""? "" : ", ").$this->getSuburb().", ".$this->getState().", ".$this->getCountry()." ".$this->getPostCode();
+    	$string = ($line1 = trim($this->getLine1())) === '' ? '' :  $line1;
+    	$string .= ($line2 = trim($this->getLine2())) === '' ? '' :  ', ' . $line2;
+    	$string .= ($suburb = trim($this->getSuburb())) === '' ? '' :  ', ' . $suburb;
+    	$string .= (!($state = $this->getState()) instanceof State || ($statename = trim($state->getName())) === '') ? '' :  ', ' . $statename;
+    	$string .= (!($country = $this->getCountry()) instanceof Country || ($countryname = trim($country->getName())) === '') ? '' :  ', ' . $countryname;
+    	$string .= ($postcode = trim($this->getPostCode())) === '' ? '' :  ' ' . $postcode;
+        if(trim($string) !== '')
+            return $string;            
+        return parent::__toString();
 	}
 	/**
 	 * (non-PHPdoc)

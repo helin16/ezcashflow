@@ -28,7 +28,7 @@ class Person extends HydraEntity
 	 *
 	 * @return UserAccount
 	 */
-	public function getUserAccount()
+	public function getUserAccounts()
 	{
 	    return $this->userAccounts;
 	}
@@ -39,7 +39,7 @@ class Person extends HydraEntity
 	 * 
 	 * @return Person
 	 */
-	public function setUserAccount(array $UserAccounts)
+	public function setUserAccounts(array $UserAccounts)
 	{
 		$this->userAccounts = $UserAccount;
 		return $this;
@@ -117,7 +117,7 @@ class Person extends HydraEntity
 		DaoMap::begin($this, 'r');
 		DaoMap::setStringType('firstName');
 		DaoMap::setStringType('lastName');
-		DaoMap::setOneToMany("userAccounts","UserAccount","ua");
+		DaoMap::setOneToMany('userAccounts', 'UserAccount', 'ua');
 		DaoMap::commit();
 	}
 }
