@@ -66,7 +66,9 @@ class Role extends HydraEntity
 	 */
 	public function __toString()
 	{
-		return $this->getName();
+		if(($name = trim($this->getName())) !== '')
+		    return $name;
+	    return parent::__toString();
 	}
 	/**
 	 * (non-PHPdoc)

@@ -102,7 +102,11 @@ class Person extends HydraEntity
 	 */
 	public function __toString()
 	{
-		return $this->getFirstName()." ".$this->getLastName();
+	    $names = array(trim($this->firstName), trim($this->lastName));
+	    $name = implode(' ', $names);
+	    if($name !== '')
+	        return $name;
+	    return parent::__toString();
 	}
 	/**
 	 * (non-PHPdoc)
