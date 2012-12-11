@@ -21,7 +21,6 @@ class TransactionUnitTest extends CoreEntityUnitTestAbstract
      */
     public function testToString()
     {
-        Transaction
     }
 }
 ?>

@@ -21,7 +21,9 @@ class UserAccountUnitTest extends CoreEntityUnitTestAbstract
      */
     public function testToString()
     {
-       //TODO: need to test __toString()
+        $expected = 'my passord';
+        $this->_entityObj->setUserName($expected);
+        $this->_testToString($expected);
     }
 }
 ?>

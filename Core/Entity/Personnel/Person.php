@@ -30,6 +30,7 @@ class Person extends HydraEntity
 	 */
 	public function getUserAccounts()
 	{
+	    $this->loadOneToMany('userAccounts');
 	    return $this->userAccounts;
 	}
 	/**
@@ -94,7 +95,12 @@ class Person extends HydraEntity
 	 */
 	public function getFullName()
 	{
-		return $this->getFirstName()." ".$this->getLastName();
+	    $names = array();
+	    if(($firstName = trim($this->getFirstName())) !== '')
+	        $names[] = $firstName;
+	    if(($lastName = trim($this->getLastName())) !== '')
+	        $names[] = $lastName;
+		return trim(implode(' ', $names));
 	}
 	/**
 	 * (non-PHPdoc)
@@ -102,9 +108,7 @@ class Person extends HydraEntity
 	 */
 	public function __toString()
 	{
-	    $names = array(trim($this->firstName), trim($this->lastName));
-	    $name = implode(' ', $names);
-	    if($name !== '')
+	    if(($name = $this->getFullName()) !== '')
 	        return $name;
 	    return parent::__toString();
 	}

@@ -21,7 +21,11 @@ class RoleUnitTest extends CoreEntityUnitTestAbstract
      */
     public function testToString()
     {
-       //TODO: need to test __toString()
+        $expected = $this->_entityName . ' name';
+        $this->_entityObj->setName($expected);
+        $this->_testToString($expected);
+        $this->_entityObj->setName(null);
+        $this->_testToString();
     }
 }
 ?>

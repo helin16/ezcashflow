@@ -21,7 +21,16 @@ class StateUnitTest extends CoreEntityUnitTestAbstract
      */
     public function testToString()
     {
-       //TODO: need to test __toString()
+        $this->_entityObj = new State();
+        $expected = 'state name';
+        $this->_entityObj->setName($expected);
+        $this->_testToString($expected);
+        
+        $country = new Country();
+        $country->setName('country name');
+        $this->_entityObj->setCountry($country);
+        $expected .= ' (' . $country->getName() . ') ';
+        $this->_testToString($expected);
     }
 }
 ?>

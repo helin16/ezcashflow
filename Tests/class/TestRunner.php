@@ -52,7 +52,6 @@ class TestRunner
         $this->_rootPath = $rootPath;
         $this->_excludeFiles = array_merge($this->_excludeFiles, $exclFiles);
         $this->_htmlMode = ($htmlMode === true ? true : false);
-        $this->_coverageReportPath = dirname(__FILE__) . $this->_coverageReportPath;
         $this->_genCoverageReport = $genCoverageReport;
     }
     /**
@@ -66,17 +65,11 @@ class TestRunner
     public function getFileTree($tree = null, $previousPath = DIRECTORY_SEPARATOR) 
     {
         if ($tree === null) 
-        {
             $tree = $this->_getFileTree($this->_rootPath);
-        }
         if ($this->_htmlMode !== true) 
-        {
             return $tree;
-        }
         if(is_array($tree) !== true || count($tree) === 0)
-        {
             return '';
-        }
         $html = '<ul>';
         foreach($tree as $key => $info) 
         {
@@ -135,14 +128,14 @@ class TestRunner
             $coverage = new PHP_CodeCoverage();
             $coverage->start('TestReport');
         }
-        $this->_findEmptyTables()
-            ->_testAll($path);
+//         $this->_findEmptyTables();
+        $this->_testAll($path);
         //if we started the PHP coverage already
         if ($coverage instanceof PHP_CodeCoverage) 
         {
             $coverage->stop();
             $writer = new PHP_CodeCoverage_Report_HTML;
-            $writer->process($coverage, $this->_coverageReportPath);
+            $writer->process($coverage, dirname(__FILE__) . $this->_coverageReportPath);
         }
     }
     /**
@@ -288,7 +281,7 @@ class TestRunner
         if ($this->_genCoverageReport === true)
         {
             $html .='<div class="resultDiv">';
-                $html .='<a class="resultTitle" href="' . $this->_coverageReportPath . '" target="__blank">View coverage report</a>';
+                $html .='<a class="resultTitle" href="/class/' . $this->_coverageReportPath . '" target="__blank">View coverage report</a>';
             $html .='</div>';
         }
         $html .= '</div>';
