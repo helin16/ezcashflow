@@ -226,13 +226,13 @@ class AccountEntry extends HydraEntity
 	 * 
 	 * @return Ambigous <array(HydraEntity), HydraEntity, multitype:, string, multitype:multitype: >
 	 */
-	public function getChildren($inclSelf=false)
+	public function getChildren($inclSelf = false)
 	{
-		$service = new BaseService(get_class($this));
+		$dao = new GenericDAO(get_class($this));
 		$where = "accountNumber like '".$this->getAccountNumber()."%'";
 		if(!$inclSelf)
 			$where .=" AND id != ".$this->getId();
-		return $service->findByCriteria($where);
+		return $dao->findByCriteria($where);
 	}
 	/**
 	 * Getting a snapshot of the current account

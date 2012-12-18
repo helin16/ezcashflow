@@ -129,7 +129,7 @@ class AppAccountService extends AppService
 		if(count($rootIds) === 0)
 			throw new Exception("Invalid rootIds!");
 		
-		$service = new BaseService("AccountEntry");
+		$service = new AccountEntryService();
 		$result = $service->findByCriteria("rootId in (" . implode(",", $rootIds). ")", array(), null, 30, array("AccountEntry.rootId" => "asc", "AccountEntry.accountNumber" => "asc"));
 		$array = array();
 		foreach($result as $a)

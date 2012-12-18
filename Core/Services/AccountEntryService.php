@@ -1,11 +1,25 @@
 <?php
+/**
+ * Account Entry Service
+ * 
+ * @package    Core
+ * @subpackage Service
+ * @author     lhe<helin16@gmail.com>
+ */
 class AccountEntryService extends BaseService 
 {
+    /**
+     * constructor
+     */
 	public function __construct()
 	{
-		parent::__construct("AccountEntry");
+	    parent::__construct("AccountEntry");
 	}
-	
+	/**
+	 * Enter description here ...
+	 * @param accountentry $parent
+	 * @throws Exception
+	 */
 	public function getNextAccountNo(accountentry $parent)
 	{
 		$i=1;
