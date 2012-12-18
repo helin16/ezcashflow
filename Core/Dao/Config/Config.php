@@ -1,18 +1,36 @@
 <?php
-
-class Config
+/**
+ * Config loader
+ * 
+ * @package    Core
+ * @subpackage Config
+ * @author     lhe<helin16@gmail.com>
+ */
+abstract class Config
 {
-	private static $values = null;
-	
-	public static function get($service,$name)
+    const DEFAULT_CONF_FILE = 'defaultConfig.php';
+    /**
+     * The values in the config file
+     * 
+     * @var array
+     */
+	private static $_values = null;
+	/**
+	 * Getting the value from the config file
+	 * 
+	 * @param string $service The section name that we are trying to load
+	 * @param string $name    The item name that we are trying to load
+	 * 
+	 * @return Mixed
+	 * @throws Exception
+	 */
+	public static function get($service, $name)
 	{
-		if(self::$values == null)
-			self::$values = require_once('defaultConfig.php');
-			
-		if(isset(self::$values[$service]) && isset(self::$values[$service][$name]))
-			return self::$values[$service][$name];
-		else
-			throw new Exception("Service($service)/Name($name) not defined in config");
+	    if(self::$_values === null)
+			self::$_values = require_once(self::DEFAULT_CONF_FILE);
+		if(isset(self::$_values[$service]) && isset(self::$_values[$service][$name]))
+			return self::$_values[$service][$name];
+		throw new Exception("Service($service)/Name($name) not defined in config.");
 	}
 }
 
