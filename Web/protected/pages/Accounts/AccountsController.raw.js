@@ -133,7 +133,9 @@ AccountsJs.prototype = {
     	} else {
     		tmp.accName = account.name;
     		tmp.accValue = account.value;
+    		tmp.accBudget = account.budget;
     		tmp.accId = account.id;
+    		tmp.comments = account.comments;
     		tmp.parentId = '';
     	}
     		

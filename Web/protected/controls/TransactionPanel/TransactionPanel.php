@@ -135,21 +135,20 @@ class TransactionPanel extends TTemplateControl
 	 * 
 	 * @return TransactionPanel
 	 */
-	private function _loadAccounts(TDropDownList &$list,$accountRootIds)
+	private function _loadAccounts(TDropDownList &$list, $accountRootIds)
 	{
-		$accountRootIds = trim($accountRootIds);
-		if($accountRootIds=="") return;
-		$accountRootIds = explode(",",$accountRootIds);
+		if(($accountRootIds = trim($accountRootIds)) == "") return;
+		$accountRootIds = explode(",", $accountRootIds);
 		if(count($accountRootIds)==0) return;
 		
 		$array = array();
 		foreach($accountRootIds as $rootId)
 		{
-			$result = $this->_accountService->findByCriteria("rootId in ($rootId) and id not in (".implode(",",$accountRootIds).")");
+			$result = $this->_accountService->findByCriteria("rootId in ($rootId) and id not in (" . implode(",", $accountRootIds) . ")");
 			foreach($result as $a)
 			{
-				if(count($a->getChildren())==0)
-					$array[strtolower(str_replace(" ","",$a->getBreadCrumbs()))] = $a;
+				if(count($a->getChildren()) === 0 )
+					$array[strtolower(str_replace(" ", "", $a->getBreadCrumbs()))] = $a;
 			}
 		}
 		krsort($array);
@@ -172,9 +171,9 @@ class TransactionPanel extends TTemplateControl
 		$value = str_replace(",","",trim($this->transValue->Text));
 		if(preg_match("/^(\d{1,3}(\,\d{3})*|(\d+))(\.\d{1,2})?$/", $value))
 		{
-			if($this->transType==TransactionPanel::TransType_Transfer)
+			if($this->transType == TransactionPanel::TransType_Transfer)
 				$this->_transferMoney("transferMoney");
-			else if($this->transType==TransactionPanel::TransType_Income)
+			else if($this->transType == TransactionPanel::TransType_Income)
 				$this->_transferMoney("earnMoney","Earned Successfully!");
 		}
 		else
@@ -220,14 +219,14 @@ class TransactionPanel extends TTemplateControl
 		$toAccount = $this->_accountService->get($toAccountId);
 		if(!$toAccount instanceof AccountEntry)
 		{
-			$this->toAccountsMsg->Text="Invalid to account!";
+			$this->toAccountsMsg->Text = "Invalid to account!";
 			return $this;
 		}
-		$value = str_replace(",","",trim($this->transValue->Text));
+		$value = str_replace(",", "", trim($this->transValue->Text));
 		$description=trim($this->description->Text);
 		try
 		{
-			$this->_transService->$function($fromAccount,$toAccount,$value,$description);
+			$trans = $this->_transService->$function($fromAccount, $toAccount, $value, $description);
 		}
 		catch(Exception $ex)
 		{

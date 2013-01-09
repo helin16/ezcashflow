@@ -20,7 +20,7 @@ class AccountsController extends EshopPage
 	public function __construct()
 	{
 		parent::__construct();
-		$this->menuItemName='accounts';
+		$this->menuItemName = 'accounts';
 		$this->_accService = new AccountEntryService();
 	}
 	/**
@@ -49,12 +49,12 @@ class AccountsController extends EshopPage
     	    if(!isset($param->CallbackParameter->rootId) || ($rootId = trim($param->CallbackParameter->rootId)) === '')
     	        throw new Exception('rootId not found!');
     	    
-    		$accounts = $this->_accService->getChildrenAccounts($this->_accService->get($rootId), true, true);
+    		$accounts = $this->_accService->get($rootId)->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc'));
     		foreach($accounts as $account)
     		{
     		    if(!$account instanceof AccountEntry)
     		        continue;
-    		    $results[] = $this->_jsonAccountEntry($account);;
+    		    $results[] = $this->_jsonAccountEntry($account);
     		}
 	    }
 	    catch(Exception $e)
@@ -82,7 +82,7 @@ class AccountsController extends EshopPage
 	    $acc['value'] = $account->getValue();
 	    $acc['budget'] = $account->getBudget();
 	    $acc['comments'] = $account->getComments();
-	    $acc['sum'] = $this->_accService->getChildrenValueSum($account);
+	    $acc['sum'] = $account->getSum(true, true);
 	    $acc['gotChildren'] = count($this->_accService->getChildrenAccounts($account)) !== 0;
 	    $parent = $account->getParent();
 	    $acc['parent'] = ($parent instanceof AccountEntry ? $this->_jsonAccountEntry($parent) : array());

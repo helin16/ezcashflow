@@ -42,7 +42,7 @@ class ProfitPanel extends TPanel
 		}
 		
 		// day
-		$today = new HydraDate("now");
+		$today = new UDate("now");
 		$start = $today->getDateTime()->format('Y-m-d 00:00:00');
 		$today->modify("+1 day");
 		$end = $today->getDateTime()->format('Y-m-d 00:00:00');
@@ -55,7 +55,7 @@ class ProfitPanel extends TPanel
 		$day_diff=$day_income-$day_expense;
 		
 		// week
-		$today = new HydraDate("now");
+		$today = new UDate("now");
 		$weekDay = $today->getDateTime()->format('N');
 		if($weekDay>=4)
 			$today->modify("-".($weekDay-4)." day");
@@ -73,7 +73,7 @@ class ProfitPanel extends TPanel
 		$week_diff=$week_income-$week_expense;
 		
 		// month
-		$today = new HydraDate("now");
+		$today = new UDate("now");
 		$start = $today->getDateTime()->format("Y-m-01 00:00:00");
 		$today->modify("+1 month");
 		$end = $today->getDateTime()->format("Y-m-01 00:00:00");
@@ -86,7 +86,7 @@ class ProfitPanel extends TPanel
 		$month_diff=$month_income-$month_expense;
 		
 		// year
-		$today = new HydraDate("now");
+		$today = new UDate("now");
 		$start = $today->getDateTime()->format("Y-01-01 00:00:00");
 		$today->modify("+1 year");
 		$end = $today->getDateTime()->format("Y-01-01 00:00:00");
@@ -99,7 +99,7 @@ class ProfitPanel extends TPanel
 		$year_diff=$year_income-$year_expense;
 		
 		// all
-		$today = new HydraDate("now");
+		$today = new UDate("now");
 		$start = $today->getDateTime()->format("1791-01-01 00:00:00");
 		$today->modify("+1 year");
 		$end = $today->getDateTime()->format("9999-01-01 00:00:00");

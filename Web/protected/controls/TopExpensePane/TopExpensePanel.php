@@ -60,9 +60,9 @@ class TopExpensePanel extends TPanel
 		$notLike = array();
 		foreach(Dao::getResultsNative("select accountnumber from accountentry where active = 1 and id in (".implode(",",$excludingAccountIds).")") as $row)
 		{
-			$notLike[] = $row[0];
+			$notLike[] = $row['accountnumber'];
 		}
-		$now = new HydraDate();
+		$now = new UDate();
 		$sql ="select distinct acc.id,
 					acc.name,
 					acc.budget,

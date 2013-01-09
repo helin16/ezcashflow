@@ -2,7 +2,7 @@
 Prado::using('System.Security.IUserManager');
 Prado::using('Application.classes.WebUser.WebUser');
 /**
- * Manager for Hydra Web Users extends TModule implements IUserManager
+ * Manager for Web Users extends TModule implements IUserManager
  *
  */
 class WebUserManager extends TModule implements IUserManager

@@ -51,15 +51,6 @@ class ReportsController extends EshopPage
 		if(!$this->IsPostBack)
 		{
 		    $reportVars = isset($this->Request['reportVars']) ? unserialize($this->Request['reportVars']) : array();
-// 		    if(count($reportVars) > 0)
-// 		    {
-// 		        $this->fromDate->Text = $reportVars["fromDate"];
-// 		        $this->toDate->Text = $reportVars["toDate"];
-		    
-// 		        $this->fromAccount->setSelectedValues($reportVars["fromAccountIds"]);
-// 		        $this->toAccount->setSelectedValues($reportVars["toAccountIds"]);
-// 		        $this->search(null,null);
-// 		    }
 		    $this->seachpage->getControls()->add($this->_getSeachPanel($reportVars));
 		    $this->script->getControls()->add($this->_getJs(count($reportVars) > 0));
 		}
@@ -96,7 +87,7 @@ class ReportsController extends EshopPage
 	        $fromAccountIds = array();
 	    if(!isset($reportVars["toAccountIds"]) || count($toAccountIds = $reportVars["toAccountIds"]) === 0)
 	        $toAccountIds = array();
-	    $accounts = $this->_accService->findByCriteria("active = 1", true, null, 30, array("AccountEntry.accountNumber" => "asc"));
+	    $accounts = $this->_accService->findByCriteria("active = ?", array(1), true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array("accountNumber" => "asc"));
 	    $html = '<div class="content-box searchPanel" ID="searchPanel">';
 	        $html .= '<h3 class="box-title">Search Transactions</h3>';
 	        $html .= '<div class="box-content">';
@@ -185,8 +176,9 @@ class ReportsController extends EshopPage
     	        $where .= " AND fromId in(" . implode(', ', $fromaccIds) . ")";
     	    if(count($toaccIds) !== 0)
     	        $where .= " AND toId in(" . implode(', ', $toaccIds) . ")";
-    	    $trans = $this->_transService->findByCriteria($where, true, $pageNo, $pageSize, array("Transaction.created" => "desc"));
-    	    $results['total'] = Dao::getTotalRows();
+    	    $trans = $this->_transService->findByCriteria($where, array(), true, $pageNo, $pageSize, array("created" => "desc"));
+    	    $stats = $this->_transService->getPageStats();
+    	    $results['total'] = $stats['totalRows'];
     	    $results['trans'] = array();
     	    foreach($trans as $tran)
     	    {

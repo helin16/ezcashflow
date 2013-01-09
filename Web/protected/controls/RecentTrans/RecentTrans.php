@@ -39,11 +39,11 @@ class RecentTrans extends TPanel
      * 
      * @param AccountEntry $fromAccount The from of the transaction
      * @param AccountEntry $toAccount   The to of the transaction
-     * @param HydraDate    $transTime   The date time of the transaction
+     * @param UDate        $transTime   The date time of the transaction
      * 
      * @return string The href string
      */
-    private function _makeURLToReport(AccountEntry $fromAccount = null, AccountEntry $toAccount, HydraDate $transTime)
+    private function _makeURLToReport(AccountEntry $fromAccount = null, AccountEntry $toAccount, UDate $transTime)
     {
         $fromDate = $transTime->__toString();
         $transTime->modify('+1 second');
@@ -64,7 +64,7 @@ class RecentTrans extends TPanel
     private function _getRecentTrans()
     {
         $service = new TransactionService();
-        return $service->findByCriteria("active = 1", false, 1, $this->_howMany, array("Transaction.id" => "desc"));
+        return $service->findByCriteria("active = ?", array(1), false, 1, $this->_howMany, array("id" => "desc"));
     }
     /**
      * get the how many trans we are going to display

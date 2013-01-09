@@ -115,7 +115,7 @@ class StaticsController extends EshopPage
 		$account = $accountService->get($accountId);
 		if(!$account instanceof AccountEntry )
 			return 0;
-		$now = new HydraDate();
+		$now = new UDate();
 		$sql="select Unix_timestamp(created) `created` from transaction order by created asc limit 1";
 		$result = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
 		$diff_secs = $now->getUnixTimeStamp() - $result[0]['created'];
