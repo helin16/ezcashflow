@@ -22,12 +22,7 @@ class StateUnitTest extends CoreEntityUnitTestAbstract
     public function testToString()
     {
         $this->_entityObj = new State();
-        $expected = 'state name';
-        $this->_entityObj->setName($expected);
-        $this->_testToString($expected);
-        
-        $country = new Country();
-        $country->setName('country name');
+        $country = Dao::findById(new DaoQuery('Country'), 1);
         $this->_entityObj->setCountry($country);
         $expected .= ' (' . $country->getName() . ') ';
         $this->_testToString($expected);

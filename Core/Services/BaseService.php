@@ -9,15 +9,15 @@
 abstract class BaseService
 {
 	/**
-	 * @var GenericDao
+	 * @var EntityDao
 	 */
 	protected $entityDao;
 	/**
-	 * Total Number Of Rows, after a search query has run
+	 * The pagination stats
 	 *
-	 * @var int
+	 * @var array
 	 */
-	public $totalNoOfRows;
+	private $_pageStats = array();
 	/**
 	 * constructor
 	 * 
@@ -25,15 +25,15 @@ abstract class BaseService
 	 */
 	public function __construct($entityName)
 	{
-		$this->entityDao = new GenericDao($entityName);
-		$this->totalNoOfRows = 0;
+		$this->entityDao = new EntityDao($entityName);
+		$this->_pageStats = Dao::getPageStats();
 	}
 	/**
 	 * Get an Entity By its Id
 	 *
 	 * @param int $id The id of the entity
 	 * 
-	 * @return HydraEntity
+	 * @return BaseEntity
 	 */
 	public function get($id)
 	{
@@ -44,9 +44,9 @@ abstract class BaseService
 	 *
 	 * @param Entity $entity The entity we are trying to save
 	 * 
-	 * @return HydraEntity
+	 * @return BaseEntity
 	 */
-	public function save(HydraEntity $entity)
+	public function save(BaseEntityAbstract $entity)
 	{
 	    $this->entityDao->save($entity);
 	    return $entity;
@@ -59,38 +59,40 @@ abstract class BaseService
 	 * @param int   $pagesize         The page size of the pagination
 	 * @param array $orderBy          The order by fields. i.e.: array("UserAccount.id" => 'desc');
 	 * 
-	 * @return Ambigous <array(HydraEntity), multitype:, string, multitype:multitype: >
+	 * @return Ambigous <array(BaseEntity), multitype:, string, multitype:multitype: >
 	 */
-	public function findAll($searchActiveOnly = true,$page = null,$pagesize = 30,$orderBy=array())
+	public function findAll($searchActiveOnly = true, $page = null, $pagesize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array())
 	{
-		if ($searchActiveOnly == false)
-			Dao::$AutoActiveEnabled = false;
 		$temp = $this->entityDao->findAll($page, $pagesize);
-		$this->totalNoOfRows = $this->entityDao->getTotalRows();
-		if ($searchActiveOnly == false)
-			Dao::$AutoActiveEnabled = true;
+		$this->_pageStats = Dao::getPageStats();
 		return $temp;
 	}
 	/**
 	 * Finding some entries for that entity
 	 * 
 	 * @param string $where            The where clause for the sql
+	 * @param array  $params           The parameters for PDO exec
 	 * @param bool   $searchActiveOnly Whether we will get the active one only
 	 * @param int    $page             The page number of the pagination
 	 * @param int    $pagesize         The page size of the pagination
-	 * @param array  $orderBy          The order by fields. i.e.: array("UserAccount.id" => 'desc');
+	 * @param array  $orderBy          The order by fields. i.e.: array("id" => 'desc');
 	 * 
-	 * @return Ambigous <array(HydraEntity), HydraEntity, multitype:, string, multitype:multitype: >
+	 * @return Ambigous <array(BaseEntity), BaseEntity, multitype:, string, multitype:multitype: >
 	 */
-	public function findByCriteria($where, $searchActiveOnly=true, $page = null, $pagesize = 30, $orderBy=array())
+	public function findByCriteria($where, $params = array(), $searchActiveOnly = true, $page = null, $pagesize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array())
 	{
-		if ($searchActiveOnly == false)
-			Dao::$AutoActiveEnabled = false;
-		$temp =  $this->entityDao->findByCriteria($where, array(), $page, $pagesize, $orderBy);
-		$this->totalNoOfRows = $this->entityDao->getTotalRows();
-		if ($searchActiveOnly == false)
-			Dao::$AutoActiveEnabled = true;
+		$temp = $this->entityDao->findByCriteria($where, $params, $page, $pagesize, $orderBy);
+		$this->_pageStats = Dao::getPageStats();
 		return $temp;
+	}
+	/**
+	 * returning the pagination stats
+	 *
+	 * @return array
+	 */
+	public function getPageStats()
+	{
+	    return $this->_pageStats;
 	}
 }
 ?>

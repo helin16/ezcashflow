@@ -1,40 +1,54 @@
 <?php
-
 /**
- * Global core settings and operations
+ * Global core settings and operations, This is for runtime only
  *
- * @package Core
+ * @package    Core
  * @subpackage Utils
+ * @author     lhe<helin16@gmail.com>
  */
-class Core
+abstract class Core
 {
-	/**
-	 * @var UserAccount
-	 */
-	private static $userAccount = null;
-	
-	/**
-	 * @var Role
-	 */
-	private static $role = null;
-	
-
+    /**
+     * The storage for the Core at the runtime level
+     * 
+     * @var array
+     */
+	private static $_storage = array('userAccount' => null, 'role' => null);
+    /**
+     * Setting the role in the core
+     * 
+     * @param Role $role The role
+     */
 	public static function setRole(Role $role)
 	{
-		self::setUser(self::getUser(),$role);
+		self::setUser(self::getUser(), $role);
 	}
-	
+	/**
+	 * removing core role
+	 */
+	public static function rmRole()
+	{
+	    self::$_storage['role'] = null;
+	}
 	/**
 	 * Set the active user on the core for auditing purposes
-	 *
-	 * @param UserAccount $userAccount
+	 * 
+	 * @param UserAccount $userAccount The useraccount
+	 * @param Role        $role        The role
 	 */
-	public static function setUser($userAccount, Role $role=null)
+	public static function setUser(UserAccount $userAccount, Role $role = null)
 	{
-		self::$userAccount = $userAccount;
-		self::$role = $role;
+		self::$_storage['userAccount'] = $userAccount;
+		self::$_storage['role'] = $role;
 	}
-	
+	/**
+	 * removing core user
+	 */
+	public static function rmUser()
+	{
+	    self::$_storage['userAccount'] = null;
+	    self::rmRole();
+	}
 	/**
 	 * Get the current user set against the System for auditing purposes
 	 *
@@ -42,9 +56,8 @@ class Core
 	 */
 	public static function getUser()
 	{
-		return self::$userAccount;
+		return self::$_storage['userAccount'];
 	}
-	
 	/**
 	 * Get the current user role set against the System for Dao filtering purposes
 	 *
@@ -52,46 +65,27 @@ class Core
 	 */
 	public static function getRole()
 	{
-		if (!is_null(self::$role))
-		{
-			return self::$role;
-		}
+		return self::$_storage['role'] instanceof Role ? self::$_storage['role'] : null;
 	}
-
+    /**
+     * serialize all the components in core
+     * 
+     * @return string
+     */
 	public static function serialize()
 	{
-		$array = array(	self::$userAccount,
-						self::$role);
-		//Debug::inspect($array);
-		//die; 
-		return serialize($array);
-		
+		return serialize(self::$_storage);
 	}
-	
+	/**
+	 * unserialize all the components and store them in Core
+	 * 
+	 * @param string $string The serialized core storage string
+	 */
 	public static function unserialize($string)
 	{
-		list($ua,$r) = unserialize($string);
-		$array = array($ua,$r); 
-//		Debug::inspect($array);
-//		die;
-		Core::setUser($ua,$r);
-	}
-	
-	public static function inspect($data)
-	{
-		echo "<pre>";
-		var_dump($data);
-		echo "</pre>";
-	}
-	
-	/**
-	 * @return PageLanguage
-	 */
-	public static function getPageLanguage()
-	{
-		$code = isset($_SESSION["language"]) ? $_SESSION["language"] : "en";
-		$service = new LanguageService();
-		return $service->findByCode($code);
+		self::$_storage = unserialize($string);
+		Core::setUser(self::$_storage['userAccount'], self::$_storage['role']);
+		return self::$_storage;
 	}
 }
 

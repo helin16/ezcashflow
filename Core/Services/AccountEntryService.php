@@ -16,62 +16,58 @@ class AccountEntryService extends BaseService
 	    parent::__construct("AccountEntry");
 	}
 	/**
-	 * Enter description here ...
-	 * @param accountentry $parent
+	 * Getting the NextAccountNo for the new children of the provided parent accountentry
+	 * 
+	 * @param AccountEntry $parent The parent account entry
+	 * 
+	 * @return int The NextAccountNo 
 	 * @throws Exception
 	 */
-	public function getNextAccountNo(accountentry $parent)
+	public function getNextAccountNo(AccountEntry $parent)
 	{
-		$i=1;
 		$parentAccountNumber = $parent->getAccountNumber();
-		while(1)
-		{
-    		$childrenPos = str_pad($i, 4, "0", STR_PAD_LEFT);
-			$sql="select id from accountentry where accountNumber ='".$parent->getAccountNumber() . $childrenPos . "'";
-			$result = Dao::getResultsNative($sql);
-			if($i>=9999)
-				throw new Exception("account number over loaded (i=$i)!");
-			if(count($result)==0)
-				break;
-			$i++;
-		}
-			
-		return $parentAccountNumber . $childrenPos;
+		$sql="select accountNumber from accountentry where active = 1 and accountNumber like '" . $parentAccountNumber . "____' order by accountNumber asc";
+		$result = Dao::getResultsNative($sql);
+		if(count($result) === 0)
+		    return $parent->getAccountNumber() . str_repeat('0', AccountEntry::ACC_NO_LENGTH);
+		
+		$expectedAccountNos = array_map(create_function('$a', 'return "' . $parentAccountNumber . '".str_pad($a, ' . AccountEntry::ACC_NO_LENGTH . ', 0, STR_PAD_LEFT);'), range(0, str_repeat('9', AccountEntry::ACC_NO_LENGTH)));
+		$usedAccountNos = array_map(create_function('$a', 'return $a["accountNumber"];'), $result);
+		$unUsed = array_diff($expectedAccountNos, $usedAccountNos);
+		sort($unUsed);
+		if (count($unUsed) === 0)
+			throw new ServiceException("account number over loaded (parentId = " . $parent->getId() . ", parentAccNo = $parentAccountNumber)!");
+		
+		return $unUsed[0];
 	}
-	
-	public function getChildrenAccounts(accountentry $parent,$includeSelf=false,$includeAll=false)
+	/**
+	 * Getting all the children account entry for a parent account
+	 * 
+	 * @param accountentry $parent             
+	 * @param bool         $includeSelf        Wether we include the provided parent account
+	 * @param bool         $directChildrenOnly Whether we are just getting all the direct children
+	 * @param int          $pageNumber         The page number of the pagination
+	 * @param int          $pageSize           The page size of the pagination
+	 * @param array        $orderBy            The order by fields. i.e.: array("id" => 'desc');
+	 * 
+	 * @return array The array of AccountEntry
+	 */
+	public function getChildrenAccounts(AccountEntry $parent,$includeSelf = false,$directChildrenOnly = true, $pageNumber = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array())
 	{
-		if($includeAll)
-			return $this->findByCriteria(($includeSelf==false ? "id!=".$parent->getId()." AND " : "")."accountNumber like '".$parent->getAccountNumber()."%'", true, null, 30, array("AccountEntry.accountNumber" => 'asc'));
-		else
-			return $this->findByCriteria("parentId=".$parent->getId());
+		return $parent->getChildren($includeSelf, $directChildrenOnly, $pageNumber, $pageSize, $orderBy);
 	}
-	
-	public function getChildrenValueSum(accountentry $parent,$includeSelf=true)
-	{
-		$sql = "
-				select 
-					round(sum(
-							if(acc.value='',0,acc.value)
-							+
-							(select if(sum(tt.value) is null,0,sum(tt.value)) from transaction tt where tt.active = 1 and tt.toId = acc.id)
-							-
-							(select if(sum(tf.value) is null,0,sum(tf.value)) from transaction tf where tf.active = 1 and tf.fromId = acc.id)
-						),2) as `sum`
-				from accountentry acc
-				where acc.active = 1 
-				and ".($includeSelf==false ? "acc.id!=".$parent->getId()." AND " : "")." acc.accountNumber like '".$parent->getAccountNumber()."%'";
-//		return $parent->getId()."  ".$sql;
-		$results = Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC);
-		return $results[0]["sum"];
-	}
-	
+	/**
+	 * gett the AccountEntry from provided account no
+	 * 
+	 * @param int $accountNo The account number 
+	 * 
+	 * @return AccountEntry
+	 */
 	public function getAccountFromAccountNo($accountNo)
 	{
-		$accounts = $this->findByCriteria("accountNumber='$accountNo'");
-		if(count($accounts)==0)
+		$accounts = $this->findByCriteria("accountNumber = ?", array($accountNo));
+		if(count($accounts) === 0)
 			return null;
-			
 		return $accounts[0];
 	}
 }

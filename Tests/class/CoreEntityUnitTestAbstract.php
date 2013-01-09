@@ -18,13 +18,13 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
      */
     protected $_entityName = '';
     /**
-     * HydraEntity object to test
+     * BaseEntity object to test
      *
-     * @var HydraEntity
+     * @var BaseEntity
      */
     protected $_entityObj = null;
     /**
-     * The ID HydraEntity object
+     * The ID BaseEntity object
      *
      * @var int
      */
@@ -39,7 +39,6 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
     public function __construct($name = NULL, array $data = array(), $dataName = '') 
     { 
         parent::__construct($name, $data, $dataName); 
-        $this->_debugMode = true;
         if($this->_entityId === null)
         {
             $this->_entityId = $this->_getEntityId();
@@ -47,15 +46,15 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
             
     }
     /**
-     * The ID HydraEntity object
+     * The ID BaseEntity object
      * 
      * @return string
      */
     private function _getEntityId()
     {
-        $result = Dao::getResultsNative('select id from ' . strtolower($this->_entityName) . ' order by id desc limit 1');
-        $id = (isset($result[0][0]) ? trim($result[0][0]) : null);
-        return $id;
+        $sql = 'select id from ' . strtolower($this->_entityName) . ' order by id desc limit 1';
+        $result = Dao::getResultsNative($sql);
+        return (isset($result[0]['id']) ? trim($result[0]['id']) : null);
     }
     /**
      * (non-PHPdoc)
@@ -84,9 +83,9 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
         parent::tearDown();
     }
     /**
-     * testing HydraEntity's getters and setters
+     * testing BaseEntity's getters and setters
      *
-     * @param HydraEntity $entity   The entity that we are testing against
+     * @param BaseEntity $entity   The entity that we are testing against
      * @param string      $field    The field that we trying to set or get
      * @param Mixed       $expected The expected value for the field to set and get
      * 
@@ -114,13 +113,13 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
         
         //testing against the value
         $actual = $entity->$getMethod();
-        if (is_array($actual) && is_array($expected) && count($actual) > 0 && count($expected) > 0 && $actual[0] instanceof HydraEntity && $expected[0] instanceof HydraEntity)
+        if (is_array($actual) && is_array($expected) && count($actual) > 0 && count($expected) > 0 && $actual[0] instanceof BaseEntity && $expected[0] instanceof BaseEntity)
         {
             usort($actual, array(get_class($this), 'sortHYEntities'));
             usort($expected, array(get_class($this), 'sortHYEntities'));
             for($i = 0, $size = count($actual); $i< $size; $i++)
             {
-                $this->assertingHydraEntity($actual[$i], $expected[$i], $i);
+                $this->assertingBaseEntity($actual[$i], $expected[$i], $i);
             }
         }
         else
@@ -131,13 +130,13 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
     /**
      * asserting the hydra entity
      * 
-     * @param HydraEntity $entity1 The hydra entity
-     * @param HydraEntity $entity2 The hydra entity
+     * @param BaseEntity $entity1 The hydra entity
+     * @param BaseEntity $entity2 The hydra entity
      * @param int         $index   The index of the array
      * 
      * @return CoreEntityUnitTestAbstract
      */
-    public function assertingHydraEntity(HydraEntity $entity1, HydraEntity $entity2, $index)
+    public function assertingBaseEntity(BaseEntity $entity1, BaseEntity $entity2, $index)
     {
         $this->assertEquals($entity1, $entity2, $index . ' - Entity (ID = ' . $entity1->getId() . ') is NOT the same as Entity (ID = ' . $entity2->getId() . ')!');
         return $this;
@@ -145,12 +144,12 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
     /**
      * sorting Hydra Entity array
      * 
-     * @param HydraEntity $entity1 The hydra entity in the array
-     * @param HydraEntity $entity2 The hydra entity in the array
+     * @param BaseEntity $entity1 The hydra entity in the array
+     * @param BaseEntity $entity2 The hydra entity in the array
      * 
      * @return int
      */
-    public static function sortHYEntities(HydraEntity $entity1, HydraEntity $entity2)
+    public static function sortHYEntities(BaseEntity $entity1, BaseEntity $entity2)
     {
         if($entity1->getId() === $entity2->getId())
         {
@@ -247,7 +246,7 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
                     }
                     case 'datetime':
                     {
-                        $newValue = new HydraDate();
+                        $newValue = new UDate();
                         break;
                     }
                     case 'double':
@@ -268,7 +267,7 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
         return $testingDataForGS;
     }
     /**
-     * common testing function for HydraDate for getters and setters
+     * common testing function for UDate for getters and setters
      * 
      * @param string $setFunction The set function for the field
      * @param string $getFunction The get function for the field
@@ -279,15 +278,15 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
     protected function _testGetDateString($setFunction, $getFunction, $dateString = '2010-09-10 00:00:00')
     {
         $this->_entityObj->$setFunction($dateString);
-        $this->assertEquals(new HydraDate($dateString), $this->_entityObj->$getFunction(), $this->_entityName . "::$getFunction() should return a HydraDate object!");
+        $this->assertEquals(new UDate($dateString), $this->_entityObj->$getFunction(), $this->_entityName . "::$getFunction() should return a UDate object!");
         
-        $this->_entityObj->$setFunction(new HydraDate($dateString));
-        $this->assertEquals(new HydraDate($dateString), $this->_entityObj->$getFunction(), $this->_entityName . "::$getFunction() should return a HydraDate object!");
+        $this->_entityObj->$setFunction(new UDate($dateString));
+        $this->assertEquals(new UDate($dateString), $this->_entityObj->$getFunction(), $this->_entityName . "::$getFunction() should return a UDate object!");
         
         return $this;
     }
     /**
-     * Testing the normal HydraEntity's __toString()
+     * Testing the normal BaseEntity's __toString()
      * 
      * @param $expected The expected value for __toString()
      */

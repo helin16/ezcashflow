@@ -1,49 +1,59 @@
 <?php
+/**
+ * UserAccount service
+ *
+ * @package    Core
+ * @subpackage Service
+ * @author     lhe<helin16@gmail.com>
+ *
+ */
 class UserAccountService extends BaseService 
 {
+    /**
+     * constructor
+     */
 	public function __construct()
 	{
 		parent::__construct("UserAccount");
 	}
-	
-	public function getUserByUsername($username,$silenceMode=true)
+	/**
+	 * Getting UserAccount
+	 * 
+	 * @param string $username    The username string
+	 * @param string $password    The password string
+	 * 
+	 * @throws AuthenticationException
+	 * @throws Exception
+	 * @return Ambigous <BaseEntityAbstract>|NULL
+	 */
+	public function getUserByUsernameAndPassword($username, $password)
 	{
-		try
-		{
-			$userAccounts = $this->findByCriteria("`UserName`='$username'");
-			if(count($userAccounts)==1)
-				return $userAccounts[0];
-			else if(count($userAccounts)>1)
-				throw new AuthenticationException("Multiple Users Found!Contact you administrator!");
-			else
-				throw new AuthenticationException("No User Found!");
-		}
-		catch(Exception $e)
-		{
-			if($silenceMode!=true)
-				throw $e;
-			return null;
-		}
+		$userAccounts = $this->findByCriteria("`UserName` = :username AND `Password` = :password", array('username' => $username, 'password' => sha1($password)));
+		if(count($userAccounts) === 1)
+			return $userAccounts[0];
+		else if(count($userAccounts) > 1)
+			throw new AuthenticationException("Multiple Users Found!Contact you administrator!");
+		else
+			throw new AuthenticationException("No User Found!");
 	}
-	
-	public function getUserByUsernameAndPassword($username,$password,$silenceMode=false)
+	/**
+	 * Getting UserAccount by username
+	 * 
+	 * @param string $username    The username string
+	 * 
+	 * @throws AuthenticationException
+	 * @throws Exception
+	 * @return Ambigous <BaseEntityAbstract>|NULL
+	 */
+	public function getUserByUsername($username)
 	{
-		try
-		{
-			$userAccounts = $this->findByCriteria("`UserName`='$username' AND `Password`='".sha1($password)."'");
-			if(count($userAccounts)==1)
-				return $userAccounts[0];
-			else if(count($userAccounts)>1)
-				throw new AuthenticationException("Multiple Users Found!Contact you administrator!");
-			else
-				throw new AuthenticationException("No User Found!");
-		}
-		catch(Exception $e)
-		{
-			if($silenceMode!=true)
-				throw $e;
-			return null;
-		}
+		$userAccounts = $this->findByCriteria("`UserName` = :username ", array('username' => $username));
+		if(count($userAccounts) === 1)
+			return $userAccounts[0];
+		else if(count($userAccounts) > 1)
+			throw new AuthenticationException("Multiple Users Found!Contact you administrator!");
+		else
+			throw new AuthenticationException("No User Found!");
 	}
 }
 ?>

@@ -41,6 +41,12 @@ class TestBuilder
      */
     const BUILD_FOR_UTILS = 'Utils';
     /**
+     * BUILD_FOR_DAO
+     * 
+     * @var string
+     */
+    const BUILD_FOR_DAO = 'Dao';
+    /**
      * building the entity test cases
      * 
      * @param string $srcPath    The test cause files are created from where
@@ -137,6 +143,9 @@ $tb->buildTestCase(dirname(__FILE__) . '/../../../Core/Entity',
     ->buildTestCase(dirname(__FILE__) . '/../../../Core/Services', 
         dirname(__FILE__) . '/../../core/unit/services', 
         TestBuilder::BUILD_FOR_SERVICE)
+    ->buildTestCase(dirname(__FILE__) . '/../../../Core/Dao', 
+        dirname(__FILE__) . '/../../core/unit/Dao', 
+        TestBuilder::BUILD_FOR_DAO)
     ->buildTestCase(dirname(__FILE__) . '/../../../Core/Utils', 
         dirname(__FILE__) . '/../../core/unit/utils', 
         TestBuilder::BUILD_FOR_UTILS);

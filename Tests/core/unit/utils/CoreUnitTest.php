@@ -10,18 +10,55 @@
  */
 class CoreUnitTest extends CoreUtilsUnitTestAbstract
 {
-   /**
-     * The testing utils class name
-     *
-     * @var string
-     */
-    protected $_utilsName = 'Core';
     /**
-     * testing the __toString function
+     * testing the Core::setUser(), Core::rmUser(), Core::getUser(), Core::getRole, Core::rmRole and Core::setRole() function
      */
-    public function testToString()
+    public function testSetUserNRole()
     {
-       //TODO: need to test __toString()
+        $userAccount = new UserAccount();
+        $role = new Role();
+        $userAccount->setId(1);
+        $role->setId(1);
+        
+        Core::setUser($userAccount, $role);
+        $this->assertEquals($userAccount, Core::getUser());
+        $this->assertEquals($role, Core::getRole());
+        
+        Core::rmRole();
+        $this->assertEquals($userAccount, Core::getUser());
+        $this->assertEquals(null, Core::getRole());
+        
+        Core::rmUser();
+        $this->assertEquals(null, Core::getUser());
+        $this->assertEquals(null, Core::getRole());
+        
+        Core::setUser($userAccount);
+        $this->assertEquals($userAccount, Core::getUser());
+        $this->assertEquals(null, Core::getRole());
+        
+        Core::setRole($role);
+        $this->assertEquals($userAccount, Core::getUser());
+        $this->assertEquals($role, Core::getRole());
+    }
+    /**
+     * testing the Core::serialize() and Core::unserialize() function
+     */
+    public function testSerializednUnserialized()
+    {
+        $userAccount = new UserAccount();
+        $role = new Role();
+        $userAccount->setId(1);
+        $role->setId(1);
+        
+        Core::setUser($userAccount, $role);
+        $storage = array('userAccount' => Core::getUser(), 'role' => Core::getRole());
+        $serialized = Core::serialize();
+        $this->assertEquals(serialize($storage), Core::serialize());
+        
+        Core::rmUser();
+        $this->assertEquals($storage, Core::unserialize($serialized));
+        $this->assertEquals($userAccount, Core::getUser());
+        $this->assertEquals($role, Core::getRole());
     }
 }
 ?>

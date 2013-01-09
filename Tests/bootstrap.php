@@ -43,6 +43,6 @@ spl_autoload_register(array('TestLoader','autoload'));
 // PHPUnit
 require_once 'PHPUnit/Autoload.php';
 
-// Hydra-core
+// core
 require dirname(__FILE__) . '/../Core/bootstrap.php';
 ?>

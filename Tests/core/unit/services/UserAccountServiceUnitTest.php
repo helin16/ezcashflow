@@ -17,11 +17,17 @@ class UserAccountServiceUnitTest extends CoreServiceUnitTestAbstract
      */
     protected $_serviceName = 'UserAccountService';
     /**
-     * testing the __toString function
+     * testing the UserAccountService::getUserByUsernameAndPassword() function
      */
-    public function testToString()
+    public function testGetUserByUsernameAndPassword()
     {
-       //TODO: need to test __toString()
+        $userAccount = $this->_serviceObj->get(1);
+        try {
+            $actual = $this->_serviceObj->getUserByUsernameAndPassword($userAccount->getUserName(), $userAccount->getPassword());
+            $this->assertEquals($userAccount, $actual);
+        } catch(Exception $ex) {
+            $this->assertEquals(new AuthenticationException("No User Found!"), $ex);
+        }  
     }
 }
 ?>
