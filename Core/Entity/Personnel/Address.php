@@ -6,7 +6,7 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class Address extends HydraEntity
+class Address extends BaseEntityAbstract
 {
     /**
      * The first line of the address
@@ -36,11 +36,6 @@ class Address extends HydraEntity
 	 * @var State
 	 */
 	protected $state;
-	/**
-	 * @var Country
-	 */
-	protected $country;
-	
 	/**
 	 * getter Line1
 	 *
@@ -120,31 +115,9 @@ class Address extends HydraEntity
 	 * 
 	 * @return Address
 	 */
-	public function setState(State $State = null)
+	public function setState(State $State)
 	{
 		$this->state = $State;
-		return $this;
-	}
-	/**
-	 * getter Country
-	 *
-	 * @return Country
-	 */
-	public function getCountry()
-	{
-		$this->loadManyToOne("country");
-		return $this->country;
-	}
-	/**
-	 * Setter Country
-	 *
-	 * @param Country Country The new country
-	 * 
-	 * @return Address
-	 */
-	public function setCountry(Country $Country = null)
-	{
-		$this->country = $Country;
 		return $this;
 	}
 	/**
@@ -170,15 +143,18 @@ class Address extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__toString()
+	 * @see BaseEntity::__toString()
 	 */
 	public function __toString()
 	{
     	$string = ($line1 = trim($this->getLine1())) === '' ? '' :  $line1;
     	$string .= ($line2 = trim($this->getLine2())) === '' ? '' :  ', ' . $line2;
     	$string .= ($suburb = trim($this->getSuburb())) === '' ? '' :  ', ' . $suburb;
-    	$string .= (!($state = $this->getState()) instanceof State || ($statename = trim($state->getName())) === '') ? '' :  ', ' . $statename;
-    	$string .= (!($country = $this->getCountry()) instanceof Country || ($countryname = trim($country->getName())) === '') ? '' :  ', ' . $countryname;
+    	if(($state = $this->getState()) instanceof State)
+    	{
+        	$string .= (($statename = trim($state->getName())) === '') ? '' :  ', ' . $statename;
+        	$string .= (!($country = $state->getCountry()) instanceof Country || ($countryname = trim($country->getName())) === '') ? '' :  ', ' . $countryname;
+    	}
     	$string .= ($postcode = trim($this->getPostCode())) === '' ? '' :  ' ' . $postcode;
         if(trim($string) !== '')
             return $string;            
@@ -186,17 +162,17 @@ class Address extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__loadDaoMap()
+	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'addr');
-		DaoMap::setStringType('line1','varchar',255);
-		DaoMap::setStringType('line2','varchar');
-		DaoMap::setStringType('suburb','varchar');
-		DaoMap::setStringType('postCode','varchar');
-		DaoMap::setManyToOne("state","State","st");
-		DaoMap::setManyToOne("country","Country","con");
+		DaoMap::setStringType('line1', 'varchar', 255);
+		DaoMap::setStringType('line2', 'varchar');
+		DaoMap::setStringType('suburb', 'varchar');
+		DaoMap::setStringType('postCode', 'varchar');
+		DaoMap::setManyToOne("state", "State", "st");
+		parent::loadDaoMap();
 		DaoMap::commit();
 	}
 }

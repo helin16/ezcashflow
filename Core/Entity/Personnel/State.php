@@ -6,7 +6,7 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class State extends HydraEntity
+class State extends BaseEntityAbstract
 {
     /**
      * The name of the state
@@ -43,21 +43,14 @@ class State extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__toString()
+	 * @see BaseEntity::__toString()
 	 */
 	public function __toString()
 	{
-		try
-		{
-    		$return = $this->getName();
-			if(($country = $this->getCountry()) instanceof Country)
-			    $return .= ' (' . $country->getName() . ') ';
-    		return $return;
-		}
-		catch(Exception $ex)
-		{
-		    return parent::__toString();
-		}
+		$return = $this->getName();
+		if(($country = $this->getCountry()) instanceof Country)
+		    $return .= ' (' . $country->getName() . ') ';
+		return $return;
 	}
 	/**
 	 * getter Country
@@ -66,6 +59,7 @@ class State extends HydraEntity
 	 */
 	public function getCountry()
 	{
+	    $this->loadManyToOne('country');
 		return $this->country;
 	}
 	/**
@@ -82,13 +76,14 @@ class State extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__loadDaoMap()
+	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'st');
-		DaoMap::setStringType('name','varchar');
-		DaoMap::setManyToOne("country","Country","c");
+		DaoMap::setStringType('name', 'varchar');
+		DaoMap::setManyToOne("country", "Country", "c");
+		parent::loadDaoMap();
 		DaoMap::commit();
 	}
 	

@@ -6,7 +6,7 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class Country extends HydraEntity
+class Country extends BaseEntityAbstract
 {
     /**
      * the name of the country
@@ -42,7 +42,7 @@ class Country extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__toString()
+	 * @see BaseEntity::__toString()
 	 */
 	public function __toString()
 	{
@@ -74,14 +74,14 @@ class Country extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__loadDaoMap()
+	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'c');
-		
-		DaoMap::setStringType('name','varchar');
-		DaoMap::setOneToMany("states","State","st");
+		DaoMap::setStringType('name', 'varchar');
+		DaoMap::setOneToMany("states", "State", "st");
+		parent::loadDaoMap();
 		DaoMap::commit();
 	}
 	

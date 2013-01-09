@@ -6,7 +6,7 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class Transaction extends HydraEntity 
+class Transaction extends BaseEntityAbstract 
 {
     /**
      * The value of the transaction
@@ -119,7 +119,7 @@ class Transaction extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__loadDaoMap()
+	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()
 	{
@@ -128,6 +128,7 @@ class Transaction extends HydraEntity
 		DaoMap::setStringType('comments','varchar',6400);
 		DaoMap::setManyToOne("from","AccountEntry","from",true);
 		DaoMap::setManyToOne("to","AccountEntry","to");
+		parent::loadDaoMap();
 		DaoMap::commit();
 	}
 }

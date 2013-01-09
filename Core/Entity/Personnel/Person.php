@@ -6,7 +6,7 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class Person extends HydraEntity
+class Person extends BaseEntityAbstract
 {
     /**
      * The firstname of the person
@@ -36,13 +36,13 @@ class Person extends HydraEntity
 	/**
 	 * Setter UserAccount
 	 *
-	 * @param array $UserAccounts The useraccounts
+	 * @param array $userAccounts The useraccounts
 	 * 
 	 * @return Person
 	 */
-	public function setUserAccounts(array $UserAccounts)
+	public function setUserAccounts(array $userAccounts)
 	{
-		$this->userAccounts = $UserAccount;
+		$this->userAccounts = $userAccounts;
 		return $this;
 	}
 	
@@ -104,7 +104,7 @@ class Person extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__toString()
+	 * @see BaseEntity::__toString()
 	 */
 	public function __toString()
 	{
@@ -114,14 +114,15 @@ class Person extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__loadDaoMap()
+	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()
 	{
-		DaoMap::begin($this, 'r');
+		DaoMap::begin($this, 'p');
 		DaoMap::setStringType('firstName');
 		DaoMap::setStringType('lastName');
 		DaoMap::setOneToMany('userAccounts', 'UserAccount', 'ua');
+		parent::loadDaoMap();
 		DaoMap::commit();
 	}
 }

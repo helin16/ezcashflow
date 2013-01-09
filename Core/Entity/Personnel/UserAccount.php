@@ -6,7 +6,7 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class UserAccount extends HydraEntity 
+class UserAccount extends BaseEntityAbstract 
 {
     /**
      * The username
@@ -120,7 +120,7 @@ class UserAccount extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__toString()
+	 * @see BaseEntity::__toString()
 	 */
 	public function __toString()
 	{
@@ -128,15 +128,16 @@ class UserAccount extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__loadDaoMap()
+	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'ua');
-		DaoMap::setStringType('userName','varchar',256);
-		DaoMap::setStringType('password','varchar',256);
-		DaoMap::setOneToOne("person","Person",true,"p");
-		DaoMap::setManyToMany("roles","Role",DaoMap::LEFT_SIDE,"r",false);
+		DaoMap::setStringType('userName', 'varchar', 256);
+		DaoMap::setStringType('password', 'varchar', 256);
+		DaoMap::setOneToOne("person", "Person", true, "p");
+		DaoMap::setManyToMany("roles", "Role", DaoMap::LEFT_SIDE, "r", false);
+		parent::loadDaoMap();
 		DaoMap::commit();
 	}
 	

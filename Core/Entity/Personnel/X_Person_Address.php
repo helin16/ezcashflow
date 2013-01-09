@@ -6,7 +6,7 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class X_Person_Address extends HydraEntity 
+class X_Person_Address extends BaseEntityAbstract 
 {
     /**
      * Whether this is the default address for that person
@@ -91,14 +91,15 @@ class X_Person_Address extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__loadDaoMap()
+	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'xpa');
 		DaoMap::setBoolType('isDefault');
-		DaoMap::setManyToOne("person","Person","p");
-		DaoMap::setManyToOne("address","Address","addr");
+		DaoMap::setManyToOne("person", "Person", "p");
+		DaoMap::setManyToOne("address", "Address", "addr");
+		parent::loadDaoMap();
 		DaoMap::commit();
 	}
 }

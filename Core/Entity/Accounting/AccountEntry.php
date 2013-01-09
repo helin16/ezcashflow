@@ -6,8 +6,33 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class AccountEntry extends HydraEntity
+class AccountEntry extends BaseEntityAbstract
 {
+    /**
+     * how many digits of the account number
+     * @var int
+     */
+    const ACC_NO_LENGTH = 4;
+    /**
+     * The account type for ASSET account
+     * @var int
+     */
+    const TYPE_ASSET = 1;
+    /**
+     * The account type for LIABILITY account
+     * @var int
+     */
+    const TYPE_LIABILITY = 2;
+    /**
+     * The account type for INCOME account
+     * @var int
+     */
+    const TYPE_INCOME = 3;
+    /**
+     * The account type for EXPENSE account
+     * @var int
+     */
+    const TYPE_EXPENSE = 4;
     /**
      * The name of the account
      * 
@@ -207,32 +232,47 @@ class AccountEntry extends HydraEntity
 	 * 
 	 * @return number
 	 */
-	public function getSum($includeChildren=false, $inclSelf=true)
+	public function getSum($includeChildren = true, $inclSelf = true)
 	{
-		$sql = "select sum(t.value) from transaction t 
-							where t.active =1 and t.fromId=".$this->getId();
-		$result = Dao::getResultsNative($sql);
-		$out = $result[0][0];
-		$sql = "select sum(t.value) from transaction t 
-							where t.active =1 and t.toId=".$this->getId();
-		$result = Dao::getResultsNative($sql);
-		$in = $result[0][0];
-		return $this->getValue() + $in - $out;
+	    if($includeChildren === false)
+	        return $this->getValue();
+	    
+		$sql = "select sum(t.value) `sum` from transaction t where t.active = 1 and t.fromId=?";
+		$result = Dao::getSingleResultNative($sql, array($this->getId()));
+		$out = $result === false ? 0 : $result['sum'];
+		$sql = "select sum(t.value) `sum` from transaction t where t.active = 1 and t.toId=?";
+		$result = Dao::getSingleResultNative($sql, array($this->getId()));
+		$in = $result === false ? 0 : $result['sum'];
+		return round($this->getValue() + $in - $out, 2);
 	}
 	/**
 	 * Getting all the children accounts for the current account
 	 * 
 	 * @param bool $inclSelf Whether to include it own value
 	 * 
-	 * @return Ambigous <array(HydraEntity), HydraEntity, multitype:, string, multitype:multitype: >
+	 * @return Ambigous <array(BaseEntity), BaseEntity, multitype:, string, multitype:multitype: >
 	 */
-	public function getChildren($inclSelf = false)
+	public function getChildren($includeSelf = false, $directChildrenOnly = true, $pageNumber = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array())
 	{
-		$dao = new GenericDAO(get_class($this));
-		$where = "accountNumber like '".$this->getAccountNumber()."%'";
-		if(!$inclSelf)
-			$where .=" AND id != ".$this->getId();
-		return $dao->findByCriteria($where);
+		$dao = new EntityDao(get_class($this));
+	    if($directChildrenOnly === true)
+	    {
+	        $where = 'parentId = :id';
+	        $params = array('id' => $this->getId());
+	        if($includeSelf === true)
+	            $where .= ' or id = :id ';
+	    }
+		else
+		{
+		    $where = 'accountNumber like :accNo';
+		    $params = array('accNo' => $this->getAccountNumber() . "%");
+		    if($includeSelf === false)
+		    {
+		        $where .= ' AND id != :id ';
+    		    $params['id'] = $this->getId();
+		    }
+		}
+        return $dao->findByCriteria($where, $params, $pageNumber, $pageSize, $orderBy);
 	}
 	/**
 	 * Getting a snapshot of the current account
@@ -241,7 +281,7 @@ class AccountEntry extends HydraEntity
 	 */
 	public function getSnapshot()
 	{
-		return $this->getRoot() . " - " . $this->getName() . " - $" . $this->getSum();
+		return $this->getRoot() . " - " . $this->getName() . " - $" . $this->getSum(true);
 	}
 	/**
 	 * Getting a snapshot of the current account
@@ -250,7 +290,7 @@ class AccountEntry extends HydraEntity
 	 */
 	public function getLongshot()
 	{
-		return $this->getBreadCrumbs() . " - $" . $this->getSum();
+		return $this->getBreadCrumbs() . " - $" . $this->getSum(true);
 	}
 	/**
 	 * Getting the BreadCrumbs of the current account path
@@ -284,11 +324,12 @@ class AccountEntry extends HydraEntity
 	 */
 	public function getParents($inclSelf=false)
 	{
+		$root = $this->getRoot();
 		$parents = array();
 		if($inclSelf)
 			$parents[] = $this;
 		$node = $this;
-		while(trim($node->getAccountNumber())!=trim($node->getRoot()->getAccountNumber()))
+		while(trim($node->getAccountNumber()) !== trim($root->getAccountNumber()))
 		{
 			$node = $node->getParent();
 			$parents[] = $node;
@@ -297,7 +338,7 @@ class AccountEntry extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__toString()
+	 * @see BaseEntity::__toString()
 	 */
 	public function __toString()
 	{
@@ -305,7 +346,7 @@ class AccountEntry extends HydraEntity
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see HydraEntity::__loadDaoMap()
+	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()
 	{
@@ -315,8 +356,9 @@ class AccountEntry extends HydraEntity
 		DaoMap::setStringType('comments', 'varchar', 255);
 		DaoMap::setStringType('value', 'varchar');
 		DaoMap::setStringType('budget', 'varchar');
-		DaoMap::setManyToOne("parent", "AccountEntry", "petr", null, true);
+		DaoMap::setManyToOne("parent", "AccountEntry", "petr", true);
 		DaoMap::setManyToOne("root", "AccountEntry", "petrr");
+		parent::loadDaoMap();
 		DaoMap::commit();
 	}
 }

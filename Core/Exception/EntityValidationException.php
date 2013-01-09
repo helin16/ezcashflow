@@ -1,10 +1,12 @@
 <?php
-
 /**
- * @package Core
+ * EntityValidationException
+ * 
+ * @package    Core
  * @subpackage Exception
+ * @author     lhe<helin16@gmail.com>
  */
-class HydraEntityValidationException extends Exception
+class EntityValidationException extends EntityException
 {
 	public function __construct($message)
 	{
