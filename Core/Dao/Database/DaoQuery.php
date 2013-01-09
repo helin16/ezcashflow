@@ -1,70 +1,73 @@
 <?php
-
 /**
  * Class for generating SQL statements for use by the Dao pattern
  *
- * @package Core
+ * @package    Core
  * @subpackage Dao
+ * @author     lhe<helin16@gmail.com>
  */
 class DaoQuery
 {
-	public $DefaultJoinType = 'inner join';
-	protected $joinOverride = "";
-	private $joinTracker = array();
-	private $focus = null;
-	private $distinct = false;
-	private $eagerLoads = array();
-	private $whereClause = '';
-	private $orderBy = array();
-	private $sql = '';
-	private $classes = array();
-	private $pageSize = 30;
-	private $pageNumber = 1;
-	private $withPaging = false;
-	
+    /**
+     * Default page size for the pagination
+     * @var int
+     */
+    const DEFAUTL_PAGE_SIZE = 30;
+    /**
+     * Default join type
+     * @var string
+     */
+    const DEFAULT_JOIN_TYPE = 'inner join';
+    /**
+     * Get focus entity name
+     * @var string
+     */
+	private $_focus = null;
+	/**
+	 * The page number of the pagination
+	 * @var int
+	 */
+	private $_pageNumber = null;
+	/**
+	 * The page size of the pagination
+	 * @var int
+	 */
+	private $_pageSize = self::DEFAUTL_PAGE_SIZE;
+    /**
+     * whether we are trying to get the distinct values
+     * @var bool
+     */
+	private $_distinct = false;
+	/**
+	 * The where clause of the query
+	 * @var array
+	 */
+	private $_whereClause = array();
+	/**
+	 * the order by clause
+	 * @var array
+	 */
+	private $_orderBy = array();
+	/**
+	 * tracks the joins, to prevent we don't do the same join again
+	 * @var array
+	 */
+	private $_joins = array();
 	/**
 	 * Creates a new DaoQuery, initialised to a focus object
 	 *
-	 * @param string $entityName
-	 * @param int $pageNumber optional
-	 * @param int $pageSize optional
+	 * @param string $entityName The name of the focus entity
+	 * @param int    $pageNumber The page number of the pagination, when NULL it's no pagination
+	 * @param int    $pageSize   The page size of the pagination
+	 * @param bool   $distinct   Whether we are getting the unique values from the query
 	 */
-	public function __construct($entityName, $pageNumber=null, $pageSize=30)
+	public function __construct($entityName, $pageNumber = null, $pageSize = self::DEFAUTL_PAGE_SIZE, $distinct = true)
 	{
-		$this->focus = $entityName;
-		
-		if (!is_null($pageNumber))
-		{
-			if (intval($pageNumber) < 1)
-			{
-				$pageNumber = 1;
-			}
-			
-			$this->pageNumber = intval($pageNumber);
-			$this->pageSize = intval($pageSize);
-			$this->withPaging = true;
-		}
-		
-		DaoMap::loadMap($entityName);
+		$this->_focus = $entityName;
+	    $this->getPage($pageNumber, $pageSize)
+		    ->distinct($distinct);
+		DaoMap::loadMap($this->_focus);
 	}
-
-	/**
-	 * daoOverride (hack method)
-	 *
-	 * @param DaoJoin $joins
-	 */
-	public function daoOverride($joins)
-	{
-		if (is_array($joins))
-		{
-			$this->joinOverride = implode(' ', $joins);
-		}
-		else
-		{
-			$this->joinOverride = $joins->__toString();
-		}
-	}
-	
 	/**
 	 * Returns the class name used to instantiate this DaoQuery instance
 	 * 
@@ -72,76 +75,49 @@ class DaoQuery
 	 */
 	public function getFocusClass()
 	{
-		return $this->focus;
+		return $this->_focus;
 	}
-	
-	/**
-	 * Get a list of classes that appear in the result set
-	 *
-	 * @return array[]string
-	 */
-	public function getJoinClasses()
-	{
-		return $this->classes;
-	}
-	
 	/**
 	 * Set the distinct behaviour on a select query
 	 *
-	 * @param bool $bool
+	 * @param bool $bool Whether we are getting the unique values from the query
+	 * 
 	 * @return DaoQuery
 	 */
 	public function distinct($bool)
 	{
-		$this->distinct = (bool)$bool;
-		
+		$this->_distinct = (bool)$bool;
 		return $this;
 	}
-	
 	/**
 	 * Set a relationship to eager load for performance reasons
 	 *
-	 * @param string $relationship
+	 * @param string $relationship The relationship for the entities: UserAccount.person
+	 * 
 	 * @return DaoQuery
 	 */
-	public function eagerLoad($relationship, $joinType='inner')
+	public function eagerLoad($relationship, $joinType = self::DEFAULT_JOIN_TYPE)
 	{
-		if (!$this->isEager($relationship))
-		{
-			$join = explode('.', $relationship);
-			$join[2] = $joinType;
-			$this->eagerLoads[] = $join;
-		}
-		
+	    list($joinClass, $joinField) = explode('.', $relationship);
+	    if(!isset(DaoMap::$map[strtolower($joinClass)]) || !isset(DaoMap::$map[strtolower($joinClass)][$joinField]))
+	        throw new DaoException('Invalid relationship for: ' . $relationship);
+	    $alias = DaoMap::$map[strtolower($joinClass)][$joinField]['alias'];
+	    $this->_buildJoin($joinField, $joinClass, $alias, $joinType);
 		return $this;
 	}
-
-	/**
-	 * Check if a relationship is being eager loaded or not
-	 *
-	 * @param string $relationship
-	 * @return bool
-	 */
-	public function isEager($relationship)
-	{
-		return in_array(explode('.', $relationship), $this->eagerLoads);
-	}
-	
 	/**
 	 * Set the order by clauses on the query
 	 *
-	 * @param string $field
-	 * @param string $direction
+	 * @param string $field     Which field we are ordering on
+	 * @param string $direction Which direction of ordering is ASC or DESC
+	 * 
 	 * @return DaoQuery
 	 */
-	public function orderBy($field, $direction='asc')
+	public function orderBy($field, $direction = DaoMap::SORT_ASC)
 	{
-		$tmp = explode('.', $field);
-		$tmp[] = $direction;
-		$this->orderBy[] = $tmp;
+		$this->_orderBy[$field] = $direction;
 		return $this;
 	}
-	
 	/**
 	 * Set the where clause on the query
 	 *
@@ -149,38 +125,27 @@ class DaoQuery
 	 */
 	public function where($clause)
 	{
-		if (strlen($this->whereClause) > 0)
-		{
-			$this->whereClause .= ' and (' . $clause . ')';
-		}
-		else
-		{
-			$this->whereClause = $clause;
-		}
-		
+		if(!in_array($clause, $this->_whereClause))
+		    $this->_whereClause[] = $clause;
 		return $this;
 	}
-
 	/**
 	 * Set which page number should return in the results
 	 *
-	 * @param int $pageNumber
-	 * @param int $pageSize
+	 * @param int $pageNumber The new page number for the pagination of the result
+	 * @param int $pageSize   The new page size for the pagination of the result
+	 * 
+	 * @return DaoQuery
 	 */
-	public function getPage($pageNumber=1, $pageSize=30)
+	public function getPage($pageNumber = null, $pageSize = self::DEFAUTL_PAGE_SIZE)
 	{
-		if (intval($pageNumber) < 1)
-		{
-			$pageNumber = 1;
-		}
-		
-		$this->pageNumber = intval($pageNumber);
-		$this->pageSize = intval($pageSize);
-		$this->withPaging = true;
-		
+	    if (!is_null($pageNumber))
+		    $this->_pageNumber = (intval($pageNumber) < 1 ? 1 : intval($pageNumber));
+	    else 
+		    $this->_pageNumber = null;
+		$this->_pageSize = intval($pageSize);
 		return $this;
 	}
-
 	/**
 	 * Get the paging stats that were used in the query
 	 *
@@ -188,9 +153,8 @@ class DaoQuery
 	 */
 	public function getPageStats()
 	{
-		return array($this->pageNumber, $this->pageSize);
+		return array($this->_pageNumber, $this->_pageSize);
 	}
-	
 	/**
 	 * Check if the results are paged or not
 	 *
@@ -198,155 +162,230 @@ class DaoQuery
 	 */
 	public function isPaged()
 	{
-		return $this->withPaging;
+		return $this->_pageNumber !== null;
 	}
-	
-	public function parseBaseQuery()
+	/**
+	* Create a select SQL query
+	*
+	* @return string
+	*/
+	public function generateForSelect()
 	{
-		if (!isset(DaoMap::$map[strtolower($this->focus)]['_']['base']))
-		{
-			return '';
-		}
-		
-		$base = DaoMap::$map[strtolower($this->focus)]['_']['base'];
-
-		if (strlen($base) == 0)
-		{
-			return '';
-		}
-		
-		$tags = array();
-		preg_match_all('/(inner join|left join) \[(.+)\]/U', $base, $tags);
-
-		$alias = DaoMap::$map[strtolower($this->focus)]['_']['alias'];
-		$leftClass = $this->focus;
-		 
-		for ($i=0; $i<count($tags[0]); $i++)
-		{
-			$joinType = $tags[1][$i];
-			$tag = $tags[2][$i];
-			
-			list($entity, $field) = explode('.', $tag);
-			
-			if ($entity == $this->focus)
-			{
-				$alias = DaoMap::$map[strtolower($this->focus)]['_']['alias'];
-				$leftClass = $this->focus;
-			}
-			
-			DaoMap::loadMap($entity);
-		 	$joins = $this->buildJoin($joinType, $leftClass, $alias, $entity, $field);
-		
-			$base = str_replace('[' . $tag . ']', implode(' ', $joins), $base);
-			
-			if (DaoMap::$map[strtolower($entity)][$field]['rel'] == DaoMap::MANY_TO_MANY)
-			{
-				$entity = DaoMap::$map[strtolower($entity)][$field]['class'];
-				$field = '_';
-			}
-			
-			$alias = DaoMap::$map[strtolower($entity)][$field]['alias'];
-			
-			$leftClass = $entity;
-		}
-		
-		return $base;
+	    $focus = strtolower($this->_focus);
+	    $fAlias = DaoMap::$map[$focus]['_']['alias'];
+	    
+        $sql = 'select ';
+        //get distinct
+        $sql .= $this->_distinct === true ? 'distinct ' : '';
+        //get pagination stats
+        $sql .= $this->isPaged() ? 'sql_calc_found_rows ' : '';
+        //get all fields
+        $sql .= implode(', ', $this->_buildFieldsForSelect()) . ' ';
+        //get from table
+        $sql .= sprintf('from %s %s', $focus, $fAlias) . ' ';
+        //get all joins
+        $sql .= count($this->_joins) === 0 ? '' : implode(' ', array_map(create_function('$a', 'return $a["joinType"] . " " . $a["joinClass"] . " " . $a["joinAlias"] . " on (" . $a["joinCondition"] . ")";'), $this->_joins)) . ' ';
+        //get whereclause
+        $this->where($fAlias . '.active = 1');
+        $sql .= count($this->_whereClause) === 0 ? '' : 'where (' . implode(') AND (', $this->_whereClause) . ')';
+        //get orderby
+        $sql .= count($orders = $this->_buildOrderByForSelect()) === 0 ? '' : ' order by ' . implode(', ', $orders);
+        //get limit for pagination
+        $sql .= ($this->isPaged() === false) ? '' : ' limit ' . (($this->_pageNumber - 1) * $this->_pageSize) . ', ' . $this->_pageSize;
+        return $sql;
 	}
-	
-	private function buildJoin($joinType, $leftClass, $alias, $entity, $field)
+	/**
+	* Create a count SQL query
+	*
+	* @return string
+	*/
+	public function generateForCount()
 	{
-		$hash = md5($leftClass . ':' . $alias . ':' . $entity . ':' . $field);
-		
-		if (in_array($hash, $this->joinTracker))
-		{
-			return array();
-		}
-		
-		$this->joinTracker[] = $hash;
-		DaoMap::loadMap($entity);
-		
-		$p = DaoMap::$map[strtolower($entity)][$field];
-		$joins = array();
-		
-		$focus = strtolower($this->focus);
-		$joinTable = strtolower($p['class']);
-		$joinAlias = $p['alias'];
-		
-		if ($p['rel'] == DaoMap::MANY_TO_MANY)
-		{
-			$joinTableMap = strtolower($p['class']);
-			
-			// Join in the many to many join table
-			if ($p['side'] == DaoMap::RIGHT_SIDE)
-			{
-				$mtmJoinTable = strtolower($entity) . '_' . $joinTableMap; 
-			}
-			else
-			{
-				$mtmJoinTable = $joinTableMap . '_' . strtolower($entity); 
-			}
-			
-			$joins[] = sprintf('%s on (%s.id = %s.%sId)',
-				$mtmJoinTable,
-				$alias,
-				$mtmJoinTable,
-				strtolower(substr($entity, 0, 1)) . substr($entity, 1));
-
-			DaoMap::loadMap($p['class']);
-			$joinAlias = DaoMap::$map[$joinTable]['_']['alias'];
-			
-			$joinTableMap = strtolower($entity);
-			$joins[] = sprintf('%s %s %s on (%s.%sId = %s.id)',
-				$joinType,
-				$joinTable,
-				$joinAlias,
-				$mtmJoinTable,
-				strtolower(substr(DaoMap::$map[$joinTableMap][$field]['class'], 0, 1)) . substr(DaoMap::$map[$joinTableMap][$field]['class'], 1),
-				$joinAlias);
-		}
-		else if ($p['rel'] == DaoMap::ONE_TO_MANY)
-		{
-			$joins[] = sprintf('%s %s on (%s.id = %s.%sId)',
-				$joinTable,
-				$joinAlias,
-				$alias,
-				$joinAlias,
-				strtolower(substr($leftClass, 0, 1)) . substr($leftClass, 1));
-		}
-		else if ($p['rel'] == DaoMap::ONE_TO_ONE)
-		{
-			if ($p['owner'])
-			{
-				$joins[] = sprintf('%s %s on (%s.%sId = %s.id)',
-					$joinTable,
-					$joinAlias,
-					$alias,
-					$field,
-					$joinAlias);
-			}
-			else
-			{
-				$joins[] = sprintf('%s %s on (%s.id = %s.%sId)',
-					$joinTable,
-					$joinAlias,
-					$alias,
-					$joinAlias,
-					strtolower(substr($leftClass, 0, 1)) . substr($leftClass, 1));
-			}
-		}
-		else
-		{
-			$joins[] = sprintf('%s %s on (%s.%sId = %s.id)',
-				$joinTable,
-				$joinAlias,
-				$alias,
-				$field,
-				$joinAlias);
-		}
-		
-		return $joins;
+	    $focus = strtolower($this->_focus);
+	    $fAlias = DaoMap::$map[$focus]['_']['alias'];
+	    
+        $sql = 'select count(';
+        //get distinct
+        $sql .= $this->_distinct === true ? 'distinct ' : '';
+        $sql .= $fAlias  . '.id) `count` ';
+        //get from table
+        $sql .= sprintf('from %s %s', $focus, $fAlias) . ' ';
+        //get all joins
+        $sql .= count($this->_joins) === 0 ? '' : implode(' ', array_map(create_function('$a', 'return $a["joinType"] . " " . $a["joinClass"] . " " . $a["joinAlias"] . " on (" . $a["joinCondition"] . ")";'), $this->_joins)) . ' ';
+        //get whereclause
+        $this->where($fAlias . '.active = 1');
+        $sql .= count($this->_whereClause) === 0 ? '' : 'where (' . implode(') AND (', $this->_whereClause) . ')';
+        return $sql;
 	}
-	
+	/**
+	 * building up an array of field for this table
+	 * 
+	 * @return multitype:string
+	 */
+	private function _buildFieldsForSelect()
+	{
+	    // ----------------------------------------------------------
+	    // Select which fields to return in the query on the focus table
+	    // ----------------------------------------------------------
+	    $focus = strtolower($this->_focus);
+	    $fAlias = DaoMap::$map[$focus]['_']['alias'];
+	    $fields = array();
+	    $fields[] = $fAlias . '.`id`';
+	    foreach (DaoMap::$map[$focus] as $field => $properties)
+	    {
+	        //entity metadata
+	        if (trim($field) === '_')
+	            continue;
+	    
+	        //if this is not a relationship
+	        if (!isset($properties['rel']))
+	        {
+	            $fields[] = $fAlias . '.`' . $field . '`';
+	            continue;
+	        }
+	         
+	        //if this is a relationship
+	        switch ($properties['rel'])
+	        {
+	            // Don't return any of these field types
+	            case DaoMap::ONE_TO_MANY:
+	            case DaoMap::MANY_TO_MANY:
+                {
+                    break;
+                }
+	            default:
+	                $field .= 'Id';
+	            $fields[] = $fAlias . '.`' . $field . '`';
+	            break;
+	        }
+	    }
+	    return $fields;
+	}
+	/**
+	 * Building up the order by clause array
+	 * 
+	 * @return multitype:string
+	 */
+	private function _buildOrderByForSelect()
+	{
+	    $focus = strtolower($this->_focus);
+	    if (count($this->_orderBy) === 0 && is_array(DaoMap::$map[$focus]['_']['sort']))
+	        $this->orderBy(DaoMap::$map[$focus]['_']['sort'][0], DaoMap::$map[$focus]['_']['sort'][1]);
+	    $orders = array();
+	    foreach ($this->_orderBy as $field => $order)
+	    {
+	        $orders[] = $field . ' ' . $order;
+	    }
+	    return $orders;
+	}
+	/**
+	 * generating the key for joins, easy to check
+	 * 
+	 * @param string $table     The table that we are tyring to join on
+	 * @param string $alias     The alias for joining table
+	 * @param string $condition The condition that we are joining on
+	 * @param string $type      The type of the join: inner join or left join
+	 * 
+	 * @return string
+	 */
+	private function _genJoinKey($table, $alias, $condition, $type)
+	{
+	    return md5($table . ':' . $alias . ':' . $condition . ':' . $type);
+	}
+	/**
+	 * Checking whether the join is in the query already
+	 * 
+	 * @param string $table     The table that we are tyring to join on
+	 * @param string $alias     The alias for joining table
+	 * @param string $condition The condition that we are joining on
+	 * @param string $type      The type of the join: inner join or left join
+	 * 
+	 * @return boolean
+	 */
+	private function _joinLoaded($table, $alias, $condition, $type)
+	{
+	    return array_key_exists($this->_genJoinKey($table, $alias, $condition, $type), $this->_joins);
+	}
+	/**
+	 * adding a join onto the query
+	 * 
+	 * @param string $table     The table that we are tyring to join on
+	 * @param string $alias     The alias for joining table
+	 * @param string $condition The condition that we are joining on
+	 * @param string $type      The type of the join: inner join or left join
+	 * 
+	 * @return DaoQuery
+	 */
+	private function _addJoin($table, $alias, $condition, $type)
+	{
+	    if($this->_joinLoaded($table, $alias, $condition, $type))
+	       return $this;
+	    
+	    $table = strtolower(trim($table));
+	    $this->_joins[$this->_genJoinKey($table, $alias, $condition, $type)] = array(
+	    	'joinType' => $type, 
+	    	'joinClass' => $table, 
+	    	'joinAlias' => $alias, 
+	    	'joinCondition' => $condition
+	    );
+	    return $this;
+	}
+	/**
+	 * building up the join query
+	 * 
+	 * @param string $field     The field of the focus class
+	 * @param string $joinClass The classname of table that we are trying to join
+	 * @param string $alias     The alias of the classname of left side of the join
+	 * @param string $joinType  The type of the join
+	 * 
+	 * @return DaoQuery
+	 */
+	private function _buildJoin($field, $joinClass, $alias, $joinType = self::DEFAULT_JOIN_TYPE)
+	{
+		//load the dao map of the join class
+		DaoMap::loadMap($joinClass);
+		$focus = strtolower($this->_focus);
+		$fAlias = DaoMap::$map[$focus]['_']['alias'];
+		$fieldMap = DaoMap::$map[$focus][$field];
+		$ref = DaoMap::$map[$focus][$field]['rel'];
+		switch($ref)
+		{
+		    case DaoMap::MANY_TO_MANY:
+	        {
+	            $joinTableMap = strtolower($fieldMap['class']);
+	            //Join in the many to many join table
+	            if ($fieldMap['side'] == DaoMap::RIGHT_SIDE)
+	                $mtmJoinTable = $focus . '_' . $joinTableMap;
+	            else
+	                $mtmJoinTable = $joinTableMap . '_' . $focus;
+	            $this->_addJoin($mtmJoinTable, $mtmJoinTable, $fAlias . '.id = ' . $mtmJoinTable . '.' . ucfirst($this->_focus) . 'Id', $joinType);
+	            
+	            //join in the target table
+	            $this->_addJoin($joinTableMap, $fieldMap['alias'], $fieldMap['alias'] . '.id = ' . $mtmJoinTable . '.' . ucfirst($fieldMap['class']) . 'Id', $joinType);
+	            break;
+	        }
+		    case DaoMap::ONE_TO_MANY:
+	        {
+	            $this->_addJoin($joinClass, $alias, $fAlias . '.id = ' . $alias . '.' . ucfirst($this->_focus) . 'Id', $joinType);
+	            break;
+	        }
+		    case DaoMap::MANY_TO_ONE:
+	        {
+	            $this->_addJoin($joinClass, $alias, $fAlias . '.' . $field . 'Id = ' . $alias . '.id', $joinType);
+	            break;
+	        }
+		    case DaoMap::ONE_TO_ONE:
+	        {
+	            if($fieldMap['owner']) //like MANY_TO_ONE
+	                $this->_addJoin($joinClass, $alias, $fAlias . '.' . $field . 'Id = ' . $alias . '.id', $joinType);
+	            else //ONE_TO_MANY
+	                $this->_addJoin($joinClass, $alias, $fAlias . '.id = ' . $alias . '.' . ucfirst($this->_focus) . 'Id', $joinType);
+	            break;
+	        }
+		    default:
+	            throw new DaoException('Invalid type(' . $ref . ') for buidling up joins in ' . __CLASS__ . '!');
+		}
+	}
 	/**
 	 * Create an update SQL query
 	 * 
@@ -354,50 +393,30 @@ class DaoQuery
 	 */
 	public function generateForUpdate()
 	{
-		// Load the Dao map for the focus entity
-		DaoMap::loadMap($this->focus);
-		
-		$focus = strtolower($this->focus);
-		
-		// ----------------------------------------------------------
-		// Grab the fields to insert in the table
-		// ----------------------------------------------------------
+		DaoMap::loadMap($this->_focus);
+		$focus = strtolower($this->_focus);
 		$fields = array();
 		foreach (DaoMap::$map[$focus] as $field => $properties)
 		{
 			if ($field == '_')
-			{
 				continue;
-			}
-			
+			$fieldName = $field;
 			if (isset($properties['rel']))
 			{
 				if (in_array($properties['rel'], array(DaoMap::MANY_TO_MANY, DaoMap::ONE_TO_MANY)))
-				{
 					continue;
-				}
-
 				if ($properties['rel'] == DaoMap::ONE_TO_ONE and !$properties['owner'])
-				{
 					continue;
-				}
-				
 				if ($properties['rel'] == DaoMap::MANY_TO_ONE or ($properties['rel'] == DaoMap::ONE_TO_ONE and $properties['owner']))
-				{
 					$field .= 'Id';
-				}
 			}
-						
-			$fields[] = '`' . $field . '`=?';
+			$fields[] = '`' . $field . '`= :' . $fieldName;
 		}
-		
 		$sql = 'update ' . $focus . ' set ';
 		$sql .= implode(', ', $fields);
-		$sql .= ' where id=?';
-		
+		$sql .= ' where id = :id';
 		return $sql;
 	}
-	
 	/**
 	 * Create an insert SQL query
 	 *
@@ -406,50 +425,31 @@ class DaoQuery
 	public function generateForInsert()
 	{
 		// Load the Dao map for the focus entity
-		DaoMap::loadMap($this->focus);
-		
-		$focus = strtolower($this->focus);
-		
-		// ----------------------------------------------------------
-		// Grab the fields to insert in the table
-		// ----------------------------------------------------------
+		DaoMap::loadMap($this->_focus);
+		$focus = strtolower($this->_focus);
 		$fields = array();
 		$values = array();
 		foreach (DaoMap::$map[$focus] as $field => $properties)
 		{
 			if ($field == '_')
-			{
 				continue;
-			}
-			
+			$fieldName = $field;
 			if (isset($properties['rel']))
 			{
 				if (in_array($properties['rel'], array(DaoMap::MANY_TO_MANY, DaoMap::ONE_TO_MANY)))
-				{
 					continue;
-				}
-				
 				if ($properties['rel'] == DaoMap::ONE_TO_ONE and !$properties['owner'])
-				{
 					continue;
-				}
-				
 				if ($properties['rel'] == DaoMap::MANY_TO_ONE or ($properties['rel'] == DaoMap::ONE_TO_ONE and $properties['owner']))
-				{
 					$field .= 'Id';
-				}
 			}
-			
 			$fields[] = '`' . $field . '`';
-			$values[] = '?';
+			$values[] = ':' . $fieldName;
 		}
-		
 		$sql = 'insert into ' . $focus;
-		$sql .= ' (' . implode(',', $fields) . ') values (' . implode(',', $values) . ')';
-		
+		$sql .= ' (' . implode(', ', $fields) . ') values (' . implode(', ', $values) . ')';
 		return $sql;
 	}
-	
 	/**
 	 * Create a delete SQL query
 	 *
@@ -457,261 +457,18 @@ class DaoQuery
 	 */
 	public function generateForDelete()
 	{
-		// Load the Dao map for the focus entity
-		DaoMap::loadMap($this->focus);
-		
-		$focus = strtolower($this->focus);
-
-		$sql = 'delete from ' . $focus . ' where id=?';
+		DaoMap::loadMap($this->_focus);
+		$focus = strtolower($this->_focus);
+		$sql = 'delete from ' . $focus . ' where id = :id';
 		return $sql;
 	}
-	
 	/**
-	 * Create a select SQL query
-	 *
+	 * magic function for toString()
 	 * @return string
 	 */
-	public function generateForSelect()
-	{
-		// Load the Dao map for the focus entity
-		DaoMap::loadMap($this->focus);
-		
-		$focus = strtolower($this->focus);
-		$fAlias = DaoMap::$map[$focus]['_']['alias'];
-		
-		if (Dao::$AutoActiveEnabled)
-		{
-			$this->where($fAlias . '.active=1');
-		}
-		
-		if (!Dao::$LazyLoadInProgress)
-		{
-			// Load the query base
-			$base = ' ' . $this->parseBaseQuery();
-	
-			// Inject global user filters into the query
-			if (Dao::getFilterSet() instanceof DaoFilterSet && isset(DaoMap::$map[$focus]['_']['filters']) && is_array(DaoMap::$map[$focus]['_']['filters']) && count(DaoMap::$map[$focus]['_']['filters']) > 0)
-			{
-				$filterSet = Dao::getFilterSet();
-				$filters = $filterSet->getFilters(DaoMap::$map[$focus]['_']['filters']);
-				
-				$filters = '(' . implode(') and (', $filters) . ')';
-
-				foreach (DaoMap::$map[$focus]['_']['filters'] as $filterName => $sqlFragment)
-				{
-					$filters = str_replace(':' . $filterName, $sqlFragment, $filters);
-				}
-				
-				if ($filters != '()')
-					$this->where($filters);
-			}
-		}
-				
-		// ----------------------------------------------------------
-		// Select which fields to return in the query on the focus table
-		// ----------------------------------------------------------
-		$fields = array();
-		$fields[] = $fAlias . '.`id`';
-		foreach (DaoMap::$map[$focus] as $field => $properties)
-		{
-			if ($field == '_')
-			{
-				continue;
-			}
-			
-			if (isset($properties['rel']))
-			{
-				switch ($properties['rel'])
-				{
-					// Don't return any of these field types
-					case DaoMap::ONE_TO_MANY:
-					case DaoMap::MANY_TO_MANY:
-						break;
-
-					case DaoMap::ONE_TO_ONE:
-						if ($properties['owner'])
-						{
-							$fields[] = $fAlias . '.`' . $field . 'Id`';
-						}
-						else
-						{
-							// Make sure we eager loading this before including it
-							if ($this->isEager($this->focus . '.' . $field))
-							{
-								$fields[] = $properties['alias'] . '.`id`';
-							}
-						}
-						break;
-						
-					default:
-						$field .= 'Id';
-						$fields[] = $fAlias . '.`' . $field . '`';
-						break;
-				}
-			}
-			else
-			{
-				$fields[] = $fAlias . '.`' . $field . '`';
-			}
-		}
-		
-		// ----------------------------------------------------------
-		// Link in the join tables
-		// ----------------------------------------------------------
-		$joins = array();
-		foreach ($this->eagerLoads as $eager)
-		{
-			$entity = DaoMap::$map[strtolower($eager[0])][$eager[1]]['class'];
-			
-			// Register the class for eager loading
-			$this->classes[] = $entity . ':' . $eager[1];
-			
-			$tmp = $this->buildJoin(' ' . $eager[2] . ' join ', $this->focus, $fAlias, $eager[0], $eager[1]);
-			
-			foreach ($tmp as $join)
-			{
-				if (substr($join, 0, strlen($this->DefaultJoinType) + 2) != ' ' . $this->DefaultJoinType . ' ')
-				{
-					$join = ' ' . $this->DefaultJoinType . ' ' . $join;
-				}
-				
-				$joins[] = $join;
-			}
-
-			// Check if we need to add active flag checking on the entities
-			if (Dao::$AutoActiveEnabled)
-			{
-				$mSource = DaoMap::$map[strtolower($eager[0])][$eager[1]];
-				DaoMap::loadMap($mSource['class']);
-				$mTarget = DaoMap::$map[strtolower($mSource['class'])];
-
-				if ($mSource['rel'] == DaoMap::ONE_TO_MANY)
-				{
-					//$this->where(DaoMap::$map[strtolower($eager[0])]['_']['alias'] . '.active=1');
-					$this->where($mTarget['_']['alias'] . '.active=1');
-				}
-				else if ($mSource['rel'] == DaoMap::MANY_TO_MANY && $mTarget['_']['versioned'])
-				{
-					$this->where($mTarget['_']['alias'] . '.active=1');
-				}
-			}
-			
-			if (DaoMap::$map[strtolower($eager[0])][$eager[1]]['rel'] == DaoMap::MANY_TO_ONE)
-			{
-				// Return the many-to-one fields back in the result set as well
-				$joinTableMap = DaoMap::$map[strtolower($eager[0])][$eager[1]]['class'];
-				DaoMap::loadMap($joinTableMap);
-				$joinTableMap = strtolower($joinTableMap);
-				
-				foreach (DaoMap::$map[$joinTableMap] as $field => $properties)
-				{
-					if ($field == '_')
-					{
-						continue;
-					}
-	
-					if (isset($properties['rel']))
-					{
-						switch ($properties['rel'])
-						{
-							case DaoMap::ONE_TO_MANY:
-							case DaoMap::MANY_TO_MANY:
-							case DaoMap::ONE_TO_ONE:
-								break;
-								
-							case DaoMap::MANY_TO_ONE:
-							default:
-								// If the child has many to one children, this may not work?
-								$field .= 'Id';
-								$fields[] = DaoMap::$map[strtolower($eager[0])][$eager[1]]['alias'] . '.`' . $field . '`';
-								break;
-						}
-					}
-					else
-					{
-						$fields[] = DaoMap::$map[strtolower($eager[0])][$eager[1]]['alias'] . '.`' . $field . '`';
-					}
-				}
-			}
-			
-		}
-
-		// ----------------------------------------------------------
-		// Set the order by clause
-		// ----------------------------------------------------------
-		if (count($this->orderBy) == 0 && is_array(DaoMap::$map[$focus]['_']['sort']))
-		{
-			$this->orderBy(DaoMap::$map[$focus]['_']['sort'][0], DaoMap::$map[$focus]['_']['sort'][1]);
-		}
-		
-		$orders = array();
-		foreach ($this->orderBy as $order)
-		{
-			if (strtolower($order[0]) == $focus)
-			{
-				$orders[] = $fAlias . '.`' . $order[1] . '` ' . strtolower($order[2]);
-			}
-			else
-			{
-				$tmp = strtolower(substr($order[0], 0, 1)) . substr($order[0], 1);
-				$orders[] = DaoMap::$map[$focus][$tmp]['alias'] . '.`' . $order[1] . '` ' . strtolower($order[2]);
-			}
-		}
-
-		// ----------------------------------------------------------
-		// Build the sql query
-		// ----------------------------------------------------------
-		$sql = 'select ';
-		
-		if ($this->distinct)
-		{
-			$sql .= 'distinct ';
-		}
-		
-		if ($this->withPaging)
-		{
-			$sql .= 'sql_calc_found_rows ';
-		}
-		
-		$sql .= implode(', ', $fields);
-		$sql .= sprintf(' from %s %s', $focus, $fAlias);
-		
-		if (!Dao::$LazyLoadInProgress)
-		{
-			$sql .= $base;
-		}
-		
-		$sql .= implode('', $joins);
-		
-		// HACK: Yes I went there.
-		if($this->joinOverride != "")
-		{
-			$sql .= $this->joinOverride;
-		}
-			
-		
-		if (strlen($this->whereClause) > 0)
-		{
-			$sql .= ' where ' . $this->whereClause;
-		}
-		
-		if (count($orders) > 0)
-		{
-			$sql .= ' order by ' . implode(', ', $orders);
-		}
-		
-		if ($this->withPaging)
-		{
-			$startRecord = ($this->pageNumber - 1) * $this->pageSize;
-			$sql .= ' limit ' . $startRecord . ', ' . $this->pageSize;
-		}
-		$this->sql = $sql;
-		return $sql;
-	}
-	
 	public function __toString()
 	{
-		return 'DaoQuery("' . $this->focus . '")'; 
+		return 'DaoQuery("' . $this->_focus . '")'; 
 	}
 }
 

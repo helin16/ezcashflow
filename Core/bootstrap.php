@@ -1,10 +1,4 @@
 <?php
-
-$incpaths = array(
-	get_include_path(),
-);
-
-set_include_path(implode(PATH_SEPARATOR, $incpaths));
 class SystemCore
 {
 	public static function autoload($className)
@@ -17,25 +11,21 @@ class SystemCore
 			$base . '/Entity/',
 			$base . '/Entity/Accounting/',
 			$base . '/Entity/Personnel/',
+			$base . '/Entity/Property/',
 			$base . '/Exception/',
 			$base . '/Services/',
 			$base . '/Utils/',
 			$base . '/'
 		);
-		
-		$found = false;
-		
 		foreach ($autoloadPaths as $path)
 		{
 			if (file_exists($path . $className . '.php'))
 			{
 				require_once $path . $className . '.php';
-				$found = true;
-				break;
+				return true;
 			}
 		}
-		
-		return $found;
+		return false;
 	}
 }
 
