@@ -22,6 +22,33 @@ abstract class EshopPage extends TPage
 	}
 	/**
 	 * (non-PHPdoc)
+	 * @see TControl::onLoad()
+	 */
+	public function onLoad($param)
+	{
+	    if(!$this->IsPostBack)
+	    {}
+	}
+	/**
+	 * Adding a control to the RightPanel
+	 * 
+	 * @param mixed $newControls The new control
+	 * 
+	 * @return EshopPage
+	 */
+	protected function _addRightPanel($newControls)
+	{
+	    $template = $this->getMaster();
+	    if(!$template->contentRightPane instanceof TPanel)
+	        return $this;
+	    
+	    $template->contentRightPane->getControls()->add($newControls);
+        if(method_exists($template, 'setView'))
+            $template->setView();
+	    return $this;
+	}
+	/**
+	 * (non-PHPdoc)
 	 * @see TPage::onPreInit()
 	 */
 	public function onPreInit($param)

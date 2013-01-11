@@ -23,6 +23,7 @@
 			<url ServiceParameter="Accounts.AccountsController" pattern="accounts.html" />
 			<url ServiceParameter="Reports.ReportsController" pattern="reports.html" />
 			<url ServiceParameter="Statics.StaticsController" pattern="statics.html" />
+			<url ServiceParameter="Properties.PropertiesController" pattern="properties.html" />
 			<url ServiceParameter="System.BackupController" pattern="backup"/>
 			<url ServiceParameter="Reports.ReportsController" pattern="reports/{reportVars}" parameters.reportVars=".+" />
 			

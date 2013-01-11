@@ -18,25 +18,14 @@
             </div>
             <div id="content">
                 <div class="widthWrapper">
-	                <div id="content-main">
+	                <com:TPanel id="contentMainPane" Cssclass="content-main">
 	                   <com:TActiveLabel Id="InfoMsg" ForeColor="green" style="width:100%"/>
 	                   <com:TActiveLabel Id="ErrorMsg" ForeColor="red" style="width:100%"/>
-	                   <com:TContentPlaceHolder ID="MainContent" />
-					</div>
-					<div id="content-right">
-					   <div class="box">
-						   <div class="title">Recent Trans</div>
-						   <div class="content">
-						      <com:Application.controls.RecentTrans.RecentTrans Id="recentTrans" HowMany="5"/>
-						  </div>
-					   </div>
-					   <div class="box">
-						   <div class="title">Links</div>
-						   <div class="content">
-						      <com:Application.controls.Links.Links Id="usefullLinks"/>
-						  </div>
-					   </div>
-	                </div>
+	                   <com:TContentPlaceHolder ID="MainContent">
+	                   </com:TContentPlaceHolder>
+					</com:TPanel>
+					<com:TPanel ID="contentRightPane" CssClass="content-right" Visible="false">
+					</com:TPanel>
 				</div>
             </div>
             <div id="footer">
