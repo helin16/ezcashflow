@@ -10,6 +10,7 @@ class SystemCore
 	        $base . '/Dao/Database/',
 			$base . '/Entity/',
 			$base . '/Entity/Accounting/',
+			$base . '/Entity/Assets/',
 			$base . '/Entity/Personnel/',
 			$base . '/Entity/Property/',
 			$base . '/Exception/',
