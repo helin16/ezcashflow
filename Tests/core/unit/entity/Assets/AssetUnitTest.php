@@ -30,7 +30,7 @@ class AssetUnitTest extends CoreEntityUnitTestAbstract
      */
     public function testGetFilePath()
     {
-        $expected = $this->_entityObj->getAssetType()->getPath() . $this->_entityObj->getPath() . '/' . $this->_entityObj->getAssetId();
+        $expected = $this->_entityObj->getAssetType()->getPath() . $this->_entityObj->getPath() . '/' . $this->_entityObj->getAssetKey();
         $this->assertEquals($expected, $this->_entityObj->getFilePath());
     }
 }

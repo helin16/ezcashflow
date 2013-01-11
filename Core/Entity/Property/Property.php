@@ -39,6 +39,12 @@ class Property extends BaseEntityAbstract
      */
     private $comments;
     /**
+     * The array of Documents
+     *
+     * @var array[Asset]
+     */
+    protected $assets;
+    /**
      * Getter for Address
      * 
      * @return Address
@@ -169,6 +175,28 @@ class Property extends BaseEntityAbstract
         $this->setupAcc = $setupAcc;
         return $this;
     }
+    /**
+     * getter for the assets
+     *
+     * @return multitype:Asset
+     */
+    public function getAssets()
+    {
+        $this->loadManyToMany('assets');
+        return $this->assets;
+    }
+    /**
+     * setter for the assets
+     *
+     * @param array $assets The array of asset
+     *
+     * @return Transaction
+     */
+    public function setAssets($assets)
+    {
+        $this->assets = $assets;
+        return $this;
+    }
 	/**
 	 * (non-PHPdoc)
 	 * @see BaseEntity::__loadDaoMap()
@@ -183,6 +211,7 @@ class Property extends BaseEntityAbstract
 		DaoMap::setManyToOne("incomeAcc", "AccountEntry", "in");
 		DaoMap::setManyToOne("outgoingAcc", "AccountEntry"," out");
 		DaoMap::setStringType('comments','varchar' , 6400);
+		DaoMap::setManyToMany('assets', 'Asset', DaoMap::LEFT_SIDE, 'doc', true);
 		parent::loadDaoMap();
 		
 		DaoMap::commit();

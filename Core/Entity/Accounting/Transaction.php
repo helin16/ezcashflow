@@ -33,6 +33,12 @@ class Transaction extends BaseEntityAbstract
      */
 	protected $to;
 	/**
+	 * The array of Documents
+	 * 
+	 * @var array[Asset]
+	 */
+	protected $assets;
+	/**
 	 * getter value
 	 *
 	 * @return string
@@ -118,6 +124,28 @@ class Transaction extends BaseEntityAbstract
 		$this->comments = $comments;
 	}
 	/**
+	 * getter for the assets
+	 * 
+	 * @return multitype:Asset
+	 */
+	public function getAssets()
+	{
+	    $this->loadManyToMany('assets');
+	    return $this->assets;
+	}
+	/**
+	 * setter for the assets
+	 * 
+	 * @param array $assets The array of asset
+	 * 
+	 * @return Transaction
+	 */
+	public function setAssets($assets)
+	{
+	    $this->assets = $assets;
+	    return $this;
+	}
+	/**
 	 * (non-PHPdoc)
 	 * @see BaseEntity::__loadDaoMap()
 	 */
@@ -128,6 +156,7 @@ class Transaction extends BaseEntityAbstract
 		DaoMap::setStringType('comments','varchar',6400);
 		DaoMap::setManyToOne("from","AccountEntry","from",true);
 		DaoMap::setManyToOne("to","AccountEntry","to");
+		DaoMap::setManyToMany('assets', 'Asset', DaoMap::LEFT_SIDE, 'doc', true);
 		parent::loadDaoMap();
 		DaoMap::commit();
 	}

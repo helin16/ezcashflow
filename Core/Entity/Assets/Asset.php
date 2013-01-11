@@ -8,6 +8,18 @@
  */
 class Asset extends BaseEntityAbstract
 {
+    /**
+     * Linked transactions
+     * 
+     * @var array[Transaction]
+     */
+    protected $transactions;
+    /**
+     * Linked Property
+     * 
+     * @var array[Property]
+     */
+    protected $propertys;
 	/**
 	 * @var AssetType
 	 */
@@ -15,7 +27,7 @@ class Asset extends BaseEntityAbstract
 	/**
 	 * @var string
 	 */
-	private $assetId;
+	private $assetKey;
 	/**
 	 * @var string
 	 */
@@ -51,24 +63,24 @@ class Asset extends BaseEntityAbstract
 		return $this;
 	}
 	/**
-	 * getter assetId
+	 * getter assetKey
 	 *
 	 * @return string
 	 */
-	public function getAssetId()
+	public function getAssetKey()
 	{
-		return $this->assetId;
+		return $this->assetKey;
 	}
 	/**
-	 * setter assetId
+	 * setter assetKey
 	 * 
-	 * @param string $assetId The asset ID(hash string)
+	 * @param string $assetKey The asset ID(hash string)
 	 * 
 	 * @return Asset
 	 */
-	public function setAssetId($assetId)
+	public function setAssetKey($assetKey)
 	{
-		$this->assetId = $assetId;
+		$this->assetKey = $assetKey;
 		return $this;
 	}
 	/**
@@ -135,13 +147,56 @@ class Asset extends BaseEntityAbstract
 		return $this;
 	}
 	/**
+	 * Getting the linked Transactions
+	 * 
+	 * @return multitype:Transaction
+	 */
+	public function getTransactions()
+	{
+	    $this->loadManyToMany('transactions');
+	    return $this->transactions;
+	}
+	/**
+	 * Setting the linked Transactions
+	 * 
+	 * @param array $transactions The linked Transactions
+	 * @return Asset
+	 */
+	public function setTransactions($transactions)
+	{
+	    $this->transactions = $transactions;
+	    return $this;
+	}
+	/**
+	 * Getting the linked Property
+	 * 
+	 * @return multitype:Property
+	 */
+	public function getPropertys()
+	{
+	    $this->loadManyToMany('propertys');
+	    return $this->propertys;
+	}
+	/**
+	 * Getting the linked Property
+	 * 
+	 * @param array $propertys The linked property
+	 * 
+	 * @return Asset
+	 */
+	public function setPropertys($propertys)
+	{
+	    $this->propertys = $propertys;
+	    return $this;
+	}
+	/**
 	 * Getting the file path of the content
 	 * 
 	 * @return The file path
 	 */
 	public function getFilePath()
 	{
-	    return $this->getAssetType()->getPath() . $this->getPath() . '/' . $this->getAssetId();
+	    return $this->getAssetType()->getPath() . $this->getPath() . '/' . $this->getAssetKey();
 	}
 	/**
 	 * (non-PHPdoc)
@@ -160,12 +215,14 @@ class Asset extends BaseEntityAbstract
 		DaoMap::begin($this, 'con');
 		
 		DaoMap::setManyToOne('assetType', 'AssetType', 'at');
-		DaoMap::setStringType('assetId', 'varchar', 32);
+		DaoMap::setStringType('assetKey', 'varchar', 32);
 		DaoMap::setStringType('filename', 'varchar', 100);
 		DaoMap::setStringType('mimeType', 'varchar', 50);
 		DaoMap::setStringType('path', 'varchar', 255);
+		DaoMap::setManyToMany('transactions', 'Transaction', DaoMap::RIGHT_SIDE, 'xt', true);
+		DaoMap::setManyToMany('propertys', 'Property', DaoMap::RIGHT_SIDE, 'xp', true);
 		
-		DaoMap::createUniqueIndex('assetId');
+		DaoMap::createUniqueIndex('assetKey');
 		
 		DaoMap::commit();
 	}

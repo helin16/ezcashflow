@@ -189,33 +189,21 @@ abstract class CoreEntityUnitTestAbstract extends CoreUnitTestAbstract
                     if ($info['rel'] === DaoMap::MANY_TO_MANY)
                     {
                         if ($info['side'] === DaoMap::LEFT_SIDE)
-                        {
                             $crossTableName = strtolower($loadingClassName . '_' . $this->_entityName);
-                        }
                         else if ($info['side'] === DaoMap::RIGHT_SIDE)
-                        {
                             $crossTableName = strtolower($this->_entityName . '_' . $loadingClassName);
-                        }
                         else
-                        {
                             throw new Exception("Invalide relationship has been setup between '$loadingClassName' and '{$this->_entityName}'.");
-                        }
                         
-                        $sql = "select distinct " . (strtolower(substr($loadingClassName, 0, 1)) . substr($loadingClassName, 1)) . "Id from $crossTableName where " . $clsfield . "Id = " . $this->_entityId;
+                        $sql = "select distinct " . (strtolower(substr($loadingClassName, 0, 1)) . substr($loadingClassName, 1)) . "Id `id` from $crossTableName where " . $clsfield . "Id = " . $this->_entityId;
                         $result = Dao::getResultsNative($sql);
-                        if (count($result) ===0)
-                        {
+                        if (count($result) === 0)
                             $newValue = array();
-                        }
                         else 
-                        {
-                            $newValue = Dao::findByCriteria($q, $alias . ".id in (" . implode(",", array_map(create_function('$a', 'return $a[0];'), $result)). ")" , array($this->_entityId));
-                        }
+                            $newValue = Dao::findByCriteria($q, $alias . ".id in (" . implode(",", array_map(create_function('$a', 'return $a["id"];'), $result)). ")" , array($this->_entityId));
                     }
                     else
-                    {
                         $newValue = Dao::findByCriteria($q, sprintf('%s.`%sId`=?', $alias, $clsfield), array($this->_entityId));
-                    }
                 }
                 else //if we are requiring one object for the setters
                 {
