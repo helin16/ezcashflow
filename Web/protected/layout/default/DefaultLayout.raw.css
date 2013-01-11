@@ -11,6 +11,7 @@ div.widthWrapper {
     margin: 0 auto 0;
     text-align: left;
     width: 980px;
+    vertical-align: top;
 }
 
 /********************************************************* header div *********************************************************/
@@ -102,10 +103,9 @@ div.menuWrapper .topMenuUser .welcomeMsg {
     padding: 8px 0 0 0;
 }
 
-#content-main {
-    width: 70%;
+div.content-main {
     display: inline-block;
-    float: left;
+    float:left;
 }
 
 .content-box {
@@ -169,23 +169,22 @@ div.menuWrapper .topMenuUser .welcomeMsg {
 }
 
 /********************************************************* content-right *********************************************************/
-#content-right {
+div.content-right {
     margin-left: 1%;
     margin-top: 10px;
     display: inline-block;
     min-height: 400px;
-    width: 25%;
     box-shadow: 0 0 13px #cccccc;
     border-radius: 4px;
     padding: 10px;
     background: white;
 }
 
-#content-right .box {
+div.content-right .box {
     margin-bottom: 18px;
 }
 
-#content-right .box .title {
+div.content-right .box .title {
     background: #1E3A7D;
     margin: 0px;
     padding: 4px 0 4px 13px;
@@ -193,13 +192,13 @@ div.menuWrapper .topMenuUser .welcomeMsg {
     font-weight: bold;
 }
 
-#content-right .box .content ul {
+div.content-right .box .content ul {
     margin: 0px;
     padding: 0px;
     list-style: none;
 }
 
-#content-right .box .content ul li a {
+div.content-right .box .content ul li a {
     display: block;
     padding: 8px;
     color: #cccccc;
@@ -209,39 +208,39 @@ div.menuWrapper .topMenuUser .welcomeMsg {
     color: #cccccc;
 }
 
-#content-right .box .content ul li a:hover {
+div.content-right .box .content ul li a:hover {
     color: white;
     background: #cccccc;
 }
 
-#content-right .box .content ul li a p {
+div.content-right .box .content ul li a p {
     padding: 0px;
     margin: 0px;
 }
 
-#content-right .box .content ul li a p.from,#content-right .box .content ul li a p.to
+div.content-right .box .content ul li a p.from,div.content-right .box .content ul li a p.to
     {
     font-size: 10px;
 }
 
-#content-right .box .content ul li a p.value {
+div.content-right .box .content ul li a p.value {
     color: #1E3A7D;
     font-weight: bold;
     text-align: right;
     float: right;
 }
 
-#content-right .box .content ul li .comments {
+div.content-right .box .content ul li .comments {
     font-size: 9px;
     font-style: italic;
 }
 
-#content-right .box .content ul li a p.link {
+div.content-right .box .content ul li a p.link {
     color: #1E3A7D;
     font-weight: bold;
 }
 
-#content-right .box .content ul li .descr {
+div.content-right .box .content ul li .descr {
     font-size: 11px;
     text-align: right;
 }
