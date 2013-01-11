@@ -29,5 +29,18 @@ class UserAccountServiceUnitTest extends CoreServiceUnitTestAbstract
             $this->assertEquals(new AuthenticationException("No User Found!"), $ex);
         }  
     }
+    /**
+     * testing the UserAccountService::getUserByUsername() function
+     */
+    public function testGetUserByUsername()
+    {
+        $userAccount = $this->_serviceObj->get(1);
+        try {
+            $actual = $this->_serviceObj->getUserByUsername($userAccount->getUserName());
+            $this->assertEquals($userAccount, $actual);
+        } catch(Exception $ex) {
+            $this->assertEquals(new AuthenticationException("No User Found!"), $ex);
+        }  
+    }
 }
 ?>
