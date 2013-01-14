@@ -41,7 +41,7 @@
 
 	<!-- configuration for available services -->
 	<services>
-		<service id="page" class="TPageService" DefaultPage="Home">
+		<service id="page" class="TPageService" DefaultPage="Home.Home">
 			<modules>
 			  <module id="auth" class="System.Security.TAuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.LoginController" AuthExpire="3600"/>
 			  <module id="users" class="Application.classes.WebUser.WebUserManager"/>
