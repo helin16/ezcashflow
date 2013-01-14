@@ -363,7 +363,7 @@ class AccountEntry extends BaseEntityAbstract
 	    $parent = $this->getParent();
 	    $acc['parent'] = array();
 	    if($parent instanceof AccountEntry)
-    	    $acc['parent'] = ($loadParent === true ? $parent->getJsonArray() : array('id' => $parent->getId(), 'name' => $parent->getName()));
+    	    $acc['parent'] = ($loadParent === true ? $parent->getJsonArray(false) : array('id' => $parent->getId(), 'name' => $parent->getName()));
 	    return $acc;
 	}
 	/**
