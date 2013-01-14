@@ -63,7 +63,7 @@ abstract class BaseService
 	 */
 	public function findAll($searchActiveOnly = true, $page = null, $pagesize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array())
 	{
-		$temp = $this->entityDao->findAll($page, $pagesize);
+		$temp = $this->entityDao->findAll($page, $pagesize, $orderBy);
 		$this->_pageStats = Dao::getPageStats();
 		return $temp;
 	}
