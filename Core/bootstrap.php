@@ -1,6 +1,19 @@
 <?php
-class SystemCore
+/**
+ * Boostrapper for the Core module
+ * 
+ * @package    Core
+ * @author lhe
+ */
+abstract class SystemCoreAbstract
 {
+    /**
+     * autoloading function
+     * 
+     * @param string $className The class that we are trying to autoloading
+     * 
+     * @return boolean Whether we loaded the class
+     */
 	public static function autoload($className)
 	{
 		$base = dirname(__FILE__);
@@ -29,10 +42,7 @@ class SystemCore
 		return false;
 	}
 }
-
-spl_autoload_register(array('SystemCore','autoload'));
-
-
+spl_autoload_register(array('SystemCoreAbstract','autoload'));
 // Bootstrap the Prado framework
 require_once dirname(__FILE__) . '/Framework/prado.php';
 

@@ -125,7 +125,10 @@ class TestRunner
     {
         if ($this->_genCoverageReport === true) 
         {
-            $coverage = new PHP_CodeCoverage();
+            //exclude Framework
+            $filter = new PHP_CodeCoverage_Filter();
+            $filter->addDirectoryToBlacklist( dirname(__FILE__) . '/../../Core/Framework/');
+            $coverage = new PHP_CodeCoverage(null, $filter);
             $coverage->start('TestReport');
         }
 //         $this->_findEmptyTables();

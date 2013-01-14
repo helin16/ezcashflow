@@ -10,7 +10,7 @@ error_reporting(E_ALL & ~E_NOTICE);
  * @author     lhe<lhe@bytecraft.com.au>
  *
  */
-class TestLoader
+abstract class TestLoader
 {
     /**
      * autoloading function
