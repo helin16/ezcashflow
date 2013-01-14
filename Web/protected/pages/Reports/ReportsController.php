@@ -253,6 +253,7 @@ class ReportsController extends EshopPage
     	    $trans->setTo($toAcc);
     	    $trans->setValue($value);
     	    $trans->setComments($comments);
+    	    $this->_transService->save($trans);
     	    $results = $this->_getJsonTrans($trans);
 	    }
 	    catch(Exception $e)
@@ -271,31 +272,7 @@ class ReportsController extends EshopPage
 	 */
 	private function _getJsonTrans(Transaction $trans)
 	{
-	    $tran = array();
-	    $tran['id'] = $trans->getId();
-	    $tran['value'] = $trans->getValue();
-	    $tran['comments'] = $trans->getComments();
-	    $tran['fromAcc'] = $this->_getJsonAccount($trans->getFrom());
-	    $tran['toAcc'] = $this->_getJsonAccount($trans->getTo());
-	    $tran['created'] = $trans->getCreated() . '';
-	    return $tran;
-	}
-	/**
-	 * Getting the array for an account for the json string
-	 * 
-	 * @param AccountEntry $account The account entry
-	 * 
-	 * @return array
-	 */
-	private function _getJsonAccount(AccountEntry $account = null)
-	{
-	    $acc = array();
-	    if($account instanceof AccountEntry)
-	    {
-    	    $acc['id'] = $account->getId();
-    	    $acc['name'] = $account->getBreadCrumbs();
-	    }
-	    return $acc;
+	    return $trans->getJsonArray();
 	}
 }
 ?>

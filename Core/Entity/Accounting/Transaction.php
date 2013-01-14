@@ -156,7 +156,8 @@ class Transaction extends BaseEntityAbstract
     	$tran['id'] = $this->getId();
     	$tran['value'] = $this->getValue();
     	$tran['comments'] = $this->getComments();
-    	$tran['fromAcc'] = $this->getFrom()->getJsonArray();
+    	$from = $this->getFrom();
+    	$tran['fromAcc'] = $from instanceof AccountEntry ? $from->getJsonArray() : array();
     	$tran['toAcc'] = $this->getTo()->getJsonArray();
     	$tran['created'] = $this->getCreated() . '';
 	    return $tran;

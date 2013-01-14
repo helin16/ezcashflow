@@ -93,9 +93,9 @@ ReportJs.prototype = {
 		tmp.newRow = new Element('div', {'class': 'row ' + (rowNo % 2 === 0 ? 'even' : 'odd'), 'transId': trans.id, 'rowno': rowNo});
 		
 		tmp.newRowContent = new Element('span', {'class': 'conent'});
-		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'fromacc'}).update('From: ' + (trans.fromAcc.name === undefined ? '' : trans.fromAcc.name))});
+		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'fromacc'}).update('From: ' + (trans.fromAcc.name === undefined ? '' : trans.fromAcc.breadCrumbs.name))});
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'created'}).update(trans.created)});
-		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'toacc'}).update('To&nbsp;&nbsp;&nbsp;&nbsp;: ' + trans.toAcc.name)});
+		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'toacc'}).update('To&nbsp;&nbsp;&nbsp;&nbsp;: ' + trans.toAcc.breadCrumbs.name)});
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'value'}).update('$' + trans.value)});
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'comments'}).update(trans.comments)});
 		tmp.newRow.insert({'bottom': tmp.newRowContent});
