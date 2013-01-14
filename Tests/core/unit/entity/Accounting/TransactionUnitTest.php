@@ -17,10 +17,18 @@ class TransactionUnitTest extends CoreEntityUnitTestAbstract
      */
     protected $_entityName = 'Transaction';
     /**
-     * testing the __toString function
+     * testing the Transaction::getJsonArray() function
      */
-    public function testToString()
+    public function testGetJsonArray()
     {
+        $tran = array();
+    	$tran['id'] = $this->_entityObj->getId();
+    	$tran['value'] = $this->_entityObj->getValue();
+    	$tran['comments'] = $this->_entityObj->getComments();
+    	$tran['fromAcc'] = $this->_entityObj->getFrom()->getJsonArray();
+    	$tran['toAcc'] = $this->_entityObj->getTo()->getJsonArray();
+    	$tran['created'] = $this->_entityObj->getCreated() . '';
+        $this->assertEquals($tran, $this->_entityObj->getJsonArray());
     }
 }
 ?>

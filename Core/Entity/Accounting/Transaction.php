@@ -146,6 +146,22 @@ class Transaction extends BaseEntityAbstract
 	    return $this;
 	}
 	/**
+	 * getting the account entry for json
+	 *
+	 * @return multitype:boolean NULL multitype: unknown
+	 */
+	public function getJsonArray()
+	{
+    	$tran = array();
+    	$tran['id'] = $this->getId();
+    	$tran['value'] = $this->getValue();
+    	$tran['comments'] = $this->getComments();
+    	$tran['fromAcc'] = $this->getFrom()->getJsonArray();
+    	$tran['toAcc'] = $this->getTo()->getJsonArray();
+    	$tran['created'] = $this->getCreated() . '';
+	    return $tran;
+	}
+	/**
 	 * (non-PHPdoc)
 	 * @see BaseEntity::__loadDaoMap()
 	 */

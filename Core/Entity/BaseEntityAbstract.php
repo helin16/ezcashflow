@@ -317,7 +317,16 @@ abstract class BaseEntityAbstract
 	{
 		$class = get_class($this);
 		throw new EntityException("Attempted to set variable $class::$var directly and it is either inaccessable or doesnt exist");
-	}	
+	}
+	/**
+	 * getting the account entry for json
+	 * 
+	 * @throws EntityException
+	 */
+	public function getJsonArray()
+	{
+		throw new EntityException("There is NO getJsonArray() defined for: " . get_class($this));
+	}
 	/**
 	 * Default toString implementation
 	 *

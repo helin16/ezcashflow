@@ -337,6 +337,28 @@ class AccountEntry extends BaseEntityAbstract
 		return $parents;
 	}
 	/**
+	 * getting the account entry for json
+	 * 
+	 * @return multitype:boolean NULL multitype: unknown
+	 */
+	public function getJsonArray()
+	{
+	    $acc = array();
+	    $thisNo = $this->getAccountNumber();
+	    $acc['level'] = ceil((strlen($thisNo) - 1) / 4);
+	    $acc['id'] = $this->getId();
+	    $acc['name'] = $this->getName();
+	    $acc['accountNumber'] = $thisNo;
+	    $acc['value'] = $this->getValue();
+	    $acc['budget'] = $this->getBudget();
+	    $acc['comments'] = $this->getComments();
+	    $acc['sum'] = $this->getSum(true, true);
+	    $acc['gotChildren'] = count($this->getChildren()) !== 0;
+	    $parent = $this->getParent();
+	    $acc['parent'] = ($parent instanceof AccountEntry ? $parent->getJsonArray() : array());
+	    return $acc;
+	}
+	/**
 	 * (non-PHPdoc)
 	 * @see BaseEntity::__toString()
 	 */

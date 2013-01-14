@@ -26,6 +26,26 @@ class AccountEntryUnitTest extends CoreEntityUnitTestAbstract
         $this->assertEquals($expected, $actual, "We should get '$expected', but got '$actual'");
     }
     /**
+     * testing the AccountEntry::getJsonArray() function
+     */
+    public function testGetJsonArray()
+    {
+        $acc = array();
+	    $this->_entityObjNo = $this->_entityObj->getAccountNumber();
+	    $acc['level'] = ceil((strlen($this->_entityObjNo) - 1) / 4);
+	    $acc['id'] = $this->_entityObj->getId();
+	    $acc['name'] = $this->_entityObj->getName();
+	    $acc['accountNumber'] = $this->_entityObjNo;
+	    $acc['value'] = $this->_entityObj->getValue();
+	    $acc['budget'] = $this->_entityObj->getBudget();
+	    $acc['comments'] = $this->_entityObj->getComments();
+	    $acc['sum'] = $this->_entityObj->getSum(true, true);
+	    $acc['gotChildren'] = count($this->_entityObj->getChildren()) !== 0;
+	    $parent = $this->_entityObj->getParent();
+	    $acc['parent'] = ($parent instanceof AccountEntry ? $parent->getJsonArray() : array());
+        $this->assertEquals($acc, $this->_entityObj->getJsonArray());
+    }
+    /**
      * testing AccountEntry::getSum()
      */
     public function testGetSum()
