@@ -35,6 +35,10 @@ class AccountEntryUnitTest extends CoreEntityUnitTestAbstract
 	    $acc['level'] = ceil((strlen($this->_entityObjNo) - 1) / 4);
 	    $acc['id'] = $this->_entityObj->getId();
 	    $acc['name'] = $this->_entityObj->getName();
+	    $acc['breadCrumbs'] = array(
+	        'id' => $this->_entityObj->getBreadCrumbs(true, true),
+	    	'name' => $this->_entityObj->getBreadCrumbs(true, false)
+	    );
 	    $acc['accountNumber'] = $this->_entityObjNo;
 	    $acc['value'] = $this->_entityObj->getValue();
 	    $acc['budget'] = $this->_entityObj->getBudget();

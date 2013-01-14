@@ -339,15 +339,21 @@ class AccountEntry extends BaseEntityAbstract
 	/**
 	 * getting the account entry for json
 	 * 
+	 * @param bool $loadParent whether to load the parent array as well. Just to avoid looping
+	 * 
 	 * @return multitype:boolean NULL multitype: unknown
 	 */
-	public function getJsonArray()
+	public function getJsonArray($loadParent = true)
 	{
 	    $acc = array();
 	    $thisNo = $this->getAccountNumber();
 	    $acc['level'] = ceil((strlen($thisNo) - 1) / 4);
 	    $acc['id'] = $this->getId();
 	    $acc['name'] = $this->getName();
+	    $acc['breadCrumbs'] = array(
+	        'id' => $this->getBreadCrumbs(true, true),
+	    	'name' => $this->getBreadCrumbs(true, false)
+	    );
 	    $acc['accountNumber'] = $thisNo;
 	    $acc['value'] = $this->getValue();
 	    $acc['budget'] = $this->getBudget();
@@ -355,7 +361,9 @@ class AccountEntry extends BaseEntityAbstract
 	    $acc['sum'] = $this->getSum(true, true);
 	    $acc['gotChildren'] = count($this->getChildren()) !== 0;
 	    $parent = $this->getParent();
-	    $acc['parent'] = ($parent instanceof AccountEntry ? $parent->getJsonArray() : array());
+	    $acc['parent'] = array();
+	    if($parent instanceof AccountEntry)
+    	    $acc['parent'] = ($loadParent === true ? $parent->getJsonArray() : array('id' => $parent->getId(), 'name' => $parent->getName()));
 	    return $acc;
 	}
 	/**

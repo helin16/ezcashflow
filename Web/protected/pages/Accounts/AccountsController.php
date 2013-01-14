@@ -73,21 +73,7 @@ class AccountsController extends EshopPage
 	 */
 	private function _jsonAccountEntry(AccountEntry $account)
 	{
-	    $acc = array();
-	    $accountNo = $account->getAccountNumber();
-	    $acc['level'] = ceil((strlen($accountNo) - 1) / 4);
-	    $acc['id'] = $account->getId();
-	    $acc['name'] = $account->getName();
-	    $acc['accountNumber'] = $accountNo;
-	    $acc['value'] = $account->getValue();
-	    $acc['budget'] = $account->getBudget();
-	    $acc['comments'] = $account->getComments();
-	    $acc['sum'] = $account->getSum(true, true);
-	    $acc['gotChildren'] = count($this->_accService->getChildrenAccounts($account)) !== 0;
-	    $parent = $account->getParent();
-	    $acc['parent'] = ($parent instanceof AccountEntry ? $this->_jsonAccountEntry($parent) : array());
-	    return $acc;
-	    
+	    return $account->getJsonArray();
 	}
 	/**
 	 * Event: ajax call to save Account
