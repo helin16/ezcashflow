@@ -9,11 +9,11 @@
 class PropertiesController extends EshopPage 
 {
     /**
-     * Account service
+     * Property service
      * 
-     * @var AccountEntryService
+     * @var PropertyService
      */
-    private $_accService;
+    private $_proService;
     /**
      * constructor
      */
@@ -21,7 +21,7 @@ class PropertiesController extends EshopPage
 	{
 		parent::__construct();
 		$this->menuItemName = 'properties';
-		$this->_accService = new AccountEntryService();
+		$this->_proService = new PropertyService();
 	}
 	/**
 	 * (non-PHPdoc)
@@ -41,119 +41,22 @@ class PropertiesController extends EshopPage
 	 * 
 	 * @throws Exception
 	 */
-	public function getAccounts($sender, $param)
+	public function getProperties($sender, $param)
 	{
 	    $results = $errors = array();
 	    try 
 	    {
-    	    if(!isset($param->CallbackParameter->rootId) || ($rootId = trim($param->CallbackParameter->rootId)) === '')
-    	        throw new Exception('rootId not found!');
+    	    if(!isset($param->CallbackParameter->pagination))
+    	        throw new Exception('Pagination not found!');
     	    
-    		$accounts = $this->_accService->get($rootId)->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc'));
-    		foreach($accounts as $account)
+    	    $pagination = $param->CallbackParameter->pagination;
+    		$properties = $this->_proService->findAll(true, $pagination->pageNumber, $pagination->pageSize);
+    		foreach($properties as $property)
     		{
-    		    if(!$account instanceof AccountEntry)
+    		    if(!$property instanceof Property)
     		        continue;
-    		    $results[] = $this->_jsonAccountEntry($account);
+    		    $results[] = $property->getJsonArray();
     		}
-	    }
-	    catch(Exception $e)
-	    {
-	        $errors[] = $e->getMessage();
-	    }
-	    $param->ResponseData = $this->_getJson($results, $errors);
-	    return $this;
-	}
-	/**
-	 * formatting the account entry for the json
-	 * 
-	 * @param AccountEntry $account The account entry that we are try to format for
-	 * 
-	 * @return multitype:number NULL Ambigous <name, string> Ambigous <value, string> Ambigous <budget, string> Ambigous <comments, string> Ambigous <accountNumber, string>
-	 */
-	private function _jsonAccountEntry(AccountEntry $account)
-	{
-	    $acc = array();
-	    $accountNo = $account->getAccountNumber();
-	    $acc['level'] = ceil((strlen($accountNo) - 1) / 4);
-	    $acc['id'] = $account->getId();
-	    $acc['name'] = $account->getName();
-	    $acc['accountNumber'] = $accountNo;
-	    $acc['value'] = $account->getValue();
-	    $acc['budget'] = $account->getBudget();
-	    $acc['comments'] = $account->getComments();
-	    $acc['sum'] = $account->getSum(true, true);
-	    $acc['gotChildren'] = count($this->_accService->getChildrenAccounts($account)) !== 0;
-	    $parent = $account->getParent();
-	    $acc['parent'] = ($parent instanceof AccountEntry ? $this->_jsonAccountEntry($parent) : array());
-	    return $acc;
-	    
-	}
-	/**
-	 * Event: ajax call to save Account
-	 * 
-	 * @param TCallback          $sender The event sender
-	 * @param TCallbackParameter $param  The event params
-	 * 
-	 * @throws Exception
-	 */
-	public function saveAccount($sender, $param)
-	{
-	    $results = $errors = array();
-	    try 
-	    {
-    	    if(($accountId = trim($param->CallbackParameter->accountId)) === '' && ($parentId = trim($param->CallbackParameter->parentId)) === '')
-    	        throw new Exception('System Error: we need at least one of them: accountId or parentId!');
-    	    if(($accountName = trim($param->CallbackParameter->name)) === '')
-    	        throw new Exception('System Error: we need name for the account!');
-    	    if(!is_numeric(($accountValue = trim($param->CallbackParameter->value))))
-    	        throw new Exception('System Error: it is not numeric for the value!');
-    	    if(!is_numeric(($accountBudget = trim($param->CallbackParameter->budget))))
-    	        throw new Exception('System Error: it is not numeric for the budget!');
-    	    
-    	    $account = new AccountEntry();
-    	    if ($accountId !== '')
-    	        $account = $this->_accService->get($accountId);
-    	    else
-    	    {
-    	        $parent = $this->_accService->get($parentId);
-    	        $account->setParent($parent);
-    	        $account->setRoot($parent->getRoot());
-    	        $accountNumber = $this->_accService->getNextAccountNo($parent);
-    	        $account->setAccountNumber($accountNumber);
-    	    }
-    	    $account->setName($accountName);
-    	    $account->setValue($accountValue);
-    	    $account->setBudget($accountBudget);
-    	    $account->setComments(trim($param->CallbackParameter->comments));
-    	    $this->_accService->save($account);
-    	    $results = $this->_jsonAccountEntry($account);
-	    }
-	    catch(Exception $e)
-	    {
-	        $errors[] = $e->getMessage();
-	    }
-	    $param->ResponseData = $this->_getJson($results, $errors);
-	    return $this;
-	}
-	/**
-	 * Event: ajax call to delete Account
-	 * 
-	 * @param TCallback          $sender The event sender
-	 * @param TCallbackParameter $param  The event params
-	 * 
-	 * @throws Exception
-	 */
-	public function delAccount($sender, $param)
-	{
-	    $results = $errors = array();
-	    try 
-	    {
-    	    if(($accountId = trim($param->CallbackParameter->accountId)) === '' || !( $account = $this->_accService->get($accountId)) instanceof AccountEntry)
-    	        throw new Exception('System Error: Invalid account id provided!');
-    	    $account->setActive(false);
-    	    $this->_accService->save($account);
-    	    $results = $this->_jsonAccountEntry($account);
 	    }
 	    catch(Exception $e)
 	    {

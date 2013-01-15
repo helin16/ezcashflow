@@ -197,6 +197,23 @@ class Property extends BaseEntityAbstract
         $this->assets = $assets;
         return $this;
     }
+    /**
+     * (non-PHPdoc)
+     * @see BaseEntityAbstract::getJsonArray()
+     */
+    public function getJsonArray()
+    {
+        $array = array();
+        $array['id'] = $this->getId();
+        $array['address'] = $this->getAddress()->__toString();
+        $array['boughtValue'] = $this->getBoughtValue();
+        $array['comments'] = $this->getComments();
+        $array['setupAcc'] = $this->getSetupAcc()->getJsonArray(false);
+        $array['incomeAcc'] = $this->getIncomeAcc()->getJsonArray(false);
+        $array['outgoingAcc()'] = $this->getOutgoingAcc()->getJsonArray(false);
+        $array['created'] = $this->getCreated()->__toString();
+        return $array;
+    }
 	/**
 	 * (non-PHPdoc)
 	 * @see BaseEntity::__loadDaoMap()

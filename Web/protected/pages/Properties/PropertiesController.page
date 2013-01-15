@@ -1,23 +1,15 @@
 <com:TContent ID="MainContent">
-    <com:TCallback ID="getAccountsBtn" OnCallback="Page.getAccounts"/>
-    <com:TCallback ID="saveAccountsBtn" OnCallback="Page.saveAccount"/>
-    <com:TCallback ID="delAccountsBtn" OnCallback="Page.delAccount"/>
-    <div class="content-box listheader">
-        <h3 class="box-title">
-            <ul>
-                <li><a onclick="return pageJs.showAccounts(this);" rootId="1" selected>Assets</a></li>
-                <li><a onclick="return pageJs.showAccounts(this);" rootId="2">Liability</a></li>
-                <li><a onclick="return pageJs.showAccounts(this);" rootId="3">Income</a></li>
-                <li><a onclick="return pageJs.showAccounts(this);" rootId="4">Expense</a></li>
-            </ul>
-        </h3>
-        <div class="box-content resultlist">
-            <div id="accountList">
-            </div>
-        </div>
-    </div>
+    <style>
+        .propertyItem {width: 248px; display:inline-block;}
+    </style>
+    <com:TCallback ID="getPropertiesBtn" OnCallback="Page.getProperties"/>
+    <com:TCallback ID="savePropertyBtn" OnCallback="Page.saveProperty"/>
+    <com:TCallback ID="delPropertyBtn" OnCallback="Page.delProperty"/>
+    
+     <div id="propertyList">
+     </div>
     <com:TClientScript>
-        var pageJs = new AccountsJs('accountList', '<%= $this->getAccountsBtn->getUniqueId()%>', '<%= $this->saveAccountsBtn->getUniqueId()%>', '<%= $this->delAccountsBtn->getUniqueId()%>');
-        $$(".content-box.listheader .box-title ul li a[selected]").first().click();
+        var pageJs = new PropertiesJs('propertyList', '<%= $this->getPropertiesBtn->getUniqueID()%>', '<%= $this->savePropertyBtn->getUniqueID()%>', '<%= $this->delPropertyBtn->getUniqueID()%>' );
+        pageJs.loadProperties();
     </com:TClientScript>
 </com:TContent>
