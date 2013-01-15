@@ -22,7 +22,7 @@
             </ul>
         </h3>
         <div class="box-content">
-            <com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" PostJs="pageJs.loadRecentTrans();"/>
+            <com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" PostJs="pageJs.refreshTrans(tmp.result.trans);"/>
         </div>
 	</div>
 	
