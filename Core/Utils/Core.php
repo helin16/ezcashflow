@@ -87,6 +87,18 @@ abstract class Core
 		Core::setUser(self::$_storage['userAccount'], self::$_storage['role']);
 		return self::$_storage;
 	}
+	/**
+	 * getting the JSON string
+	 *
+	 * @param array $data   The result data
+	 * @param array $errors The errors
+	 *
+	 * @return string The json string
+	 */
+	public static function getJson($data = array(), $errors = array())
+	{
+	    return json_encode(array('resultData' => $data, 'errors' => $errors, 'succ' => (count($errors) === 0 ? true : false)));
+	}
 }
 
 ?>

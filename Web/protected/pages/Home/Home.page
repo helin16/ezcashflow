@@ -16,24 +16,19 @@
 	<div class="content-box listheader">
 		<h3 class="box-title">
             <ul>
-                <li><a href="#" selected onclick="return pageJs.selectSummary(this, 'Expense');">Expense</a></li>
-                <li><a href="#" onclick="return pageJs.selectSummary(this,'Income');">Income</a></li>
-                <li><a href="#" onclick="return pageJs.selectSummary(this, 'Transfer');">Transfer</a></li>
+                <li><a href="#" selected onclick="return pageJs.selectSummary(this, [1,2], [4]);">Expense</a></li>
+                <li><a href="#" onclick="return pageJs.selectSummary(this, [3], [1]);">Income</a></li>
+                <li><a href="#" onclick="return pageJs.selectSummary(this, [1,2], [1,2]);">Transfer</a></li>
             </ul>
         </h3>
         <div class="box-content">
-            <div summary='Expense'>
-	            <com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" FromAccountRootIds="1,2"  ToAccountRootIds="4"/>
-	        </div>
-            <div summary='Income' Style="display:none;">
-	            <com:Application.controls.TransactionPanel.TransactionPanel Id="Income" FromAccountRootIds="3" ToAccountRootIds="1" TransType="income"/>
-	        </div>
-            <div summary='Transfer' Style="display:none;">
-	            <com:Application.controls.TransactionPanel.TransactionPanel Id="Transfer" FromAccountRootIds="1,2,3,4" ToAccountRootIds="1,2,3,4"/>
-	        </div>
+            <com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" PostJs="pageJs.loadRecentTrans();"/>
         </div>
 	</div>
+	
+	<com:TCallback ID="getRecentTransBtn" OnCallback="Page.getRecentTrans" />
     <com:TClientScript>
-        var pageJs = new HomeJs();
+        var pageJs = new HomeJs('recentTransList', '<%= $this->getRecentTransBtn->getUniqueID()%>');
+        pageJs.loadRecentTrans();
     </com:TClientScript>
 </com:TContent>

@@ -144,7 +144,7 @@ abstract class EshopPage extends TPage
 	 */
 	protected function _getJson($data = array(), $errors = array())
 	{
-	    return json_encode(array('resultData' => $data, 'errors' => $errors, 'succ' => (count($errors) === 0 ? true : false)));
+	    return Core::getJson($data, $errors);
 	}
 }
 ?>

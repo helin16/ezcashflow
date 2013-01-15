@@ -20,12 +20,17 @@ class Home extends EshopPage
 	        $this->_addRightPanel($this->_loadRightPanel());
 	    }
 	}
+	/**
+	 * Load right panel
+	 * 
+	 * @return string The HTML code in that panel
+	 */
 	private function _loadRightPanel()
 	{
 	    $html = '<div class="box">';
 	        $html .= '<div class="title">Recent Trans</div>';
-    	    $html .= '<div class="content">';
-    	    $html .= $this->_getRecentTrans();
+    	    $html .= '<div class="content" id="recentTransList">';
+        	    $html .= '<img src="/contents/images/loading.gif" style="display:block; with:150px; height:150px;"/>';
     	    $html .= '</div>';
 	    $html .= '</div>';
 	    $html .= '<div class="box">';
@@ -66,29 +71,33 @@ class Home extends EshopPage
         return $html;
 	}
 	/**
-	* (non-PHPdoc)
-	* @see TPanel::renderEndTag()
-	*/
-	private function _getRecentTrans()
+	 * Event: ajax call to get all the RecentTrans
+	 *
+	 * @param TCallback          $sender The event sender
+	 * @param TCallbackParameter $param  The event params
+	 *
+	 * @throws Exception
+	 */
+	public function getRecentTrans($sender, $param)
 	{
-	    $html = '<ul>';
-	    $service = new TransactionService();
-	    $trans = $service->findByCriteria("active = ?", array(1), false, 1, 5, array("id" => "desc"));
-	    foreach($trans as $tran)
+	    $results = $errors = array();
+	    try
 	    {
-	        $fromAcc = $tran->getFrom();
-	        $toAcc = $tran->getTo();
-	        $html .= '<li class="row" transid="' . $tran->getId() . '">';
-	        $html .= "<a href='". $this->_makeURLToReport($fromAcc, $toAcc, $tran->getCreated()) . "'>";
-	        $html .= '<p class="value">$' . $tran->getValue() . '</p>';
-	        $html .= '<p class="from">From: '. (!$fromAcc instanceof AccountEntry ? '' : $fromAcc->getName()) . '</p>';
-	        $html .= '<p class="to">To: '.  $toAcc->getName() . '</p>';
-	        $html .= '<p class="comments">'. $tran->getComments() . '</p>';
-	        $html .= '</a>';
-	        $html .= '</li>';
+	        $service = new TransactionService();
+	        $trans = $service->findByCriteria("active = ?", array(1), false, 1, 5, array("id" => "desc"));
+	        foreach($trans as $tran)
+	        {
+	            $transArray = $tran->getJsonArray();
+	            $transArray['link'] = $this->_makeURLToReport($fromAcc = $tran->getFrom(), $toAcc = $tran->getTo(), $tran->getCreated());
+	            $results[] = $transArray;
+	        }
 	    }
-	    $html .= '</ul>';
-	    return $html;
+	    catch(Exception $e)
+	    {
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = Core::getJson($results, $errors);
+	    return $this;
 	}
 	/**
 	 * getting the href for that transaction
@@ -111,15 +120,6 @@ class Home extends EshopPage
 	    );
 	    $serial = serialize($vars);
 	    return "/reports/$serial";
-	}
-	/**
-	 * reload the page
-	 */
-	public function reload()
-	{
-		$this->Expense->reload();
-		$this->Income->reload();
-		$this->Transfer->reload();
 	}
 }
 ?>

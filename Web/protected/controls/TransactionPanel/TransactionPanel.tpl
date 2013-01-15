@@ -1,39 +1,31 @@
-<com:TPanel ID="TransPanel" DefaultButton="submitBtn" CssClass="TransPanel">
-	<div class="transDiv">
-	   <div class="row">
-	       <com:TActiveLabel Id="errorMsg" ForeColor="red"/>
-	       <com:TActiveLabel Id="infoMsg" ForeColor="green"/>
-	   </div>
-	   <div class="row">
-	       <span class="title">From: <com:TActiveLabel Id="fromAccountsMsg" ForeColor="red"/></span>
-	       <span class="item">
-	           <com:TDropDownList Id="fromAccounts" DataValueField="id" DataTextField="longshot" Attributes.transpane="fromAccounts" Cssclass="chzn-select"/>
-	       </span>
-	   </div>
-	   <div class="row">
-	       <span class="title">To: <com:TActiveLabel Id="toAccountsMsg" ForeColor="red"/></span>
-	       <span class="item">
-	           <com:TDropDownList Id="toAccounts" DataValueField="id" DataTextField="longshot" Attributes.transpane="toAccounts" Cssclass="chzn-select"/>
-	       </span>
-	   </div>
+<com:TPanel ID="TransPanel" CssClass="TransPanel">
+    <div class="transDiv">
+		<div class="row">
+	       <span class="title">From:</span>
+	       <span class="item"><select Id="fromAccounts_<%= $this->getId()%>" transpane="fromAccounts" ></select></span>
+       </div>
+		<div class="row">
+	       <span class="title">To:</span>
+	       <span class="item"><select Id="toAccounts_<%= $this->getId()%>" transpane="toAccounts" ></select></span>
+       </div>
 	   <div class="row">
 	       <span class="title">Value:</span>
-	       <span class="item">
-               $<com:TTextBox Id="transValue" Attributes.transpane="value"/>
-               <com:TActiveLabel Id="valueMsg" ForeColor="red"/>
-	       </span>
+	       <span class="item">$<input type="text" transpane="value" placeholder="0.00"/></span>
 	   </div>
 	   <div class="row">
 	       <span class="title">Description:</span>
-	       <span class="item">
-               <com:TTextBox Id="description" Attributes.transpane="description"/>
-	       </span>
+	       <span class="item"><input type="text" transpane="description" placeholder="comments"/></span>
 	   </div>
 	   <div class="row">
 	       <span class="title"></span>
-	       <span class="item">
-               <com:TButton Id="submitBtn" Text="save" OnClick="save" Attributes.transpane="saveBtn" CssClass="submitBtn"/>
-	       </span>
+	       <span class="item"><input value="save" type="button" transpane="saveBtn" class="submitBtn" onclick="transJs.saveTrans(this, '<%= $this->getPostJs()%>');return false;"/></span>
 	   </div>
-	</div>
+    </div>
 </com:TPanel>
+
+<com:TCallback ID="getAccountsBtn" OnCallback="getAccounts" />
+<com:TCallback ID="saveTrans" OnCallback="saveTrans" />
+<com:TClientScript>
+    var transJs = new TransPaneJs('<%= $this->TransPanel->getClientId()%>', '<%= $this->getAccountsBtn->getUniqueID()%>', '<%= $this->saveTrans->getUniqueID()%>');
+    transJs.buildFrom([1,2], [4]);
+</com:TClientScript>

@@ -14,6 +14,12 @@ div.widthWrapper {
     vertical-align: top;
 }
 
+.errorMsg {
+	margin-left: 18px;
+    color: red;
+    font-size: 12px;
+}
+
 /********************************************************* header div *********************************************************/
 div#header {
     background: -webkit-linear-gradient(top, #122249 0%, #13244E 24%, #192F62 82%,

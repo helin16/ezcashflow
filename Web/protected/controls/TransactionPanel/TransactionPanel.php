@@ -10,35 +10,10 @@
 class TransactionPanel extends TTemplateControl  
 {
     /**
-     * From Account Root Ids, i.e: 1, 2
-     * 
+     * The javascript that will run after saving
      * @var string
      */
-	public $fromAccountRootIds = "";
-    /**
-     * To Account Root Ids, i.e: 1, 2
-     * 
-     * @var string
-     */
-	public $toAccountRootIds = "";
-	/**
-	 * Transaction type: transfer(spend) or income(this is a double entry)
-	 * 
-	 * @var string
-	 */
-	public $transType = '';
-	/**
-	 * Tye Transfer type of transaction
-	 * 
-	 * @var string
-	 */
-	const TransType_Transfer="trans";
-	/**
-	 * Tye Income type of transaction
-	 * 
-	 * @var string
-	 */
-	const TransType_Income="income";
+    private $_postJs;
 	/**
 	 * AccountEntryService
 	 * 
@@ -56,9 +31,29 @@ class TransactionPanel extends TTemplateControl
 	public function __construct()
 	{
 		parent::__construct();
-		$this->transType = TransactionPanel::TransType_Transfer;
 		$this->_transService = new TransactionService();
 		$this->_accountService = new AccountEntryService();
+	}
+	/**
+	 * Getter for the postJs
+	 * 
+	 * @return string The javascript string
+	 */
+	public function getPostJs()
+	{
+	    return $this->postJs;
+	}
+	/**
+	 * Setter for the postJs
+	 * 
+	 * @param string $postJs The post javascript after saving
+	 * 
+	 * @return TransactionPanel
+	 */
+	public function setPostJs($postJs)
+	{
+	    $this->postJs = $postJs;
+	    return $this;
 	}
 	/**
 	 * (non-PHPdoc)
@@ -67,66 +62,117 @@ class TransactionPanel extends TTemplateControl
 	public function onLoad($param)
 	{
 	    $this->getPage()->getClientScript()->registerStyleSheetFile('TransPanelCss', $this->publishAsset(__CLASS__ . '.css'));
-		if(!$this->Page->IsPostBack || $param == "reload")
-		{
-			$this->_loadAccounts($this->fromAccounts,$this->fromAccountRootIds)
-			    ->_loadAccounts($this->toAccounts,$this->toAccountRootIds);
-		}
+	    $this->getPage()->getClientScript()->registerScriptFile('TransPanelJs', $this->publishAsset(__CLASS__ . '.js'));
 	}
 	/**
-	 * getter fromAccountRootIds
+	 * Event: ajax call to get all the accounts
 	 *
-	 * @return fromAccountRootIds
+	 * @param TCallback          $sender The event sender
+	 * @param TCallbackParameter $param  The event params
+	 *
+	 * @throws Exception
 	 */
-	public function getFromAccountRootIds()
+	public function saveTrans($sender, $param)
 	{
-		return $this->fromAccountRootIds;
+	    $results = $errors = array();
+	    try
+	    {
+	        if(!isset($param->CallbackParameter->fromIds) || count($fromIds = $param->CallbackParameter->fromIds) === 0)
+	            throw new Exception('fromIds not found!');
+	        if(!isset($param->CallbackParameter->toIds) || count($toIds = $param->CallbackParameter->toIds) === 0)
+	            throw new Exception('toIds not found!');
+	        if(!isset($param->CallbackParameter->fromAccId) || !($fromAccount = ($this->_accountService->get($param->CallbackParameter->fromAccId))) instanceof AccountEntry)
+	            throw new Exception('fromAccId not found!');
+	        if(!isset($param->CallbackParameter->toAccId) || !($toAccount = ($this->_accountService->get($param->CallbackParameter->toAccId))) instanceof AccountEntry)
+	            throw new Exception('toAccId not found!');
+	        if(!isset($param->CallbackParameter->value) || ($value = trim($param->CallbackParameter->value)) <= 0)
+	            throw new Exception('value not found!');
+	        if(!isset($param->CallbackParameter->comments))
+	            throw new Exception('comments not found!');
+	        $comments = trim($param->CallbackParameter->comments);
+	        $results = $this->_getAccList($fromIds, $toIds);
+	        if($fromAccount->getRoot()->getId() == AccountEntry::TYPE_INCOME)
+    	        $this->_transService->earnMoney($fromAccount, $toAccount, $value, $comments);
+	        else
+	            $this->_transService->transferMoney($fromAccount, $toAccount, $value, $comments);
+// 	        $results['trans'] = $trans->getJsonArray();
+	    }
+	    catch(Exception $e)
+	    {
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = Core::getJson($results, $errors);
+	    return $this;
 	}
 	/**
-	 * setter fromAccountRootIds
+	 * Event: ajax call to get all the accounts
 	 *
-	 * @var fromAccountRootIds
+	 * @param TCallback          $sender The event sender
+	 * @param TCallbackParameter $param  The event params
+	 *
+	 * @throws Exception
 	 */
-	public function setFromAccountRootIds($fromAccountRootIds)
+	public function getAccounts($sender, $param)
 	{
-		$this->fromAccountRootIds = $fromAccountRootIds;
+	    $results = $errors = array();
+	    try
+	    {
+	        if(!isset($param->CallbackParameter->fromIds) || count($fromIds = $param->CallbackParameter->fromIds) === 0)
+	            throw new Exception('fromIds not found!');
+	        if(!isset($param->CallbackParameter->toIds) || count($toIds = $param->CallbackParameter->toIds) === 0)
+	            throw new Exception('toIds not found!');
+	        $results = $this->_getAccList($fromIds, $toIds);
+	    }
+	    catch(Exception $e)
+	    {
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = Core::getJson($results, $errors);
+	    return $this;
 	}
 	/**
-	 * getter toAccountRootIds
-	 *
-	 * @return toAccountRootIds
+	 * Getting the account list
+	 * 
+	 * @param array $fromIds The rootId for the from account
+	 * @param array $toIds   The rootId fro the to account
+	 * 
+	 * @return Ambigous <multitype:multitype: , multitype:>
 	 */
-	public function getToAccountRootIds()
+	private function _getAccList($fromIds, $toIds)
 	{
-		return $this->toAccountRootIds;
+	    $results = array();
+	    $results['from'] = array();
+	    foreach($this->_accountService->findByCriteria('id in (' . implode(', ', $fromIds) . ')') as $root)
+	        $results['from'][$root->getName()] = $this->_getAccountList($root->getId());
+	     
+	    $results['to'] = array();
+	    foreach($this->_accountService->findByCriteria('id in (' . implode(', ', $toIds) . ')') as $root)
+	        $results['to'][$root->getName()] = $this->_getAccountList($root->getId());
+	    return $results;
 	}
 	/**
-	 * setter toAccountRootIds
-	 *
-	 * @var toAccountRootIds
+	 * Getting the acocunt list
+	 * 
+	 * @param int $rootId The root Id
+	 * 
+	 * @return array
 	 */
-	public function setToAccountRootIds($toAccountRootIds)
+	private function _getAccountList($rootId)
 	{
-		$this->toAccountRootIds = $toAccountRootIds;
+	    $accounts = array();
+	    $results = $this->_accountService->findByCriteria('rootId = :rootId and id != :rootId', array('rootId' => $rootId), true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('rootId' => 'asc'));
+	    foreach($results as $account)
+	    {
+	        if(!$account instanceof AccountEntry || count($account->getChildren()) > 0 )
+	            continue;
+	        $accArray = $account->getJsonArray(false);
+	        $accounts[$accArray['breadCrumbs']['name']] = $accArray;
+	    }
+	    krsort($accounts);
+	    $accounts = array_reverse($accounts);
+	    return $accounts;
 	}
-	/**
-	 * getter transType
-	 *
-	 * @return transType
-	 */
-	public function getTransType()
-	{
-		return $this->transType;
-	}
-	/**
-	 * setter transType
-	 *
-	 * @var transType
-	 */
-	public function setTransType($transType)
-	{
-		$this->transType = $transType;
-	}
+	
 	/**
 	 * Loading all the accounts
 	 * 
@@ -155,87 +201,6 @@ class TransactionPanel extends TTemplateControl
 		$array = array_reverse($array);
 		$list->DataSource = $array;
 		$list->DataBind();
-		return $this;
-	}
-	/**
-	 * Event: saving the transaction
-	 * 
-	 * @param TButton $sender The event sender
-	 * @param Mixe    $param  The event params
-	 * 
-	 * @return TransactionPanel 
-	 */
-	public function save($sender, $param)
-	{
-		$msg="";
-		$value = str_replace(",","",trim($this->transValue->Text));
-		if(preg_match("/^(\d{1,3}(\,\d{3})*|(\d+))(\.\d{1,2})?$/", $value))
-		{
-			if($this->transType == TransactionPanel::TransType_Transfer)
-				$this->_transferMoney("transferMoney");
-			else if($this->transType == TransactionPanel::TransType_Income)
-				$this->_transferMoney("earnMoney","Earned Successfully!");
-		}
-		else
-			$msg ="digits only!";
-		$this->valueMsg->Text = $msg;
-		return $this;
-	}
-	/**
-	 * Reloading this panel
-	 * 
-	 * @return TransactionPanel
-	 */
-	public function reload()
-	{
-		$this->_loadAccounts($this->fromAccounts,$this->fromAccountRootIds)
-		    ->_loadAccounts($this->toAccounts,$this->toAccountRootIds);
-		$this->transValue->Text="";
-		$this->description->Text="";
-		return $this;
-	}
-	/**
-	 * Recording the transaction
-	 * 
-	 * @param string $function   The function for the TransactionService
-	 * @param string $successMsg The msg that will be displayed after saving the transaction successfully
-	 * 
-	 * @return TransactionPanel
-	 */
-	private function _transferMoney($function = "transferMoney", $successMsg = "Spend Successfully!")
-	{
-		$this->fromAccountsMsg->Text="";
-		$this->toAccountsMsg->Text="";
-		$this->errorMsg->Text="";
-		$this->infoMsg->Text="";
-		$fromAccountId = $this->fromAccounts->getSelectedValue();
-		$fromAccount = $this->_accountService->get($fromAccountId);
-		if(!$fromAccount instanceof AccountEntry)
-		{
-			$this->fromAccountsMsg->Text ="Invalid from account!";
-			return $this;
-		}
-		$toAccountId = $this->toAccounts->getSelectedValue();
-		$toAccount = $this->_accountService->get($toAccountId);
-		if(!$toAccount instanceof AccountEntry)
-		{
-			$this->toAccountsMsg->Text = "Invalid to account!";
-			return $this;
-		}
-		$value = str_replace(",", "", trim($this->transValue->Text));
-		$description=trim($this->description->Text);
-		try
-		{
-			$trans = $this->_transService->$function($fromAccount, $toAccount, $value, $description);
-		}
-		catch(Exception $ex)
-		{
-			$this->errorMsg->Text= $ex->getMessage();
-			return $this;
-		}
-		$this->Page->reload();
-		$this->infoMsg->Text = $successMsg;
-		$this->fromAccounts->focus();
 		return $this;
 	}
 }
