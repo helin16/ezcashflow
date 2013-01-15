@@ -90,12 +90,16 @@ class TransactionPanel extends TTemplateControl
 	        if(!isset($param->CallbackParameter->comments))
 	            throw new Exception('comments not found!');
 	        $comments = trim($param->CallbackParameter->comments);
-	        $results = $this->_getAccList($fromIds, $toIds);
+	        
 	        if($fromAccount->getRoot()->getId() == AccountEntry::TYPE_INCOME)
-    	        $this->_transService->earnMoney($fromAccount, $toAccount, $value, $comments);
+    	        $transArray = $this->_transService->earnMoney($fromAccount, $toAccount, $value, $comments);
 	        else
-	            $this->_transService->transferMoney($fromAccount, $toAccount, $value, $comments);
-// 	        $results['trans'] = $trans->getJsonArray();
+	            $transArray = array($this->_transService->transferMoney($fromAccount, $toAccount, $value, $comments));
+	        
+	        $results['trans'] = array();
+	        foreach($transArray as $trans)
+	            $results['trans'][] = $trans->getJsonArray();
+	        $results = array_merge($results, $this->_getAccList($fromIds, $toIds));
 	    }
 	    catch(Exception $e)
 	    {
