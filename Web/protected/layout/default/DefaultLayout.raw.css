@@ -212,6 +212,7 @@ div.content-right .box .content ul li a {
     text-decoration: none;
     text-transform: uppercase;
     color: #cccccc;
+    min-height: 30px;
 }
 
 div.content-right .box .content ul li a:hover {
