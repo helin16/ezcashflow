@@ -118,7 +118,7 @@ class Home extends EshopPage
 	                "fromDate" => $fromDate,
 	                "toDate" => $toDate
 	    );
-	    $serial = serialize($vars);
+	    $serial = json_encode($vars);
 	    return "/reports/$serial";
 	}
 }

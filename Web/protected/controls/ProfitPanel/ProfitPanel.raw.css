@@ -1,0 +1,45 @@
+div.profitPanel{
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+div.profitPanel .headerRow{
+	background:#555555;
+	color:#dddddd;
+}
+div.profitPanel .minusCurrency{
+	color: red;
+}
+div.profitPanel .ExpenseRow{
+	background:#cccccc;
+}
+div.profitPanel .headerCol{
+	display: inline-block;
+    width: 40px;
+    font-size:9px;
+}
+div.profitPanel .dayCol,
+div.profitPanel .weekCol,
+div.profitPanel .monthCol,
+div.profitPanel .yearCol,
+div.profitPanel .allCol{
+	display: inline-block;
+	width: 110px;
+	padding: 3px;
+	font-size:13px;
+}
+div.profitPanel .dataCol a,
+div.profitPanel .dataCol a:link {
+	text-decoration: none;
+	color: #555555;
+}
+div.profitPanel .dataCol a:hover{
+	text-decoration: underline;
+}
+div.profitPanel .headerRow .headerCell .headerTitle{
+	display:block;
+}
+div.profitPanel .headerRow .headerCell .headerRange{
+	font-size:9px;
+	display:block;
+}

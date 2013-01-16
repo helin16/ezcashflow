@@ -50,7 +50,7 @@ class ReportsController extends EshopPage
 	{
 		if(!$this->IsPostBack)
 		{
-		    $reportVars = isset($this->Request['reportVars']) ? unserialize($this->Request['reportVars']) : array();
+		    $reportVars = isset($this->Request['reportVars']) ? json_decode($this->Request['reportVars'], true) : array();
 		    $this->seachpage->getControls()->add($this->_getSeachPanel($reportVars));
 		    $this->script->getControls()->add($this->_getJs(count($reportVars) > 0));
 		}

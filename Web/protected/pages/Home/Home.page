@@ -2,23 +2,20 @@
     <div class="content-box listheader">
         <h3 class="box-title">
             <ul>
-                <li><a href="#" selected onclick="return pageJs.selectSummary(this, 'Summary');">Summary</a></li>
-                <li><a href="#" onclick="return pageJs.selectSummary(this,'SummaryInvest');">Summary with Invest</a></li>
-                <li><a href="#" onclick="return pageJs.selectSummary(this, 'Top5');">Over Budget Expenses</a></li>
+                <li><a href="#" selected onclick="return pageJs.selectSummary(this, profitJs.loadInfo('30003', '40002'));" id="summaryBtn">Summary</a></li>
+                <li><a href="#" onclick="return pageJs.selectSummary(this, profitJs.loadInfo());">Summary with Invest</a></li>
             </ul>
         </h3>
         <div class="box-content">
-            <com:Application.controls.ProfitPanel.ProfitPanel Id="Summary" IgnoreInvest="true" Attributes.summary='Summary'/>
-			<com:Application.controls.ProfitPanel.ProfitPanel Id="SummaryInvest" Style="display:none;" Attributes.summary='SummaryInvest'/>
-			<com:Application.controls.TopExpensePane.TopExpensePanel Id="Top5" Style="display:none;" Attributes.summary='Top5'/>
+            <com:Application.controls.ProfitPanel.ProfitPanel Id="Summary"/>
 		</div>
 	</div>	
 	<div class="content-box listheader">
 		<h3 class="box-title">
             <ul>
-                <li><a href="#" selected onclick="return pageJs.selectSummary(this, [1,2], [4]);">Expense</a></li>
-                <li><a href="#" onclick="return pageJs.selectSummary(this, [3], [1]);">Income</a></li>
-                <li><a href="#" onclick="return pageJs.selectSummary(this, [1,2], [1,2]);">Transfer</a></li>
+                <li><a href="#" selected onclick="return pageJs.selectSummary(this, transJs.buildFrom([1,2], [4]));">Expense</a></li>
+                <li><a href="#" onclick="return pageJs.selectSummary(this, transJs.buildFrom([3], [1]));">Income</a></li>
+                <li><a href="#" onclick="return pageJs.selectSummary(this, transJs.buildFrom([1,2], [1,2]));">Transfer</a></li>
             </ul>
         </h3>
         <div class="box-content">

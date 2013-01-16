@@ -1,178 +1,147 @@
 <?php
-
-class ProfitPanel extends TPanel  
+/**
+ * The Lost & Profit Panel
+ * 
+ * @package    Web
+ * @subpackage Controls
+ * @author     lhe<helin16@gmail.com>
+ */
+class ProfitPanel extends TTemplateControl  
 {
-	private $ignoreInvest=false;
-	private $investExpensePos='40002';
-	private $investIncomePos='30003';
-	
-	public function setIgnoreInvest($ignoreInvest)
+    /**
+     * AccountEntryService
+     *
+     * @var AccountEntryService
+     */
+    private $_accountService;
+    /**
+     * TransactionService
+     * 
+     * @var TransactionService
+     */
+    private $_transService;
+    /**
+     * constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->_transService = new TransactionService();
+        $this->_accountService = new AccountEntryService();
+    }
+	/**
+	 * (non-PHPdoc)
+	 * @see TControl::onLoad()
+	 */
+	public function onLoad($param)
 	{
-		$this->ignoreInvest = $ignoreInvest;
+	    $this->getPage()->getClientScript()->registerStyleSheetFile('ProfitPanelCss', $this->publishAsset(__CLASS__ . '.css'));
+	    $this->getPage()->getClientScript()->registerScriptFile('ProfitPanelJs', $this->publishAsset(__CLASS__ . '.js'));
 	}
-	
-	public function getIgnoreInvest($ignoreInvest)
+	/**
+	 * Event: ajax call to get all the RecentTrans
+	 *
+	 * @param TCallback          $sender The event sender
+	 * @param TCallbackParameter $param  The event params
+	 *
+	 * @throws Exception
+	 */
+	public function getInfo($sender, $param)
 	{
-		return $this->ignoreInvest;
+	    $results = $errors = array();
+	    try
+	    {
+	        $excludeIncomePos = trim($param->CallbackParameter->excludeIncomePos);
+	        $excludeExpensePos = trim($param->CallbackParameter->excludeExpensePos);
+	        $results['accIds'] = $this->_getAccIds($excludeIncomePos, $excludeExpensePos);
+	        
+	        // day
+	        $results['day'] = array();
+	        $today = new UDate("now");
+	        $start = $today->getDateTime()->format('Y-m-d 00:00:00');
+	        $today->modify("+1 day");
+	        $end = $today->getDateTime()->format('Y-m-d 00:00:00');
+	        $results['day']['range']['start'] = $start;
+	         $results['day']['range']['end'] = $end;
+	        $results['day']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+	        $results['day']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	        
+	        // week
+	        $results['week'] = array();
+	        $today = new UDate("now");
+	        $weekDay = $today->getDateTime()->format('N');
+	        if($weekDay>=4)
+	            $today->modify("-".($weekDay-4)." day");
+	        else
+	            $today->modify("-".(3+$weekDay)." day");
+	        $start = $today->getDateTime()->format("Y-m-d 00:00:00");
+	        $today->modify("+1 week");
+	        $end = $today->getDateTime()->format("Y-m-d 00:00:00");
+	        $results['week']['range']['start'] = $start;
+	        $results['week']['range']['end'] = $end;
+	        $results['week']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+	        $results['week']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	        
+	        // month
+	        $results['month'] = array();
+	        $today = new UDate("now");
+	        $start = $today->getDateTime()->format("Y-m-01 00:00:00");
+	        $today->modify("+1 month");
+	        $end = $today->getDateTime()->format("Y-m-01 00:00:00");
+	        $results['month']['range']['start'] = $start;
+	        $results['month']['range']['end'] = $end;
+	        $results['month']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+	        $results['month']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	        
+	        // year
+	        $results['year'] = array();
+	        $today = new UDate("now");
+	        $start = $today->getDateTime()->format("Y-01-01 00:00:00");
+	        $today->modify("+1 year");
+	        $end = $today->getDateTime()->format("Y-01-01 00:00:00");
+	        $results['year']['range']['start'] = $start;
+	        $results['year']['range']['end'] = $end;
+	        $results['year']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+	        $results['year']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	        
+	        // all
+	        $results['all'] = array();
+	        $today = new UDate("now");
+	        $start = $today->getDateTime()->format("1791-01-01 00:00:00");
+	        $today->modify("+1 year");
+	        $end = $today->getDateTime()->format("9999-01-01 00:00:00");
+	        $results['all']['range']['start'] = $start;
+	        $results['all']['range']['end'] = $end;
+	        $results['all']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
+	        $results['all']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	    }
+	    catch(Exception $e)
+	    {
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = Core::getJson($results, $errors);
+	    return $this;
 	}
-	
-	public function renderEndTag($writer)
+	/**
+	 * Getting the Incomea and Expense account Ids
+	 * 
+	 * return array
+	 */
+	private function _getAccIds($excludeIncomePos = '', $excludeExpensePos = '')
 	{
-		$html = $this->loadAccounts();
-		$writer->write($html);
-		parent::renderEndTag($writer);
-	}
-	
-	public function loadAccounts()
-	{
-		$excludeIncomePos = ($this->ignoreInvest ? $this->investIncomePos : "");
-		$excludeExpensePos = ($this->ignoreInvest ? $this->investExpensePos : "");
-		$transactionService = new TransactionService();
-		
-		$incomeAccountIds=array();
-		$expenseAccountIds=array();
-		
-		$sql = "select id,rootId from accountentry where active = 1 and rootId in (3,4) ".($this->ignoreInvest ? " and accountNumber not like '{$this->investIncomePos}%' and accountNumber not like '{$this->investExpensePos}%'" : "");
-		foreach(Dao::getResultsNative($sql,array(),PDO::FETCH_ASSOC) as $row)
-		{
-			if($row["rootId"]==3)
-				$incomeAccountIds[] = $row["id"];
-			else if($row["rootId"]==4)
-				$expenseAccountIds[] = $row["id"];
-		}
-		
-		// day
-		$today = new UDate("now");
-		$start = $today->getDateTime()->format('Y-m-d 00:00:00');
-		$today->modify("+1 day");
-		$end = $today->getDateTime()->format('Y-m-d 00:00:00');
-		$day_start = $start;
-		$day_end = $end;
-		$day_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-		$day_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
-		$day_income = (trim($day_income)=="") ? 0 :$day_income;
-		$day_expense = (trim($day_expense)=="") ? 0 :$day_expense;
-		$day_diff=$day_income-$day_expense;
-		
-		// week
-		$today = new UDate("now");
-		$weekDay = $today->getDateTime()->format('N');
-		if($weekDay>=4)
-			$today->modify("-".($weekDay-4)." day");
-		else
-			$today->modify("-".(3+$weekDay)." day");
-		$start = $today->getDateTime()->format("Y-m-d 00:00:00");
-		$today->modify("+1 week");
-		$end = $today->getDateTime()->format("Y-m-d 00:00:00");
-		$week_start = $start;
-		$week_end = $end;
-		$week_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-		$week_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
-		$week_income = (trim($week_income)=="") ? 0 :$week_income;
-		$week_expense = (trim($week_expense)=="") ? 0 :$week_expense;
-		$week_diff=$week_income-$week_expense;
-		
-		// month
-		$today = new UDate("now");
-		$start = $today->getDateTime()->format("Y-m-01 00:00:00");
-		$today->modify("+1 month");
-		$end = $today->getDateTime()->format("Y-m-01 00:00:00");
-		$month_start = $start;
-		$month_end = $end;
-		$month_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-		$month_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
-		$month_income = (trim($month_income)=="") ? 0 :$month_income;
-		$month_expense = (trim($month_expense)=="") ? 0 :$month_expense;
-		$month_diff=$month_income-$month_expense;
-		
-		// year
-		$today = new UDate("now");
-		$start = $today->getDateTime()->format("Y-01-01 00:00:00");
-		$today->modify("+1 year");
-		$end = $today->getDateTime()->format("Y-01-01 00:00:00");
-		$year_start = $start;
-		$year_end = $end;
-		$year_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-		$year_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
-		$year_income = (trim($year_income)=="") ? 0 :$year_income;
-		$year_expense = (trim($year_expense)=="") ? 0 :$year_expense;
-		$year_diff=$year_income-$year_expense;
-		
-		// all
-		$today = new UDate("now");
-		$start = $today->getDateTime()->format("1791-01-01 00:00:00");
-		$today->modify("+1 year");
-		$end = $today->getDateTime()->format("9999-01-01 00:00:00");
-		$all_start = $start;
-		$all_end = $end;
-		$all_income = $transactionService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-		$all_expense = $transactionService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
-		$all_income = (trim($all_income)=="") ? 0 :$all_income;
-		$all_expense = (trim($all_expense)=="") ? 0 :$all_expense;
-		$all_diff=$all_income-$all_expense;
-		
-		$html="<table>";
-			$html.="<tr style='background:#555555;color:#dddddd;'>";
-				$html .="<td  width='60px'>&nbsp;</td>";
-				$html .="<td width='100px'>
-							Day<br />
-							<i style='font-size:9px'>$day_start ~ <br />$day_end </i>
-						</td>";
-				$html .="<td width='100px'>
-							Week<br />
-							<i style='font-size:9px'>$week_start ~ <br />$week_end </i>
-						</td>";
-				$html .="<td width='100px'>
-							Month<br />
-							<i style='font-size:9px'>$month_start ~ <br />$month_end </i>
-						</td>";
-				$html .="<td width='100px'>
-							Year<br />
-							<i style='font-size:9px'>$year_start ~ <br />$year_end </i>
-						</td>";
-				$html .="<td width='100px'>
-							All<br />
-							<i style='font-size:9px'>$all_start ~ <br />$all_end </i>
-						</td>";
-			$html.="</tr>";
-			$html.="<tr>";
-				$html .="<td>Income</td>";
-				$html .="<td>".$this->makeURLToReport("\$$day_income",array(),$incomeAccountIds,$day_start,$day_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("\$$week_income",array(),$incomeAccountIds,$week_start,$week_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("\$$month_income",array(),$incomeAccountIds,$month_start,$month_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("\$$year_income",array(),$incomeAccountIds,$year_start,$year_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("\$$all_income",array(),$incomeAccountIds,$all_start,$all_end)."</td>";
-			$html.="</tr>";
-			$html.="<tr style='background:#cccccc;'>";
-				$html .="<td>Expense</td>";
-				$html .="<td>".$this->makeURLToReport("\$$day_expense",array(),$expenseAccountIds,$day_start,$day_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("\$$week_expense",array(),$expenseAccountIds,$week_start,$week_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("\$$month_expense",array(),$expenseAccountIds,$month_start,$month_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("\$$year_expense",array(),$expenseAccountIds,$year_start,$year_end)."</td>";
-				$html .="<td>".$this->makeURLToReport("\$$all_expense",array(),$expenseAccountIds,$all_start,$all_end)."</td>";
-			$html.="</tr>";
-			$html.="<tr style='font-weight:bold;'>";
-				$html .="<td>Diff</td>";
-				$html .="<td>$ $day_diff</td>";
-				$html .="<td>$ $week_diff</td>";
-				$html .="<td>$ $month_diff</td>";
-				$html .="<td>$ $year_diff</td>";
-				$html .="<td>$ $all_diff</td>";
-			$html.="</tr>";
-		$html.="</table>";
-		return $html;
-	}
-	
-	public function makeURLToReport($value,$fromAccountIds,$toAccountIds,$fromDate,$toDate)
-	{
-		$vars = array(
-					"fromAccountIds"=>$fromAccountIds,
-					"toAccountIds"=>$toAccountIds,
-					"fromDate"=>$fromDate,
-					"toDate"=>$toDate
-				);
-		$serial = serialize($vars);
-		return "<a href='/reports/$serial'> $value</a>";
+	    $accountIds = array();
+	    $sql = "select id, rootId 
+	    	from accountentry 
+	    	where active = 1 and rootId in (" . AccountEntry::TYPE_INCOME . ", " . AccountEntry::TYPE_EXPENSE . ") " 
+	        . (($excludeIncomePos !== '') ? " and accountNumber not like '{$excludeIncomePos}%'" : "")
+	        . (($excludeExpensePos !== '') ? " and accountNumber not like '{$excludeExpensePos}%'" : "");
+	    foreach(Dao::getResultsNative($sql) as $row)
+        {
+            if(!isset($accountIds[$row["rootId"]]))
+                $accountIds[$row["rootId"]] = array();
+            $accountIds[$row["rootId"]][] = $row["id"];
+        }
+        return $accountIds;
 	}
 }
 

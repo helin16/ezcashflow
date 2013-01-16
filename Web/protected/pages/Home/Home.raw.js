@@ -14,14 +14,14 @@ HomeJs.prototype = {
 	/**
 	 * click event for the table in the .box-title
 	 */
-	selectSummary: function (btn, fromAccountIds, toAccountIds) {
+	selectSummary: function (btn, postScript) {
         var tmp = {};
         tmp.clickedBtn = $(btn);
         tmp.clickedBtn.up('ul').getElementsBySelector('li').each(function(item){
             item.down('a').removeAttribute('selected');
         });
         tmp.clickedBtn.writeAttribute('selected');
-        transJs.buildFrom(fromAccountIds, toAccountIds);
+        eval(postScript);
         return false;
     },
     /**
@@ -48,6 +48,7 @@ HomeJs.prototype = {
 	//refereshing transaction list with the new results
 	refreshTrans: function(data) {
 		var tmp = {};
+		$('summaryBtn').click();
 		tmp.ul = $(this.recentTrans.holder).down('ul');
 		data.each(function(trans){
 			tmp.lastLi = tmp.ul.getElementsBySelector('li').last();
