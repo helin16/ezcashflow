@@ -21,6 +21,12 @@ class AssetType extends BaseEntityAbstract
      */
     const ID_REPORT = 2;
     /**
+     * ID of the type for doc
+     * 
+     * @var string
+     */
+    const ID_DOC = 3;
+    /**
      * @var string
      */
     private $type;

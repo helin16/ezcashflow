@@ -207,6 +207,29 @@ class TransactionPanel extends TTemplateControl
 		$list->DataBind();
 		return $this;
 	}
+	/**
+	 * File upload handler
+	 * 
+	 * @param TFileUploader $sender The file uploader
+	 * @param Mixed         $param  The parameters
+	 */
+	public function fileUploaded($sender, $param)
+	{
+	    if($sender->HasFile)
+	    {
+	        $this->Result->Text = "
+	        You just uploaded a file:
+	        <br/>
+	        Name: {$sender->FileName}
+	        <br/>
+	        Size: {$sender->FileSize}
+	        <br/>
+	        Type: {$sender->FileType}";
+	    }
+	    else {
+	        $this->Result->Text= $sender->ErrorCode;
+	    }
+	}
 }
 
 ?>
