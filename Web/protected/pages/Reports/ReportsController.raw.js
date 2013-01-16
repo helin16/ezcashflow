@@ -96,7 +96,7 @@ ReportJs.prototype = {
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'fromacc'}).update('From: ' + (trans.fromAcc.name === undefined ? '' : trans.fromAcc.breadCrumbs.name))});
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'created'}).update(trans.created)});
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'toacc'}).update('To&nbsp;&nbsp;&nbsp;&nbsp;: ' + trans.toAcc.breadCrumbs.name)});
-		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'value'}).update(appJs.getCurrency(data))});
+		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'value'}).update(appJs.getCurrency(trans.value))});
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'comments'}).update(trans.comments)});
 		tmp.newRow.insert({'bottom': tmp.newRowContent});
 		
