@@ -40,8 +40,8 @@ PropertiesJs.prototype = {
 	    		}
 	    		$(tmp.resultDivId).update('');
 	    		for(tmp.i = 0; tmp.i < tmp.count; tmp.i++) {
-	    			tmp.newRow = pageJs.formatProperty(tmp.result[tmp.i]);
-	    			$(tmp.resultDivId).insert({'bottom': tmp.newRow});
+	    			tmp.newProperty = pageJs.formatProperty(tmp.result[tmp.i]);
+	    			$(tmp.resultDivId).insert({'bottom': tmp.newProperty});
 	    		}
 	    	}
     	});
@@ -49,12 +49,42 @@ PropertiesJs.prototype = {
 	//getting the html for the property
 	formatProperty: function(data) {
 		var tmp = {};
-		tmp.html = '<div class="content-box propertyItem">';
-			tmp.html += '<h3 class="box-title">' + data.address.substr(0,20)  + ' ... </h3>';
-			tmp.html += '<div class="box-content">';
-			tmp.html += 'test';
-			tmp.html += '</div>';
-		tmp.html += '</div>';
-		return tmp.html;
+		console.debug(data);
+		tmp.wrapper = new Element('div', {'class': "content-box propertyItem", 'title': data.address.full});
+		tmp.titleDiv = new Element('h3', {'class': "box-title"}).update(data.address.full.substr(0,30));
+		tmp.wrapper.insert({'bottom': tmp.titleDiv});
+		tmp.contentDiv = new Element('div', {'class': "box-content"});
+		tmp.wrapper.insert({'bottom': tmp.contentDiv});
+		
+		//add value
+		tmp.boughtValueDiv = new Element('span', {'class': "boughtvalue"}).update(appJs.getCurrency(data.boughtValue)); 
+		tmp.contentDiv.insert({'bottom': tmp.boughtValueDiv});
+//		//add address
+//		tmp.addressDiv = new Element('span', {'class': "address"}).update(); 
+//		tmp.contentDiv.insert({'bottom': tmp.addressDiv});
+		//add comments
+		tmp.commentsDiv = new Element('span', {'class': "comments"}).update(data.comments); 
+		tmp.contentDiv.insert({'bottom': tmp.commentsDiv});
+		//add add Setup Acc
+		if(data.setupAcc.breadCrumbs !== undefined) {
+			tmp.setupAccDiv = new Element('span', {'class': "setupAcc"}).update(data.setupAcc.breadCrumbs.name); 
+			tmp.contentDiv.insert({'bottom': tmp.setupAccDiv});
+		}
+		//add add Income Acc
+		if(data.incomeAcc.breadCrumbs !== undefined) {
+			tmp.incomeAccDiv = new Element('span', {'class': "incomeAcc"}).update(data.incomeAcc.breadCrumbs.name); 
+			tmp.contentDiv.insert({'bottom': tmp.incomeAccDiv});
+		}
+		//add add outgoingAcc
+		if(data.outgoingAcc.breadCrumbs !== undefined) {
+			tmp.outgoingAccDiv = new Element('span', {'class': "outgoingAcc"}).update(data.outgoingAcc.breadCrumbs.name); 
+			tmp.contentDiv.insert({'bottom': tmp.outgoingAccDiv});
+		}
+		
+		return tmp.wrapper;
+	},
+	//show add/edit property panel
+	showPropertyPanel: function(property) {
+		var tmp = {};
 	}
 };

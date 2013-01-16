@@ -1,13 +1,11 @@
 <com:TContent ID="MainContent">
-    <style>
-        .propertyItem {width: 248px; display:inline-block;}
-    </style>
     <com:TCallback ID="getPropertiesBtn" OnCallback="Page.getProperties"/>
     <com:TCallback ID="savePropertyBtn" OnCallback="Page.saveProperty"/>
     <com:TCallback ID="delPropertyBtn" OnCallback="Page.delProperty"/>
-    
-     <div id="propertyList">
-     </div>
+    <div id="controlDiv">
+        <input type="button" value=" + Create" class="submitBtn"/>
+    </div>
+    <div id="propertyList"></div>
     <com:TClientScript>
         var pageJs = new PropertiesJs('propertyList', '<%= $this->getPropertiesBtn->getUniqueID()%>', '<%= $this->savePropertyBtn->getUniqueID()%>', '<%= $this->delPropertyBtn->getUniqueID()%>' );
         pageJs.loadProperties();
