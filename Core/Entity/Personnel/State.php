@@ -76,6 +76,18 @@ class State extends BaseEntityAbstract
 	}
 	/**
 	 * (non-PHPdoc)
+	 * @see BaseEntityAbstract::getJsonArray()
+	 */
+	public function getJsonArray()
+	{
+	    $state = array();
+	    $state['id'] = $this->getId();
+	    $state['name'] = $this->getName();
+	    $state['country'] = $this->getCountry()->getJsonArray();
+	    return $state;
+	}
+	/**
+	 * (non-PHPdoc)
 	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()

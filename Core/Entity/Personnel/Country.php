@@ -74,6 +74,17 @@ class Country extends BaseEntityAbstract
 	}
 	/**
 	 * (non-PHPdoc)
+	 * @see BaseEntityAbstract::getJsonArray()
+	 */
+	public function getJsonArray()
+	{
+	    $country = array();
+	    $country['id'] = $this->getId();
+	    $country['name'] = $this->getName();
+	    return $country;
+	}
+	/**
+	 * (non-PHPdoc)
 	 * @see BaseEntity::__loadDaoMap()
 	 */
 	public function __loadDaoMap()

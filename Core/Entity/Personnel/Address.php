@@ -143,6 +143,22 @@ class Address extends BaseEntityAbstract
 	}
 	/**
 	 * (non-PHPdoc)
+	 * @see BaseEntityAbstract::getJsonArray()
+	 */
+	public function getJsonArray()
+	{
+	    $addr = array();
+	    $addr['id'] = $this->getId();
+	    $addr['line1'] = $this->getLine1();
+	    $addr['line2'] = $this->getLine2();
+	    $addr['suburb'] = $this->getSuburb();
+	    $addr['postcode'] = $this->getPostCode();
+	    $addr['state'] = $this->getState()->getJsonArray();
+	    $addr['full'] = $this->__toString();
+	    return $addr;
+	}
+	/**
+	 * (non-PHPdoc)
 	 * @see BaseEntity::__toString()
 	 */
 	public function __toString()
