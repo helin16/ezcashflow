@@ -41,15 +41,16 @@ AppJs.prototype = {
 		return tmp.result.resultData;
 	},
 	//format the currency
-	getCurrency: function(number, decimal, decimalPoint, thousandPoint) {
+	getCurrency: function(number, dollar, decimal, decimalPoint, thousandPoint) {
 		var tmp = {};
 		tmp.decimal = (isNaN(decimal = Math.abs(decimal)) ? 2 : decimal);
+		tmp.dollar = (dollar == undefined ? "$" : dollar);
 		tmp.decimalPoint = (decimalPoint == undefined ? "." : decimalPoint);
 		tmp.thousandPoint = (thousandPoint == undefined ? "," : thousandPoint);
 		tmp.sign = (number < 0 ? "-" : "");
 		tmp.Int = parseInt(number = Math.abs(+number || 0).toFixed(tmp.decimal)) + "";
 		tmp.j = (tmp.j = tmp.Int.length) > 3 ? tmp.j % 3 : 0;
-		return tmp.sign + (tmp.j ? tmp.Int.substr(0, tmp.j) + tmp.thousandPoint : "") + tmp.Int.substr(tmp.j).replace(/(\d{3})(?=\d)/g, "$1" + tmp.thousandPoint) + (tmp.decimal ? tmp.decimalPoint + Math.abs(number - tmp.Int).toFixed(tmp.decimal).slice(2) : "");
+		return tmp.dollar + tmp.sign + (tmp.j ? tmp.Int.substr(0, tmp.j) + tmp.thousandPoint : "") + tmp.Int.substr(tmp.j).replace(/(\d{3})(?=\d)/g, "$1" + tmp.thousandPoint) + (tmp.decimal ? tmp.decimalPoint + Math.abs(number - tmp.Int).toFixed(tmp.decimal).slice(2) : "");
 	 }
 };
 var appJs = new AppJs();

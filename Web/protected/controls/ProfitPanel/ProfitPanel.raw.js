@@ -91,9 +91,9 @@ ProfitPanel.prototype = {
 	//format the cell for the income, expense and diff
 	formatCell: function(title, dateTitle, data, href) {
 		var tmp = {};
-		tmp.cellData = '$' + appJs.getCurrency(data);
+		tmp.cellData = appJs.getCurrency(data);
 		if(href !== undefined)
-			tmp.cellData = new Element('a', {'href': href}).update('$' + appJs.getCurrency(data));
+			tmp.cellData = new Element('a', {'href': href}).update(appJs.getCurrency(data));
 		tmp.cell = new Element('span', {'class': dateTitle + 'Col dataCol' + (data < 0 ? ' minusCurrency' : ''), 'value': data}).update(tmp.cellData);
 		tmp.cell.writeAttribute(title.toLowerCase(), dateTitle);
 		return tmp.cell;

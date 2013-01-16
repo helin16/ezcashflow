@@ -64,7 +64,7 @@ HomeJs.prototype = {
 		var tmp = {};
 		tmp.li = new Element('li', {'class': "row", 'transid': trans.id});
 		tmp.href = new Element('a', {'href': trans.link});
-		tmp.href.insert({'bottom': new Element('p', {'class': 'value'}).update(trans.value)});
+		tmp.href.insert({'bottom': new Element('p', {'class': 'value'}).update(appJs.getCurrency(trans.value))});
 		tmp.href.insert({'bottom': new Element('p', {'class': 'from'}).update(trans.fromAcc.name === undefined ? '': trans.fromAcc.name)});
 		tmp.href.insert({'bottom': new Element('p', {'class': 'to'}).update(trans.toAcc.name === undefined ? '': trans.toAcc.name)});
 		tmp.href.insert({'bottom': new Element('p', {'class': 'comments'}).update(trans.comments)});
