@@ -6,7 +6,7 @@
  * @subpackage Controller
  * @author     lhe<helin16@gmail.com>
  */
-class ReportsController extends EshopPage 
+class ReportsController extends PageAbstract 
 {
     /**
      * Account service

@@ -1,9 +1,12 @@
 <?php
 /**
- * The Generic page
- * @author lhe
+ * The Page Abstract
+ * 
+ * @package    Web
+ * @subpackage Class
+ * @author     lhe<helin16@gmail.com>
  */
-abstract class EshopPage extends TPage 
+abstract class PageAbstract extends TPage 
 {
     /**
      * The selected Menu Item name
@@ -34,7 +37,7 @@ abstract class EshopPage extends TPage
 	 * 
 	 * @param mixed $newControls The new control
 	 * 
-	 * @return EshopPage
+	 * @return PageAbstract
 	 */
 	protected function _addRightPanel($newControls)
 	{
@@ -113,7 +116,7 @@ abstract class EshopPage extends TPage
 	 * 
 	 * @param string $msg The new information message
 	 * 
-	 * @return EshopPage
+	 * @return PageAbstract
 	 */
 	public function setInfoMsg($msg)
 	{
@@ -126,7 +129,7 @@ abstract class EshopPage extends TPage
      * 
 	 * @param string $msg The new error message
 	 * 
-	 * @return EshopPage
+	 * @return PageAbstract
      */	
 	public function setErrorMsg($msg)
 	{

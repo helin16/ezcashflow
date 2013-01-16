@@ -6,7 +6,7 @@
  * @subpackage Controller
  * @author     lhe<helin16@gmail.com>
  */
-class PropertiesController extends EshopPage 
+class PropertiesController extends PageAbstract 
 {
     /**
      * Property service

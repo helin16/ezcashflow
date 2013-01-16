@@ -1,5 +1,5 @@
 <?php
-class StaticsController extends EshopPage 
+class StaticsController extends PageAbstract 
 {
 	public $onePercentageWidth=0.1;
 	

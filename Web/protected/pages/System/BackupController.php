@@ -6,7 +6,7 @@
  * @subpackage Controller
  * @author     lhe<helin16@gmail.com>
  */
-class BackupController extends EshopPage  
+class BackupController extends PageAbstract  
 {
     /**
      * which command to mysql store

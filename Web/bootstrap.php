@@ -12,7 +12,7 @@ class Web
 		$autoloadPaths = array(
 			dirname(__FILE__) . '/protected/',
 			dirname(__FILE__) . '/protected/classes/',
-			dirname(__FILE__) . '/protected/classes/EshopPage/',
+			dirname(__FILE__) . '/protected/classes/PageAbstract/',
 			dirname(__FILE__) . '/protected/pages/ContentLoader/'
 				);
 		

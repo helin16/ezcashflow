@@ -6,11 +6,11 @@
  * @subpackage Controller
  * @author     lhe<helin16@gmail.com>
  */
-class Home extends EshopPage 
+class Home extends PageAbstract 
 {
     /**
      * (non-PHPdoc)
-     * @see EshopPage::onLoad()
+     * @see PageAbstract::onLoad()
      */
 	public function onLoad($param) 
 	{
