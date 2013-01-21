@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<application id="KangTianProperty" mode="Debug">
+<application id="EzCashFlow" mode="Debug">
   <!-- alias definitions and namespace usings
   <paths>
     <alias id="myalias" path="./lib" />
@@ -43,7 +43,7 @@
 	<services>
 		<service id="page" class="TPageService" DefaultPage="Home.Home">
 			<modules>
-			  <module id="auth" class="System.Security.TAuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.LoginController" AuthExpire="3600"/>
+			  <module id="auth" class="Application.classes.WebUser.AuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.LoginController" AuthExpire="3600"/>
 			  <module id="users" class="Application.classes.WebUser.WebUserManager"/>
 			</modules>
 		</service>
