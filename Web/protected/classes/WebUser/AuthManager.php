@@ -34,6 +34,12 @@ class AuthManager extends TAuthManager
 	        exit;
 	    }
         parent::onAuthorize($param);
+        $u = Core::getUser();
+        if ($u instanceof UserAccount)
+        {
+            $r = Core::getRole();
+            Core::setUser($u, $r);
+        }
 	}
 }
 ?>
