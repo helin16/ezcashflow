@@ -15,6 +15,7 @@
 
 	<!-- configurations for modules -->
 	<modules>
+	    <module id="Session" class="Application.classes.Session.SessionDb" UseCustomStorage="true"/>
 		<module id="security" class="TSecurityManager" EncryptionKey="EasyCashFlowCool" ValidationKey="EasyCashFlowCool" />
 		<module id="request" class="THttpRequest" UrlManager="friendly-url" />
 		<module id="friendly-url" class="System.Web.TUrlMapping" EnableCustomUrl="true" UrlPrefix="/">	

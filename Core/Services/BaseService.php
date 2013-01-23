@@ -86,6 +86,30 @@ abstract class BaseService
 		return $temp;
 	}
 	/**
+	 * Getting the total count for the search criteria
+	 *
+	 * @param string $where  The where clause
+	 * @param array  $params The parameters
+	 *
+	 * @return int
+	 */
+	public function countByCriteria($where, $params)
+	{
+	    return $this->entityDao->countByCriteria($where, $params);
+	}
+	/**
+	 * Updating a table for the search criteria
+	 *
+	 * @param string $criteria The where clause
+	 * @param array  $params   The parameters
+	 *
+	 * @return int
+	 */
+	public function updateByCriteria($setClause, $criteria, $params)
+	{
+	    return $this->entityDao->updateByCriteria($setClause, $criteria, $params);
+	}
+	/**
 	 * returning the pagination stats
 	 *
 	 * @return array

@@ -205,5 +205,42 @@ class EntityDao
 		$this->_query = clone $this->_tmpQuery;
 		return $this;
 	}
+	/**
+	 * Updating a table for the search criteria
+	 *
+	 * @param string $setClause The set clause
+	 * @param string $criteria  The where clause
+	 * @param array  $params    The parameters
+	 *
+	 * @return int
+	 */
+	public function updateByCriteria($setClause, $criteria, $params = array())
+	{
+	    return Dao::updateByCriteria($this->_query, $setClause, $criteria, $params);
+	}
+	/**
+	 * Getting the total count for the search criteria
+	 *
+	 * @param string   $criteria The where clause
+	 * @param array    $params   The parameters
+	 *
+	 * @return int
+	 */
+	public function countByCriteria($criteria, $params = array())
+	{
+	    return Dao::countByCriteria($this->_query, $setClause, $criteria, $params);
+	}
+	/**
+	 * delete a table for the search criteria
+	 *
+	 * @param string   $criteria The where clause
+	 * @param array    $params   The parameters
+	 *
+	 * @return int
+	 */
+	public function deleteByCriteria($criteria, $params = array())
+	{
+	    return Dao::deleteByCriteria($this->_query, $criteria, $params);
+	}
 }
 ?>

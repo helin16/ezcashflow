@@ -527,6 +527,34 @@ abstract class Dao
         $results = self::_getResults($qry, $sql, $params, self::AS_ARRAY);
         return (isset($results[0]) && isset($results[0][0])) ? $results[0][0] : 0;
     }
+    /**
+     * Updating a table for the search criteria
+     * 
+     * @param DaoQuery $qry      The dao query
+     * @param string   $criteria The where clause
+     * @param array    $params   The parameters
+     * 
+     * @return int
+     */
+    public static function updateByCriteria(DaoQuery $qry, $setClause, $criteria, $params = array())
+    {
+        self::connect();
+        return Dao::_execSql('update ' . strtolower($qry->getFocusClass()) . ' set ' . $setClause . ' where ' . $criteria, $params);
+    }
+    /**
+     * delete a table for the search criteria
+     * 
+     * @param DaoQuery $qry      The dao query
+     * @param string   $criteria The where clause
+     * @param array    $params   The parameters
+     * 
+     * @return int
+     */
+    public static function deleteByCriteria(DaoQuery $qry, $criteria, $params = array())
+    {
+        self::connect();
+        return Dao::_execSql('delete from ' . strtolower($qry->getFocusClass()) . ' where (' . $criteria . ')', $params);
+    }
 }
 
 ?>
