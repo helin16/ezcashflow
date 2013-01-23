@@ -81,7 +81,13 @@ TransPaneJs.prototype = {
     			tmp.saveBtn.disabled = true;
     		},
 	    	'onComplete': function(sender, param){
-	    		tmp.result = appJs.getResp(param);
+	    		try{
+	    			tmp.result = appJs.getResp(param, false, true);
+	    		} catch(e) {
+	    			tmp.saveBtn.value = tmp.saveBtnValue;
+		    		tmp.saveBtn.disabled = false;
+	    			return;
+	    		}
 	    		transJs.getAccList(tmp.result.from, tmp.fromAccListBox);
 	    		transJs.getAccList(tmp.result.to, tmp.toAccListBox);
 	    		tmp.commentsBox.value = tmp.valueBox.value = '';
@@ -113,7 +119,7 @@ TransPaneJs.prototype = {
 		
 		tmp.regex = /^(\d{1,3}(\,\d{3})*|(\d+))(\.\d{1,2})?$/;
 		if(!$F(valueBox).strip().match(tmp.regex)) {
-			$(valueBox).insert({"after": new Element("span", {'class': "errorMsg"}).update('Invalid Value')});
+			$(valueBox).up("div.row").down('span.title').insert({"bottom": new Element("span", {'class': "errorMsg"}).update('Invalid Value')});
 			tmp.succ = false;
 		}
 		return tmp.succ;

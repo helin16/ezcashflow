@@ -5,6 +5,9 @@
 .TransPanel .transDiv .row {
     padding: 4px 0 0 0; 
 }
+.TransPanel .transDiv .row.inline {
+    display: inline-block;
+}
 .TransPanel .transDiv [transpane=fromAccounts],
 .TransPanel .transDiv [transpane=toAccounts] {
     width: 100%;
@@ -13,17 +16,23 @@
     border: 1px #cccccc solid;
     border-radius: 4px;
 }
+.TransPanel .transDiv .row.inline.value{
+    width: 160px;
+}
 .TransPanel .transDiv [transpane=value] {
     font-size: 16px;
     padding: 4px;
-    display: inline-block;
     border: 1px #cccccc solid;
     border-radius: 4px;
+    width: 90%;
+}
+.TransPanel .transDiv .row.inline.description {
+    width: 460px;
 }
 .TransPanel .transDiv [transpane=description] {
     font-size: 16px;
     padding: 4px;
-    width: 90%;
+    width: 98%;
     border: 1px #cccccc solid;
     border-radius: 4px;
 }

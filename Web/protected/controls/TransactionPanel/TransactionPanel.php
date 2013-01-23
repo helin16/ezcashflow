@@ -87,9 +87,7 @@ class TransactionPanel extends TTemplateControl
 	            throw new Exception('toAccId not found!');
 	        if(!isset($param->CallbackParameter->value) || ($value = trim($param->CallbackParameter->value)) <= 0)
 	            throw new Exception('value not found!');
-	        if(!isset($param->CallbackParameter->comments))
-	            throw new Exception('comments not found!');
-	        $comments = trim($param->CallbackParameter->comments);
+	        $comments = !isset($param->CallbackParameter->comments) ? '' : trim($param->CallbackParameter->comments);
 	        
 	        if($fromAccount->getRoot()->getId() == AccountEntry::TYPE_INCOME)
     	        $transArray = $this->_transService->earnMoney($fromAccount, $toAccount, $value, $comments);

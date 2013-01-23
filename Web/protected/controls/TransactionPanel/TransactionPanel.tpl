@@ -8,11 +8,11 @@
 	       <span class="title">To:</span>
 	       <span class="item"><select Id="toAccounts_<%= $this->getId()%>" transpane="toAccounts" ></select></span>
        </div>
-	   <div class="row">
-	       <span class="title">Value:</span>
-	       <span class="item">$<input type="text" transpane="value" placeholder="0.00"/></span>
+	   <div class="row inline value">
+	       <span class="title">Value($):</span>
+	       <span class="item"><input type="text" transpane="value" placeholder="0.00"/></span>
 	   </div>
-	   <div class="row">
+	   <div class="row inline description">
 	       <span class="title">Description:</span>
 	       <span class="item"><input type="text" transpane="description" placeholder="comments"/></span>
 	   </div>
