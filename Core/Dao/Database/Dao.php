@@ -555,6 +555,55 @@ abstract class Dao
         self::connect();
         return Dao::_execSql('delete from ' . strtolower($qry->getFocusClass()) . ' where (' . $criteria . ')', $params);
     }
+    /**
+     * Add a join table record for many to many relationship
+     *
+     * @param DaoQuery $qry         The dao query
+     * @param string   $rightEntity The other entity
+     * @param int      $leftId      The id of the left side entity
+     * @param int      $rightId     The id of the right side entity
+     *
+     * @return int
+     */
+    public static function saveManyToManyJoin(DaoQuery $qry, $rightClass, $leftId, $rightId)
+    {
+        if(self::existsManyToManyJoin($qry, $rightClass, $leftId, $rightId) === true)
+            return 0;
+        return Dao::_execSql($qry->generateInsertForMTM($rightClass), array($leftId, $rightId, Core::getUser()->getId()));
+    }
+    /**
+     * Remove a join table record for many to many relationship
+     *
+     * @param DaoQuery $qry         The dao query
+     * @param string   $rightEntity The other entity
+     * @param int      $leftId      The id of the left side entity
+     * @param int      $rightId     The id of the right side entity
+     * 
+     * @return int
+     */
+    public static function deleteManyToManyJoin(DaoQuery $qry, $rightClass, $leftId, $rightId)
+    {
+        $leftClass = $qry->getFocusClass();
+        $qry->where(strtolower(substr($leftClass, 0, 1)) . substr($leftClass, 1) . 'Id = ? and ' . strtolower(substr($rightClass, 0, 1)) . substr($rightClass, 1) . 'Id = ?');
+        return Dao::_execSql($qry->generateDeleteForMTM($rightClass), array($leftId, $rightId));
+    }
+    /**
+     * finds if a join table record for many to many relationship exists
+     *
+     * @param DaoQuery $qry         The dao query
+     * @param string   $rightEntity The other entity
+     * @param int      $leftId      The id of the left side entity
+     * @param int      $rightId     The id of the right side entity
+     * 
+     * @return bool
+     */
+    public static function existsManyToManyJoin(DaoQuery $qry, $rightClass, $leftId, $rightId)
+    {
+        $leftClass = $qry->getFocusClass();
+        $qry->where(strtolower(substr($leftClass, 0, 1)) . substr($leftClass, 1) . 'Id = ? and ' . strtolower(substr($rightClass, 0, 1)) . substr($rightClass, 1) . 'Id = ?');
+        $results = self::_getResults($qry, $qry->generateSelectForMTM($rightClass), array($leftId, $rightId), self::AS_ARRAY);
+        return count($results) > 0;
+    }
 }
 
 ?>

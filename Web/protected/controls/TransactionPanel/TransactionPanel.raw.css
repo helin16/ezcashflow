@@ -1,12 +1,17 @@
 .TransPanel{
     margin:0px;
     padding: 0px;
+    font-size: 11px;
 }
 .TransPanel .transDiv .row {
     padding: 4px 0 0 0; 
 }
-.TransPanel .transDiv .row.inline {
+.TransPanel .transDiv .inline {
     display: inline-block;
+}
+.TransPanel .transDiv fieldset {
+    border: 1px #cccccc solid;
+    border-radius: 4px;
 }
 .TransPanel .transDiv [transpane=fromAccounts],
 .TransPanel .transDiv [transpane=toAccounts] {
@@ -35,4 +40,25 @@
     width: 98%;
     border: 1px #cccccc solid;
     border-radius: 4px;
+}
+
+.TransPanel .transDiv .fileList .row {
+    width: 98%;
+    padding: 2px;
+}
+.TransPanel .transDiv .fileList .row.old {
+    background: #cccccc;
+}
+.TransPanel .transDiv .fileList .row:hover {
+    background: #5BB75B;
+    color: white;
+}
+.TransPanel .transDiv .fileList .row .file{
+    width: 90%;
+}
+.TransPanel .transDiv .fileList .row .btns a{
+    color: red;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 0 0 5px 0;
 }

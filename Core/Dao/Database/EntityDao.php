@@ -242,5 +242,31 @@ class EntityDao
 	{
 	    return Dao::deleteByCriteria($this->_query, $criteria, $params);
 	}
+	/**
+	 * Add a join table record for many to many relationship
+	 * 
+	 * @param BaseEntityAbstract $leftEntity  The left entity
+	 * @param BaseEntityAbstract $rightEntity The right entity
+	 * 
+	 * @return int
+	 */
+	public function saveManyToManyJoin(BaseEntityAbstract $leftEntity, BaseEntityAbstract $rightEntity)
+	{
+	    Dao::saveManyToManyJoin(new DaoQuery(get_class($leftEntity)), get_class($rightEntity), $leftEntity->getId(), $rightEntity->getId());
+	    return 1;
+	}
+	/**
+	 * Remove a join table record for many to many relationship
+	 *
+	 * @param BaseEntityAbstract $leftEntity  The left entity
+	 * @param BaseEntityAbstract $rightEntity The right entity
+	 * 
+	 * @return int
+	 */
+	public static function deleteManyToManyJoin(BaseEntityAbstract $leftEntity, BaseEntityAbstract $rightEntity)
+	{
+	    Dao::deleteManyToManyJoin(new DaoQuery(get_class($leftEntity)), get_class($rightEntity), $leftEntity->getId(), $rightEntity->getId());
+	    return 1;
+	}
 }
 ?>

@@ -29,6 +29,7 @@
 			<url ServiceParameter="Reports.ReportsController" pattern="reports/{reportVars}" parameters.reportVars=".+" />
 			
 			<url ServiceParameter="FileLoader.FileLoaderController" pattern="asset/{assetId}/{param}" parameters.assetId="\w+"  parameters.param=".+" />
+			<url ServiceId="stream" ServiceParameter="" pattern="asset/{id}" parameters.id="\w+" />
 			
 		</module>
 	
@@ -48,6 +49,13 @@
 			  <module id="users" class="Application.classes.WebUser.WebUserManager"/>
 			</modules>
 		</service>
+		
+		<service id="stream" class="Application.pages.Stream.StreamController">
+            <modules>
+              <module id="auth" class="Application.classes.WebUser.AuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.LoginController" AuthExpire="3600"/>
+              <module id="users" class="Application.classes.WebUser.WebUserManager"/>
+            </modules>
+        </service>
 	</services>
 	<!-- application parameters -->
 	<parameters>

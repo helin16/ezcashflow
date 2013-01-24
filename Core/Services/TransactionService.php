@@ -140,6 +140,31 @@ class TransactionService extends BaseService
 		$results = Dao::getSingleResultNative($qry, $params);
 		return $results;
 	}
-
+	/**
+	 * adding an asset to a transaction
+	 * 
+	 * @param Transaction $trans The transaction
+	 * @param Asset       $asset The asset
+	 * 
+	 * @return Transaction
+	 */
+    public function addAsset(Transaction $trans, Asset $asset)
+    {
+        $this->entityDao->saveManyToManyJoin($asset, $trans);
+        return $this->get($trans->getId());
+    }
+    /**
+     * removing an asset to a transaction
+     * 
+     * @param Transaction $trans The transaction
+	 * @param Asset       $asset The asset
+	 * 
+	 * @return Transaction
+     */
+    public function removeAsset(Transaction $trans, Asset $asset)
+    {
+        $this->entityDao->deleteManyToManyJoin($asset, $trans);
+        return $this->get($trans->getId());
+    }
 }
 ?>

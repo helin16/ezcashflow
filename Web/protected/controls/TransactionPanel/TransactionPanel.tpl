@@ -16,10 +16,16 @@
 	       <span class="title">Description:</span>
 	       <span class="item"><input type="text" transpane="description" placeholder="comments"/></span>
 	   </div>
-       <fieldset>
-           <legend>Attach Files</legend>
-           <com:TActiveFileUpload OnFileUpload="fileUploaded" MaxFileSize="4000000"/>
-           <com:TActiveLabel ID="Result" />
+       <fieldset class="fileset">
+           <legend>
+                <input id="chk_<%= $this->getId()%>" type="checkbox" onclick="return transJs.toggleFileList(this);">
+                <label for="chk_<%= $this->getId()%>">Attach Files</label>
+           </legend>
+           <div class="filewrapper" style="display:none;">
+	           <com:TActiveFileUpload OnFileUpload="fileUploaded" MaxFileSize="4000000" />
+	           <com:TActiveLabel ID="Result" CssClass="resultList"/>
+	           <com:TActiveHiddenField ID="resultJson" Attributes.transpane="assets" />
+	       </div>
        </fieldset>
 	   <div class="row">
 	       <span class="title"></span>
@@ -30,7 +36,8 @@
 
 <com:TCallback ID="getAccountsBtn" OnCallback="getAccounts" />
 <com:TCallback ID="saveTrans" OnCallback="saveTrans" />
+<com:TCallback ID="deleteFile" OnCallback="delFile" />
 <com:TClientScript>
-    var transJs = new TransPaneJs('<%= $this->TransPanel->getClientId()%>', '<%= $this->getAccountsBtn->getUniqueID()%>', '<%= $this->saveTrans->getUniqueID()%>');
+    var transJs = new TransPaneJs('<%= $this->TransPanel->getClientId()%>', '<%= $this->getAccountsBtn->getUniqueID()%>', '<%= $this->saveTrans->getUniqueID()%>', '<%= $this->deleteFile->getUniqueID()%>');
     transJs.buildFrom([1,2], [4]);
 </com:TClientScript>

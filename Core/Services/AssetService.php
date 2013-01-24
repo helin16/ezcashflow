@@ -70,8 +70,8 @@ class AssetService extends BaseService
      */
     public function removeFile($assetid)
     {
-        $asset = $this->findByCriteria('`assetKey` = ?', array($assetid), true, 1, 1);
-        if(count($asset) !== 1)
+        $asset = $this->getAssetByKey($assetid);
+        if($asset instanceof Asset)
             throw new ServiceException('Asset (key=' . $assetid . ') does NOT exsits!');
 
         $asset = $asset[0];
@@ -89,13 +89,25 @@ class AssetService extends BaseService
      */
     public function streamFile($assetid)
     {
-        $asset = $this->findByCriteria('`assetKey` = ?', array($assetid), true, 1, 1);
-        if(count($asset) !== 1)
+        $asset = $this->getAssetByKey($assetid);
+        if($asset instanceof Asset)
             throw new ServiceException('Asset (key=' . $assetid . ') does NOT exsits!');
         $asset = $asset[0];
 		header('Content-Type: ' . $asset->getMimeType());
 		readfile($asset->getFilePath());
         return $this;
+    }
+    /**
+     * getting the asset object by the provided key
+     * 
+     * @param string $key The key of the asset
+     * 
+     * @return Asset
+     */
+    public function getAssetByKey($key)
+    {
+        $asset = $this->findByCriteria('`assetKey` = ?', array($key), true, 1, 1);
+        return count($asset) > 0 ? $asset[0] : null;
     }
     /**
      * Simple method for detirmining mime type of a file based on file extension

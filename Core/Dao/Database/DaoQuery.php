@@ -463,6 +463,70 @@ class DaoQuery
 		return $sql;
 	}
 	/**
+	 * Generating the insert sql statement for the Many-To-Many relationship
+	 * 
+	 * @param string $rightClass The right hand class
+	 * 
+	 * @return string 
+	 */
+	public function generateInsertForMTM($rightClass)
+	{
+	    $sql = sprintf('insert into ' . $this->_getTableForMTM($rightClass). ' (%sId, %sId, createdById) values (?, ?, ?)',
+    	    strtolower(substr($this->_focus, 0, 1)) . substr($this->_focus, 1),
+    	    strtolower(substr($rightClass, 0, 1)) . substr($rightClass, 1)
+    	);
+	    return $sql;
+	}
+	/**
+	 * Generating the select sql statement for the Many-To-Many relationship
+	 * 
+	 * @param string $rightClass The right hand class
+	 * 
+	 * @return string 
+	 */
+	public function generateSelectForMTM($rightClass, $select = '*')
+	{
+	    return 'select ' . $select . ' from ' . $this->_getTableForMTM($rightClass). (count($this->_whereClause) === 0 ? '' : ' where (' . implode(') AND (', $this->_whereClause) . ')');
+	}
+	/**
+	 * Generating the select sql statement for the Many-To-Many relationship
+	 * 
+	 * @param string $rightClass The right hand class
+	 * 
+	 * @return string 
+	 */
+	public function generateDeleteForMTM($rightClass)
+	{
+	    if(count($this->_whereClause) === 0)
+	        throw new DaoException('Where clause needed for delete!!!!!');
+	    return 'delete from ' . $this->_getTableForMTM($rightClass). ' where (' . implode(') AND (', $this->_whereClause) . ')';
+	}
+	/**
+	 * Generating the m_m join table
+	 * 
+	 * @param string $rightClass The other join class
+	 * 
+	 * @throws DaoException
+	 * @return string
+	 */
+	private function _getTableForMTM($rightClass)
+	{
+	    $leftClass = $this->_focus;
+	    DaoMap::loadMap($leftClass);
+	    foreach (DaoMap::$map[strtolower($leftClass)] as $field => $properties)
+	    {
+	        if(isset($properties['rel']) && $properties['rel'] == DaoMap::MANY_TO_MANY)
+	        {
+	            if(isset($properties['class']) && $properties['class'] == $rightClass)
+	            {
+	                if(isset($properties['side']) && $properties['side'] == DaoMap::RIGHT_SIDE)
+                        return strtolower($leftClass) . '_' . strtolower($rightClass);
+	            }
+	        }
+	    }
+        throw new DaoException('Many-to-many relationship not found');
+	}
+	/**
 	 * magic function for toString()
 	 * @return string
 	 */

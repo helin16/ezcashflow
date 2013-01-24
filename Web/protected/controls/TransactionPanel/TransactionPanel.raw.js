@@ -5,14 +5,16 @@ TransPaneJs.prototype = {
 	formDivId: '',
 	callbackIds: {
 		'getAccounts': '',
-		'saveTrans': ''
+		'saveTrans': '',
+		'delFileCBId': ''
 	},
 	
 	//constructor
-	initialize: function (formDivId, getAccountsCBId, saveTransCBId) {
+	initialize: function (formDivId, getAccountsCBId, saveTransCBId, delFileCBId) {
 		this.formDivId = formDivId;
 		this.callbackIds.getAccounts = getAccountsCBId;
 		this.callbackIds.saveTrans = saveTransCBId;
+		this.callbackIds.delFileCBId = delFileCBId;
 	},
 	
 	//buildForm
@@ -69,12 +71,25 @@ TransPaneJs.prototype = {
 		tmp.toAccListBox = tmp.form.down("[transpane=toAccounts]");
 		tmp.valueBox = tmp.form.down("[transpane=value]");
 		tmp.commentsBox = tmp.form.down("[transpane=description]");
+		tmp.assets = tmp.form.down("[transpane=assets]");
 		tmp.saveBtn = tmp.form.down("[transpane=saveBtn]");
 		if(this.validForm(tmp.fromAccListBox, tmp.toAccListBox, tmp.valueBox) === false)
 			return false;
 		
 		tmp.saveBtnValue =tmp.saveBtn.value;
-		tmp.data = {'fromAccId': $F(tmp.fromAccListBox), 'toAccId': $F(tmp.toAccListBox), 'value': $F(tmp.valueBox).strip(), 'comments': $F(tmp.commentsBox).strip(), 'fromIds': this.accountIds.from, 'toIds': this.accountIds.to};
+		try{
+			tmp.assetsJson = $F(tmp.assets).evalJSON();
+		} catch(e) {
+			tmp.assetsJson = {};
+		}
+		tmp.data = {'fromAccId': $F(tmp.fromAccListBox), 
+				'toAccId': $F(tmp.toAccListBox), 
+				'value': $F(tmp.valueBox).strip(), 
+				'comments': $F(tmp.commentsBox).strip(), 
+				'fromIds': this.accountIds.from, 
+				'toIds': this.accountIds.to, 
+				'assets': tmp.assetsJson
+		};
 		appJs.postAjax(this.callbackIds.saveTrans, tmp.data, {
     		'onLoading': function(sender, param){
     			tmp.saveBtn.value = 'Saving ...';
@@ -84,13 +99,15 @@ TransPaneJs.prototype = {
 	    		try{
 	    			tmp.result = appJs.getResp(param, false, true);
 	    		} catch(e) {
+	    			alert(e);
 	    			tmp.saveBtn.value = tmp.saveBtnValue;
 		    		tmp.saveBtn.disabled = false;
 	    			return;
 	    		}
 	    		transJs.getAccList(tmp.result.from, tmp.fromAccListBox);
 	    		transJs.getAccList(tmp.result.to, tmp.toAccListBox);
-	    		tmp.commentsBox.value = tmp.valueBox.value = '';
+	    		tmp.commentsBox.value = tmp.valueBox.value = tmp.assets.value = '';
+	    		$(tmp.assets).up('.fileset').down('.resultList').update('');
 	    		tmp.saveBtn.value = tmp.saveBtnValue;
 	    		tmp.saveBtn.disabled = false;
 	    		alert('Saved Successfully!');
@@ -123,5 +140,38 @@ TransPaneJs.prototype = {
 			tmp.succ = false;
 		}
 		return tmp.succ;
-	}
+	},
+	
+	//toggling the file upload list
+	toggleFileList: function(btn){
+		var tmp = {};
+		tmp.wrapper = $(btn).up('.fileset').down('.filewrapper');
+		if($(btn).checked) {
+			tmp.wrapper.show();
+		} else {
+			tmp.wrapper.hide();
+		}
+		return true;
+	},
+	
+	//remove file from asset list
+	removeFile: function(btn, jsonHolder) {
+		var tmp = {};
+		tmp.key = $(btn).readAttribute('assetkey');
+		tmp.json = $F(jsonHolder).evalJSON();
+		//asking the server to delete the tmp file
+		appJs.postAjax(this.callbackIds.delFileCBId, tmp.json[tmp.key], {
+	    	'onComplete': function(sender, param){
+	    		try{
+	    			tmp.result = appJs.getResp(param, false, true);
+	    		} catch(e) {
+	    			alert(e);
+	    		}
+	    		delete tmp.json[tmp.key];
+	    		$(jsonHolder).value = Object.toJSON(tmp.json);
+	    		$(btn).up('.row').remove();
+	    	}
+    	});
+		return false;
+	},
 };

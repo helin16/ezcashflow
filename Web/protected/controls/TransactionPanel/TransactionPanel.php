@@ -22,9 +22,16 @@ class TransactionPanel extends TTemplateControl
 	private $_accountService;
 	/**
 	 * TransactionService
+	 * 
 	 * @var TransactionService
 	 */
 	private $_transService;
+	/**
+	 * The asset service
+	 * 
+	 * @var AssetService
+	 */
+	private $_assetService;
 	/**
 	 * constructor
 	 */
@@ -33,6 +40,7 @@ class TransactionPanel extends TTemplateControl
 		parent::__construct();
 		$this->_transService = new TransactionService();
 		$this->_accountService = new AccountEntryService();
+		$this->_assetService = new AssetService();
 	}
 	/**
 	 * Getter for the postJs
@@ -87,8 +95,10 @@ class TransactionPanel extends TTemplateControl
 	            throw new Exception('toAccId not found!');
 	        if(!isset($param->CallbackParameter->value) || ($value = trim($param->CallbackParameter->value)) <= 0)
 	            throw new Exception('value not found!');
+	        if(!isset($param->CallbackParameter->assets))
+	            throw new Exception('assets not found!');
+	        $assets = json_decode(json_encode($param->CallbackParameter->assets), true);
 	        $comments = !isset($param->CallbackParameter->comments) ? '' : trim($param->CallbackParameter->comments);
-	        
 	        if($fromAccount->getRoot()->getId() == AccountEntry::TYPE_INCOME)
     	        $transArray = $this->_transService->earnMoney($fromAccount, $toAccount, $value, $comments);
 	        else
@@ -96,7 +106,15 @@ class TransactionPanel extends TTemplateControl
 	        
 	        $results['trans'] = array();
 	        foreach($transArray as $trans)
+	        {
+	            foreach($assets as $asset)
+	            {
+	                $asset = $this->_assetService->getAssetByKey($asset['assetKey']);
+	                if($asset instanceof Asset)
+	                    $trans = $this->_transService->addAsset($trans, $asset);
+	            }
 	            $results['trans'][] = $trans->getJsonArray();
+	        }
 	        $results = array_merge($results, $this->_getAccList($fromIds, $toIds));
 	    }
 	    catch(Exception $e)
@@ -213,20 +231,91 @@ class TransactionPanel extends TTemplateControl
 	 */
 	public function fileUploaded($sender, $param)
 	{
+	    $assets = json_decode($this->resultJson->Value, true);
+	    $key = md5(Core::getUser() . '' . new UDate());
+        $fileInfo = array();
 	    if($sender->HasFile)
 	    {
-	        $this->Result->Text = "
-	        You just uploaded a file:
-	        <br/>
-	        Name: {$sender->FileName}
-	        <br/>
-	        Size: {$sender->FileSize}
-	        <br/>
-	        Type: {$sender->FileType}";
+	        try
+	        {
+	            $filePath = sys_get_temp_dir() . '/' . $sender->FileName;
+	            $sender->saveAs($filePath, true);
+	            $asset = $this->_assetService->registerFile(AssetType::ID_DOC, $filePath, $sender->FileName);
+    	        $fileInfo['assetKey'] = $asset->getAssetKey();
+    	        $fileInfo['fileName'] = $asset->getFilename();
+    	        $fileInfo['filePath'] = $asset->getAssetType()->getPath() . '/' . $asset->getPath() . '/' . $asset->getAssetKey();
+	        } 
+	        catch(Exception $ex)
+	        {
+	            $fileInfo['error'] = $ex->getMessage();
+	        }
 	    }
-	    else {
-	        $this->Result->Text= $sender->ErrorCode;
+	    else 
+	    {
+	        $fileInfo['error'] = 'There is an error occurred with code: ' . $sender->ErrorCode;
 	    }
+	    $assets[$key] = $fileInfo;
+	    $this->resultJson->Value = json_encode($assets);
+	    $this->Result->Text = $this->_displayFileList($assets);
+	}
+	/**
+	 * getting the html code for the list of files
+	 * 
+	 * @param array $assets The file list
+	 * 
+	 * @return string
+	 */
+	private function _displayFileList($assets)
+	{
+	    $html = '<div class="fileList">';
+	    $i = 0;
+	    foreach($assets as $key => $fileInfo)
+	    {
+	        $html .= '<div class="row ' . ($i % 2 === 0 ? 'even' : 'old') . '">';
+	        if(isset($fileInfo['error']) && $fileInfo['error'] !== '')
+	        {
+	            $html .= '<span class="error">';
+	                $html .= $fileInfo['error'];
+	            $html .= '</span>';
+	        }
+	        else
+	        {
+	            $html .= '<span class="file inline">';
+        	        $html .= '<a href="/asset/' . $fileInfo['assetKey'] . '" target="_blank">' . $fileInfo['fileName'] . '</a>';
+    	        $html .= '</span>';
+    	        $html .= '<span class="btns inline">';
+        	        $html .= '<a href="javascript: void(0);" onclick="transJs.removeFile(this, ' . "'" . $this->resultJson->getClientId() . "'" . ')" assetkey="' . $key . '">x</a>';
+    	        $html .= '</span>';
+	        }
+	        $html .= '</div>';
+	        $i++;
+	    }
+	    $html .= '</div>';
+	    return $html;
+	}
+	/**
+	* Delete the file
+	*
+	* @param TCallback          $sender The event sender
+	* @param TCallbackParameter $param  The event params
+	*
+	* @throws Exception
+	*/
+	public function delFile($sender, $param)
+	{
+	    $results = $errors = array();
+	    try
+	    {
+	        if(!isset($param->CallbackParameter->assetKey) || ($assetKey = trim($param->CallbackParameter->assetKey)) === '')
+	            throw new Exception('assetKey NOT found!');
+	        $this->_assetService->removeFile($assetKey);
+	    }
+	    catch(Exception $e)
+	    {
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = Core::getJson($results, $errors);
+	    return $this;
 	}
 }
 
