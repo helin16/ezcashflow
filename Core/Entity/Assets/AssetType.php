@@ -78,6 +78,18 @@ class AssetType extends BaseEntityAbstract
     }
     /**
      * (non-PHPdoc)
+     * @see BaseEntityAbstract::getJsonArray()
+     */
+    public function getJsonArray()
+    {
+        $entity = array();
+        $entity['id'] = $this->getId();
+        $entity['type'] = $this->getType();
+        $entity['path'] = $this->getPath();
+        return $entity;
+    }
+    /**
+     * (non-PHPdoc)
      * @see BaseEntityAbstract::__loadDaoMap()
      */
     public function __loadDaoMap()

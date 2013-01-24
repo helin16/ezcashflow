@@ -160,6 +160,11 @@ class Transaction extends BaseEntityAbstract
     	$tran['fromAcc'] = $from instanceof AccountEntry ? $from->getJsonArray() : array();
     	$tran['toAcc'] = $this->getTo()->getJsonArray();
     	$tran['created'] = $this->getCreated() . '';
+    	$tran['assets'] = array();
+    	foreach($this->getAssets() as $asset)
+    	{
+    	    $tran['assets'][] = $asset->getJsonArray();
+    	}
 	    return $tran;
 	}
 	/**

@@ -199,6 +199,23 @@ class Asset extends BaseEntityAbstract
 	    return $this->getAssetType()->getPath() . $this->getPath() . '/' . $this->getAssetKey();
 	}
 	/**
+	 * getting the account entry for json
+	 *
+	 * @return multitype:boolean NULL multitype: unknown
+	 */
+	public function getJsonArray()
+	{
+	    $entity = array();
+	    $entity['id'] = $this->getId();
+	    $entity['assetKey'] = $this->getAssetKey();
+	    $entity['assetType'] = $this->getAssetType()->getJsonArray();
+	    $entity['filename'] = $this->getFilename();
+	    $entity['mimeType'] = $this->getMimeType();
+	    $entity['path'] = $this->getPath();
+	    $entity['filePath'] = $this->getFilePath();
+	    return $entity;
+	}
+	/**
 	 * (non-PHPdoc)
 	 * @see HydraEntity::__toString()
 	 */
