@@ -90,9 +90,8 @@ class AssetService extends BaseService
     public function streamFile($assetid)
     {
         $asset = $this->getAssetByKey($assetid);
-        if($asset instanceof Asset)
+        if(!$asset instanceof Asset)
             throw new ServiceException('Asset (key=' . $assetid . ') does NOT exsits!');
-        $asset = $asset[0];
 		header('Content-Type: ' . $asset->getMimeType());
 		readfile($asset->getFilePath());
         return $this;

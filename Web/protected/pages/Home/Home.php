@@ -88,7 +88,7 @@ class Home extends PageAbstract
 	        foreach($trans as $tran)
 	        {
 	            $transArray = $tran->getJsonArray();
-	            $transArray['link'] = $this->_makeURLToReport($fromAcc = $tran->getFrom(), $toAcc = $tran->getTo(), $tran->getCreated());
+	            $transArray['link'] = '/trans/' . $tran->getId();
 	            $results[] = $transArray;
 	        }
 	    }
@@ -98,28 +98,6 @@ class Home extends PageAbstract
 	    }
 	    $param->ResponseData = Core::getJson($results, $errors);
 	    return $this;
-	}
-	/**
-	 * getting the href for that transaction
-	 *
-	 * @param AccountEntry $fromAccount The from of the transaction
-	 * @param AccountEntry $toAccount   The to of the transaction
-	 * @param UDate        $transTime   The date time of the transaction
-	 *
-	 * @return string The href string
-	 */
-	private function _makeURLToReport(AccountEntry $fromAccount = null, AccountEntry $toAccount, UDate $transTime)
-	{
-	    $fromDate = $transTime->__toString();
-	    $transTime->modify('+1 second');
-	    $toDate = $transTime->__toString();
-	    $vars = array("fromAccountIds" => (!$fromAccount instanceof AccountEntry ? array() : array($fromAccount->getId())),
-	                "toAccountIds" => array($toAccount->getId()),
-	                "fromDate" => $fromDate,
-	                "toDate" => $toDate
-	    );
-	    $serial = json_encode($vars);
-	    return "/reports/$serial";
 	}
 }
 ?>
