@@ -119,7 +119,7 @@ class EntityDao
 	    return $this->_pageStats;
 	}
 	/**
-	 * Alias for GenericDAO::deactivate()
+	 * Deleting an entity from database
 	 *
 	 * @param BaseEntityAbstract $entity The entity that we are trying to delete
 	 * 
@@ -127,7 +127,7 @@ class EntityDao
 	 */
 	public function delete(BaseEntityAbstract $entity)
 	{
-		return $this->deactivate($entity);
+	    return $this->deleteByCriteria('`id` = ? ', array($entity->getId()));
 	}
 	/**
 	 * Deactivate an entity instance

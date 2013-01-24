@@ -86,7 +86,7 @@ class AssetType extends BaseEntityAbstract
     
         DaoMap::setStringType('type', 'varchar', 10);
         DaoMap::setStringType('path', 'varchar', 255);
-    
+        parent::loadDaoMap();
         DaoMap::commit();
     }
 }

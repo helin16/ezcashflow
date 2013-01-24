@@ -218,6 +218,17 @@ class UDate
 	{
 		return $this->_dateTime->format('U');
 	}
+	/**
+	 * formating the datetime object
+	 * 
+	 * @param string $format The format
+	 * 
+	 * @return string
+	 */
+	public function format($format)
+	{
+	    return $this->_dateTime->format($format);
+	}
 }
 
 ?>

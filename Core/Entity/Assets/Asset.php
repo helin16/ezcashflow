@@ -222,8 +222,8 @@ class Asset extends BaseEntityAbstract
 		DaoMap::setManyToMany('transactions', 'Transaction', DaoMap::RIGHT_SIDE, 'xt', true);
 		DaoMap::setManyToMany('propertys', 'Property', DaoMap::RIGHT_SIDE, 'xp', true);
 		
+		parent::loadDaoMap();
 		DaoMap::createUniqueIndex('assetKey');
-		
 		DaoMap::commit();
 	}
 }
