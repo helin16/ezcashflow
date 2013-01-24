@@ -50,10 +50,25 @@ class ReportsController extends PageAbstract
 	{
 		if(!$this->IsPostBack)
 		{
-		    $reportVars = isset($this->Request['reportVars']) ? json_decode($this->Request['reportVars'], true) : array();
+		    if(isset($this->Request['reportVars']))
+		        $reportVars = json_decode($this->Request['reportVars'], true);
+		    else if(isset($this->Request['transid']))
+		        $reportVars = $this->_getVarFromTrans(trim($this->Request['transid']));
 		    $this->seachpage->getControls()->add($this->_getSeachPanel($reportVars));
 		    $this->script->getControls()->add($this->_getJs(count($reportVars) > 0));
 		}
+	}
+	private function _getVarFromTrans($transId)
+	{
+	    $trans = $this->_transService->get($transId);
+	    if(!$trans instanceof Transaction)
+	        throw new Exception('Invalid Transaction with(ID=' . $transId . ')!');
+	    $reportVars = array();
+	    $reportVars["fromDate"] = $trans->getUpdated() . '';
+	    $reportVars["toDate"] = $trans->getUpdated() . '';
+	    $reportVars["fromAccountIds"] = (($from = $trans->getFrom()) instanceof AccountEntry ? array($from->getId()) : array());
+	    $reportVars["toAccountIds"] = array($trans->getTo()->getId());
+	    return $reportVars;
 	}
 	/**
 	 * generate the javascript

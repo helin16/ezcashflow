@@ -113,7 +113,9 @@ class TransactionPanel extends TTemplateControl
 	                if($asset instanceof Asset)
 	                    $trans = $this->_transService->addAsset($trans, $asset);
 	            }
-	            $results['trans'][] = $trans->getJsonArray();
+	            $transArray = $trans->getJsonArray();
+	            $transArray['link'] = '/trans/' . $trans->getId();
+	            $results['trans'][] = $transArray;
 	        }
 	        $results = array_merge($results, $this->_getAccList($fromIds, $toIds));
 	    }
