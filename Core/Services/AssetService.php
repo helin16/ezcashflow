@@ -148,7 +148,6 @@ class AssetService extends BaseService
         if(!$asset instanceof Asset)
             throw new ServiceException('Asset (key=' . $assetid . ') does NOT exsits!');
 
-        $asset = $asset[0];
         unlink($asset->getFilePath());
         $this->entityDao->delete($asset);
         return $this;

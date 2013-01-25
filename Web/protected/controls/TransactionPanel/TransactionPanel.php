@@ -240,9 +240,7 @@ class TransactionPanel extends TTemplateControl
 	    {
 	        try
 	        {
-	            $filePath = sys_get_temp_dir() . '/' . $sender->FileName;
-	            $sender->saveAs($filePath, true);
-	            $asset = $this->_assetService->registerFile(AssetType::ID_DOC, $filePath, $sender->FileName);
+	            $asset = $this->_assetService->registerFile(AssetType::ID_DOC, $sender->LocalName, $sender->FileName);
     	        $fileInfo['assetKey'] = $asset->getAssetKey();
     	        $fileInfo['fileName'] = $asset->getFilename();
     	        $fileInfo['filePath'] = $asset->getAssetType()->getPath() . '/' . $asset->getPath() . '/' . $asset->getAssetKey();
