@@ -15,7 +15,7 @@ div.widthWrapper {
 }
 
 .errorMsg {
-	margin-left: 18px;
+    margin-left: 18px;
     color: red;
     font-size: 12px;
 }
@@ -471,4 +471,26 @@ div.content-right .box .content ul li .descr {
     border: 1 #7DCB39 solid;
     cursor: pointer;
     border-radius: 4px;
+}
+#transpage .box-content.resultlist .row ul.assets {
+    list-style: none;
+    margin:0;
+    padding: 0px;
+}
+#transpage .box-content.resultlist .row ul.assets li {
+    display: inline-block;
+}
+#transpage .box-content.resultlist .row ul.assets li a,
+#transpage .box-content.resultlist .row ul.assets li a:link {
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 10px;
+    color: #1E3A7D;
+    margin:  3px;
+    padding: 4px;
+}
+#transpage .box-content.resultlist .row ul.assets li a:hover {
+    background: #1E3A7D;
+    border-radius: 4px;
+    color: white;
 }

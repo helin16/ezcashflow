@@ -91,7 +91,6 @@ ReportJs.prototype = {
 	getRow: function(trans, rowNo) {
 		var tmp = {};
 		tmp.newRow = new Element('div', {'class': 'row ' + (rowNo % 2 === 0 ? 'even' : 'odd'), 'transId': trans.id, 'rowno': rowNo});
-		console.debug(trans);
 		tmp.newRowContent = new Element('span', {'class': 'conent'});
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'fromacc'}).update('From: ' + (trans.fromAcc.name === undefined ? '' : trans.fromAcc.breadCrumbs.name))});
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'created'}).update(trans.created)});
