@@ -36,14 +36,42 @@ class AssetService extends BaseService
         return $this->_typeDao->findAll($pageNumber, $pageSize, $order);
     }
     /**
-     * Saving the asset type
+     * get asset type by id
      * 
-     * @param AssetType $at The assettype that we are trying to save
+     * @param int $id The id of the asset type
      * 
      * @return AssetType
      */
-    public function saveAssetType(AssetType $at)
+    public function getAllAssetType($id)
     {
+        return $this->_typeDao->findById($id);
+    }
+    /**
+     * Saving the asset type
+     * 
+     * @param AssetType $at   The asset type that we are trying to save. When new, it's just a new AssetType()
+     * @param string    $type The new type of $at
+     * @param string    $path The new path of $at
+     * 
+     * @return AssetType
+     */
+    public function saveAssetType(AssetType $at, $type, $path)
+    {
+        //if the new path doesn't exsit, then create one
+        if(!is_dir($path))
+        {
+            mkdir($path);
+            chmod($path, 0777);
+        }
+        //if the new path is different from the old path
+        $originalPath = trim($at->getPath());
+        if($originalPath !== $path)
+        {
+            rename($originalPath . '/*', $path);
+        }
+        
+        $at->setType($type);
+        $at->setPath($path);
         return $this->_typeDao->save($at);
     }
     /**

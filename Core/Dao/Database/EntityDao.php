@@ -78,7 +78,8 @@ class EntityDao
 			$this->_affectedRows = 1;
 			$this->_lastId = -1;
 		}
-		return $this->resetQuery();
+		$this->resetQuery();
+		return $entity;
 	}
 	/**
 	 * Get a single instance of an entity by its database record id
