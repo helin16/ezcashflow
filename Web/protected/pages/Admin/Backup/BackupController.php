@@ -63,7 +63,7 @@ class BackupController extends PageAbstract
 			else
 				$command =sprintf('%s -h%s -u%s %s > %s',$this->_mysqldump,$host,$username,$database,$this->_backFile);
 			system($command,$return);
-			$this->backupResult->Text="<div style='width:300px;margin:10px;padding:15px;background:#cccccc;border: 1px #ff0000 dotted;'><h3>Result:$return</h3>Backup generated. <a href='{$this->_backFile}' target='__blank'>click here to download</a></div>";
+			$this->backupResult->Text="<div style='width:300px;margin:10px;padding:15px;background:#cccccc;border: 1px #ff0000 dotted;'><h3>Result:$return</h3>Backup generated. <a href='/{$this->_backFile}' target='__blank'>click here to download</a></div>";
 		}
 		catch (Exception $ex)
 		{

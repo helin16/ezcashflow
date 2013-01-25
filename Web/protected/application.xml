@@ -25,9 +25,11 @@
 			<url ServiceParameter="Reports.ReportsController" pattern="reports.html" />
 			<url ServiceParameter="Statics.StaticsController" pattern="statics.html" />
 			<url ServiceParameter="Properties.PropertiesController" pattern="properties.html" />
-			<url ServiceParameter="System.BackupController" pattern="backup"/>
 			<url ServiceParameter="Reports.ReportsController" pattern="trans/{transid}" parameters.transid="\d+" />
 			<url ServiceParameter="Reports.ReportsController" pattern="reports/{reportVars}" parameters.reportVars=".+" />
+			
+			<!--  admin pages -->
+			<url ServiceParameter="Admin.Backup.BackupController" pattern="admin/backup"/>
 			
 			<url ServiceParameter="FileLoader.FileLoaderController" pattern="asset/{assetId}/{param}" parameters.assetId="\w+"  parameters.param=".+" />
 			<url ServiceId="stream" ServiceParameter="" pattern="asset/{id}" parameters.id="\w+" />
