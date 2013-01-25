@@ -1,4 +1,4 @@
-<%@MasterClass="Application.layout.default.DefaultLayout"%>
+<%@MasterClass="Application.layout.admin.AdminLayout"%>
 <com:TContent ID="MainContent">
 	<div class="bodyWrapper">
 		<com:TTabPanel ID="result">
