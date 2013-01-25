@@ -67,12 +67,34 @@ class AssetService extends BaseService
         $originalPath = trim($at->getPath());
         if($originalPath !== $path)
         {
-            rename($originalPath . '/*', $path);
+            if(count(scandir($path)) > 2)
+                throw new ServiceException('Path(=' . $originalPath . ') exsits already and NOT empty!');
+            AssetService::moveDir($originalPath, $path);
         }
         
         $at->setType($type);
         $at->setPath($path);
         return $this->_typeDao->save($at);
+    }
+    /**
+     * Moving all the file from source dir to target dir
+     * 
+     * @param unknown_type $sourceDir
+     * @param unknown_type $targetDir
+     */
+    public static function moveDir($sourceDir, $targetDir)
+    {
+        // Get array of all source files
+        $files = scandir($sourceDir);
+        // Cycle through all source files
+        foreach ($files as $file) 
+        {
+            if (in_array($file, array(".",".."))) 
+                continue;
+            if(is_dir($file))
+                self::moveDir($sourceDir.$file, $targetDir.$file);
+            rename($sourceDir.$file, $targetDir.$file);
+        }
     }
     /**
      * Saving the file onto asset table
