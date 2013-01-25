@@ -15,7 +15,7 @@ AppJs.prototype = {
 		tmp.expectNonJSONResult = (expectNonJSONResult !== true ? false : true);
 		tmp.result = response;
 		if(tmp.result === null || tmp.result.blank()) {
-			tmp.error = 'Your session/request probably timed out, please logout / refine your search criteria and search again!';
+			tmp.error = 'Your request probably timed out, please try again later!';
 			if (noAlert === true)
 				throw tmp.error;
 			else 
