@@ -50,6 +50,7 @@ class ReportsController extends PageAbstract
 	{
 		if(!$this->IsPostBack)
 		{
+		    $reportVars = array();
 		    if(isset($this->Request['reportVars']))
 		        $reportVars = json_decode($this->Request['reportVars'], true);
 		    else if(isset($this->Request['transid']))
