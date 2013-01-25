@@ -59,6 +59,13 @@ class ReportsController extends PageAbstract
 		    $this->script->getControls()->add($this->_getJs(count($reportVars) > 0));
 		}
 	}
+	/**
+	 * translate a transaction id into search variables
+	 * 
+	 * @param int $transId The ID of a transaction
+	 * 
+	 * @throws Exception
+	 */
 	private function _getVarFromTrans($transId)
 	{
 	    $trans = $this->_transService->get($transId);
