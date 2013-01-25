@@ -8,7 +8,7 @@
 </com:THead>
 <body>
 	<com:TForm>
-		<div style="width: 300px;">
+		<div style="width: 100%;">
 			<com:TContentPlaceHolder ID="MainContent" />
 		</div>
 	</com:TForm>
