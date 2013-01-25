@@ -31,6 +31,7 @@
 			<!--  admin pages -->
 			<url ServiceParameter="Admin.Admin.AdminController" pattern="admin/"/>
 			<url ServiceParameter="Admin.Backup.BackupController" pattern="admin/backup"/>
+			<url ServiceParameter="Admin.AssetType.AssetTypeController" pattern="admin/assettype"/>
 			
 			<url ServiceParameter="FileLoader.FileLoaderController" pattern="asset/{assetId}/{param}" parameters.assetId="\w+"  parameters.param=".+" />
 			<url ServiceId="stream" ServiceParameter="" pattern="asset/{id}" parameters.id="\w+" />

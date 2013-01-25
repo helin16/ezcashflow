@@ -28,7 +28,7 @@ class AdminController extends PageAbstract
     private function _loadRightPanel()
     {
         $html = '<div class="box">';
-            $html .= '<div class="title">Links</div>';
+            $html .= '<div class="title">Menu</div>';
             $html .= '<div class="content">';
                 $html .= $this->_getLinks();
             $html .= '</div>';
@@ -42,7 +42,13 @@ class AdminController extends PageAbstract
      */
     private function _getLinks()
     {
-        $html = '<ul>';
+        $html = '<ul class="menulinks">';
+            $html .= '<li>';
+                $html .= '<a href="/admin/assettype" onclick="return pageJs.changePage(this);">';
+                    $html .= '<p class="link">Asset Type</p>';
+                    $html .= '<p class="descr">Asset Type Manager</p>';
+                $html .= '</a>';
+            $html .= '</li>';
             $html .= '<li>';
                 $html .= '<a href="/admin/backup" onclick="return pageJs.changePage(this);">';
                     $html .= '<p class="link">Backup/Restore</p>';

@@ -1,0 +1,7 @@
+<%@MasterClass="Application.layout.admin.AdminLayout"%>
+<com:TContent ID="MainContent">
+    <div class="bodyWrapper">
+        test
+    </div>
+    <com:TCallback ID="getAssetTypesBtn" OnCallback="getAssetTypes" />
+</com:TContent>

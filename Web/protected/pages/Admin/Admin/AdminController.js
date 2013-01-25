@@ -16,12 +16,12 @@ AdminJs.prototype = {
 		var tmp = {};
 		tmp.iframeId = this.iframeId;
 		tmp.canvasId = this.canvasId;
-		tmp.iframe = new Element('iframe', {'src': url, 'id': tmp.iframeId, 'style': 'display:none;width:100%;min-height: 500px;', 'scrolling': false, 'allowtransparency': true, 'frameborder': 0}).observe('load', function() {
+		tmp.iframe = new Element('iframe', {'src': url, 'id': tmp.iframeId, 'style': 'display:none;width:100%;height: 800px;', 'scrolling': true, 'allowtransparency': true, 'frameborder': 0}).observe('load', function() {
 			$(tmp.canvasId).getElementsBySelector('img#loadingImg').each(function(item){
 				item.remove();
 			});
 			if($(this).contentDocument) {
-				$(this).height = $(this).contentDocument.documentElement.scrollHeight + 30; //FF 3.0.11, Opera 9.63, and Chrome
+				$(this).height = $(this).contentDocument.documentElement.getHeight() + 30; //FF 3.0.11, Opera 9.63, and Chrome
 			} else {
 				$(this).height = $(this).contentWindow.document.body.scrollHeight + 30; //IE6, IE7 and Chrome
 			}

@@ -1,10 +1,10 @@
 <com:TContent ID="MainContent">
 	<div class="content-box">
         <h3 class="box-title">
-            Admin for: <span id='canvasTitle'></span>
+            <span id='canvasTitle'>Welcome</span>
         </h3>
         <div class="box-content" id="canvas">
-            <img src="/contents/images/loading.gif" style="display:block; with:150px; height:150px;"/>
+            This is the administrator page.
         </div>
     </div>
     <com:TClientScript>
