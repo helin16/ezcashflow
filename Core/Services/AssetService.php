@@ -23,6 +23,30 @@ class AssetService extends BaseService
         $this->_typeDao = new EntityDao('AssetType');
     }
     /**
+     * get all asset type
+     * 
+     * @param int   $pageNumber The page number
+     * @param int   $pageSize   The page size
+     * @param array $order      The order clause
+     * 
+     * @return Ambigous <multitype:, multitype:BaseEntityAbstract >
+     */
+    public function getAllAssetTypes($pageNumber = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $order = array())
+    {
+        return $this->_typeDao->findAll($pageNumber, $pageSize, $order);
+    }
+    /**
+     * Saving the asset type
+     * 
+     * @param AssetType $at The assettype that we are trying to save
+     * 
+     * @return AssetType
+     */
+    public function saveAssetType(AssetType $at)
+    {
+        return $this->_typeDao->save($at);
+    }
+    /**
      * Saving the file onto asset table
      * 
      * @param int    $assetTypeId The id of asset type

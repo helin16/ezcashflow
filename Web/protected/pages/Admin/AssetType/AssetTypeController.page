@@ -1,7 +1,12 @@
 <%@MasterClass="Application.layout.admin.AdminLayout"%>
 <com:TContent ID="MainContent">
     <div class="bodyWrapper">
-        test
+        <div id="list">
+        </div>
     </div>
     <com:TCallback ID="getAssetTypesBtn" OnCallback="getAssetTypes" />
+    <com:TClientScript>
+        var pageJs = new AssetTypeJs('list', '<%= $this->getAssetTypesBtn->getUniqueID()%>');
+        pageJs.getList();
+    </com:TClientScript>
 </com:TContent>
