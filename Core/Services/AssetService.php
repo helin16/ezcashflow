@@ -145,7 +145,7 @@ class AssetService extends BaseService
     public function removeFile($assetid)
     {
         $asset = $this->getAssetByKey($assetid);
-        if($asset instanceof Asset)
+        if(!$asset instanceof Asset)
             throw new ServiceException('Asset (key=' . $assetid . ') does NOT exsits!');
 
         $asset = $asset[0];
