@@ -1,12 +1,13 @@
 <%@MasterClass="Application.layout.admin.AdminLayout"%>
 <com:TContent ID="MainContent">
-    <div class="bodyWrapper">
-        <div id="list">
+    <div id="transpage" class="bodyWrapper">
+        <div id="list" class="box-content resultlist">
         </div>
     </div>
     <com:TCallback ID="getAssetTypesBtn" OnCallback="getAssetTypes" />
+    <com:TCallback ID="editAssetTypeBtn" OnCallback="editAssetType" />
     <com:TClientScript>
-        var pageJs = new AssetTypeJs('list', '<%= $this->getAssetTypesBtn->getUniqueID()%>');
-        pageJs.getList();
+        var assetJs = new AssetTypeJs('list', '<%= $this->getAssetTypesBtn->getUniqueID()%>', '<%= $this->editAssetTypeBtn->getUniqueID()%>');
+        assetJs.getList(true);
     </com:TClientScript>
 </com:TContent>

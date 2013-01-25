@@ -9,7 +9,7 @@
 class AssetTypeController extends PageAbstract
 {
     /**
-     * Enter description here ...
+     * Asset Service
      * 
      * @var AssetService
      */
@@ -53,6 +53,38 @@ class AssetTypeController extends PageAbstract
         }
         $param->ResponseData = $this->_getJson($results, $errors);
         return $this;
+    }
+    /**
+     * Event: ajax call to edit a asset type
+     *
+     * @param TCallback          $sender The event sender
+     * @param TCallbackParameter $param  The event params
+     *
+     * @throws Exception
+     */
+    public function editAssetType($sender, $param)
+    {
+        $results = $errors = array();
+	    try 
+	    {
+	        if(!isset($param->CallbackParameter->id) || ($id = trim($param->CallbackParameter->id)) === '')
+    	        throw new Exception('System Error:Id not found!');
+    	    $entity = $this->_assetService->getAllAssetType($id);
+    	    if(!$entity instanceof AssetType)
+    	        throw new Exception('System Error: Invalid id(=' . $id . ') provided!');
+	        
+	        if(!isset($param->CallbackParameter->name) || ($name = trim($param->CallbackParameter->name)) === '')
+    	        throw new Exception('System Error: name can not be empty!');
+	        if(!isset($param->CallbackParameter->path) || ($path = trim($param->CallbackParameter->path)) === '')
+    	        throw new Exception('System Error: path can not be empty!');
+    	    $results = $this->_assetService->saveAssetType($entity, $name, $path)->getJsonArray();
+	    }
+	    catch(Exception $e)
+	    {
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = $this->_getJson($results, $errors);
+	    return $this;
     }
 }
 ?>
