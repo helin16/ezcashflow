@@ -166,6 +166,7 @@ class AssetService extends BaseService
         if(!$asset instanceof Asset)
             throw new ServiceException('Asset (key=' . $assetid . ') does NOT exsits!');
 		header('Content-Type: ' . $asset->getMimeType());
+		header('Content-Disposition: attachment; filename=' . $asset->getFilename());
 		readfile($asset->getFilePath());
         return $this;
     }
