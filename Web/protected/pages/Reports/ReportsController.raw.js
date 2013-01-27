@@ -73,7 +73,9 @@ ReportJs.prototype = {
 	    		}
 	    		
 	    		//display more btn
-	    		tmp.resultPanel.down('.box-content').insert({'bottom': pageJs.getMoreBtn(tmp.rowNo, tmp.result.total)});
+	    		if(tmp.rowNo < tmp.result.total) {
+	    			tmp.resultPanel.down('.box-content').insert({'bottom': pageJs.getMoreBtn(tmp.rowNo, tmp.result.total)});
+	    		}
 	    	}
     	});
 	},
@@ -145,7 +147,9 @@ ReportJs.prototype = {
 		    			tmp.resultPanel.down('.box-content').insert({'bottom': tmp.newRow});
 		    		}
 		    		//display more btn
-		    		tmp.resultPanel.down('.box-content').insert({'bottom': pageJs.getMoreBtn(tmp.rowNo, tmp.result.total)});
+		    		if(tmp.rowNo < tmp.result.total) {
+		    			tmp.resultPanel.down('.box-content').insert({'bottom': pageJs.getMoreBtn(tmp.rowNo, tmp.result.total)});
+		    		}
 	    		} catch(e) {
 	    			alert(e);
 	    			if($(btn) !== undefined && $(btn) !== null) {
