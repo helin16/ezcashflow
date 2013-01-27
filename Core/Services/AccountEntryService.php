@@ -9,11 +9,18 @@
 class AccountEntryService extends BaseService 
 {
     /**
+     * BaseEntity Dao
+     * 
+     * @var EntityDao
+     */
+    private $_transDao;
+    /**
      * constructor
      */
 	public function __construct()
 	{
 	    parent::__construct("AccountEntry");
+	    $this->_transDao = new EntityDao('Transaction');
 	}
 	/**
 	 * Getting the NextAccountNo for the new children of the provided parent accountentry
@@ -25,20 +32,7 @@ class AccountEntryService extends BaseService
 	 */
 	public function getNextAccountNo(AccountEntry $parent)
 	{
-		$parentAccountNumber = $parent->getAccountNumber();
-		$sql="select accountNumber from accountentry where active = 1 and accountNumber like '" . $parentAccountNumber . "____' order by accountNumber asc";
-		$result = Dao::getResultsNative($sql);
-		if(count($result) === 0)
-		    return $parent->getAccountNumber() . str_repeat('0', AccountEntry::ACC_NO_LENGTH);
-		
-		$expectedAccountNos = array_map(create_function('$a', 'return "' . $parentAccountNumber . '".str_pad($a, ' . AccountEntry::ACC_NO_LENGTH . ', 0, STR_PAD_LEFT);'), range(0, str_repeat('9', AccountEntry::ACC_NO_LENGTH)));
-		$usedAccountNos = array_map(create_function('$a', 'return $a["accountNumber"];'), $result);
-		$unUsed = array_diff($expectedAccountNos, $usedAccountNos);
-		sort($unUsed);
-		if (count($unUsed) === 0)
-			throw new ServiceException("account number over loaded (parentId = " . $parent->getId() . ", parentAccNo = $parentAccountNumber)!");
-		
-		return $unUsed[0];
+		return $parent->getNextAccountNo();
 	}
 	/**
 	 * Getting all the children account entry for a parent account
@@ -69,5 +63,108 @@ class AccountEntryService extends BaseService
 		if(count($accounts) === 0)
 			return null;
 		return $accounts[0];
+	}
+	/**
+	 * Creating an accountentry
+	 * 
+	 * @param AccountEntry $account  The accountentry that we are trying to save
+	 * @param AccountEntry $parent   The paren AccountEntry
+	 * @param string       $name     The name of the accountentry
+	 * @param float        $value    The initial value fo the AccountEntry
+	 * @param string       $comments The comments of the AccountEntry
+	 * @param float        $budget   The budget of the AccountEntry
+	 * 
+	 * @return AccountEntry
+	 */
+	public function createAccount(AccountEntry $parent, $name, $value = '0.00', $comments = '', $budget = '0.00')
+	{
+	    $name = trim($name);
+	    $value = trim($value);
+	    $comments = trim($comments);
+	    $budget = trim($budget);
+	    return $this->_saveAccount(new AccountEntry(), $parent, $name, $value, $comments, $budget);
+	}
+	/**
+	 * Updating an accountentry
+	 * 
+	 * @param AccountEntry $account  The accountentry that we are trying to save
+	 * @param AccountEntry $parent   The paren AccountEntry
+	 * @param string       $name     The name of the accountentry
+	 * @param float        $value    The initial value fo the AccountEntry
+	 * @param string       $comments The comments of the AccountEntry
+	 * @param float        $budget   The budget of the AccountEntry
+	 * 
+	 * @return AccountEntry
+	 */
+	public function updateAccount(AccountEntry $account, AccountEntry $parent = null, $name = null, $value = null, $comments = null, $budget = null)
+	{
+	    $parent = ($parent instanceof AccountEntry && $parent->getId() !== $account->getParent()->getId()) ? $parent : $account->getParent();
+	    $name = trim($name);
+	    $name = ($name !== null) ? trim($name) : $account->getName();
+	    $value = ($value !== null) ? trim($value) : $account->getValue();
+	    $comments = ($comments !== null) ? trim($comments) : $account->getComments();
+	    $budget = ($budget !== null) ? trim($budget) : $account->getBudget();
+	    return $this->_saveAccount($account, $parent, $name, $value, $comments, $budget);
+	}
+	/**
+	 * Getting all account entry with allow transaction turn on
+	 * 
+	 * @param array  $rootIds  The ID of the root accounts
+	 * @param int    $page     The page number of the pagination
+	 * @param int    $pagesize The page size of the pagination
+	 * @param array  $orderBy  The order by fields. i.e.: array("id" => 'desc');
+	 * 
+	 * @return array
+	 */
+	public function getAllAllowTransAcc($rootIds = array(), $pageNumber = null, $pageSize = Daoquery::DEFAUTL_PAGE_SIZE, $orderBy = array())
+	{
+	    return $this->findByCriteria('allowTrans = ?' . (count($rootIds) > 0 ? ' AND rootId in (' . implode(', ', $rootIds).')' : ''), array(1), true, $pageNumber, $pageSize, $orderBy);
+	}
+	/**
+	 * Executor for the saving an accountentry
+	 * 
+	 * @param AccountEntry $account  The accountentry that we are trying to save
+	 * @param AccountEntry $parent   The paren AccountEntry
+	 * @param string       $name     The name of the accountentry
+	 * @param float        $value    The initial value fo the AccountEntry
+	 * @param string       $comments The comments of the AccountEntry
+	 * @param float        $budget   The budget of the AccountEntry
+	 * 
+	 * @return AccountEntry
+	 */
+	private function _saveAccount(AccountEntry $account, AccountEntry $parent, $name, $value, $comments, $budget)
+	{
+	    $trans = $this->_transDao->findByCriteria('toId = :id or fromId = :id', array('id' => $parent->getId()), 1, 1);
+	    if(count($trans) > 0)
+	        throw new ServiceException('There are transactions for the parent account, please move those transactions to somewhere else first!');
+	    
+        Dao::beginTransaction();
+	    try 
+	    {
+	        //if this is a new account
+    	    if(trim($account->getId()) === '')
+    	    {
+    	        $account->setAllowTrans(true);
+    	        $parent->setAllowTrans(false);
+    	        $this->save($parent);
+    	    }
+    	    $account->setName($name);
+    	    $account->setParent($parent);
+    	    $account->setRoot($parent->getRoot());
+    	    $account->setBudget($budget);
+    	    $account->setValue($value);
+    	    $account->setComments(trim($comments));
+    	    $accountNumber = $this->getNextAccountNo($parent);
+    	    $account->setAccountNumber($accountNumber);
+    	    $account = $this->save($account);
+    	    
+    	    Dao::commitTransaction();
+    	    return $account;
+	    }
+	    catch(Exception $ex)
+	    {
+	        Dao::rollbackTransaction();
+	        throw $ex;
+	    }
 	}
 }

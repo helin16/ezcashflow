@@ -39,6 +39,12 @@ class AccountEntry extends BaseEntityAbstract
      * @var string
      */
 	private $name;
+	/**
+	 * The sum value of this account
+	 * 
+	 * @var float
+	 */
+	private $sum = '0.00';
     /**
      * The account number of the account
      * 
@@ -75,6 +81,12 @@ class AccountEntry extends BaseEntityAbstract
 	 * @var AccountEntry
 	 */
 	protected $parent;
+	/**
+	 * Whether we are allow transactions created on this account, most likely to be the leaf account
+	 * 
+	 * @var bool
+	 */
+	private $allowTrans = false;
 	/**
 	 * getter name
 	 *
@@ -227,23 +239,68 @@ class AccountEntry extends BaseEntityAbstract
 	/**
 	 * Getting the sum of the values of the current account entry
 	 * 
-	 * @param bool $includeChildren Whether we need to calculate this for all its children
-	 * @param bool $inclSelf        Whether to include it own value
-	 * 
 	 * @return number
 	 */
-	public function getSum($includeChildren = true, $inclSelf = true)
+	public function getSum()
 	{
-	    if($includeChildren === false)
-	        return $this->getValue();
+	    return $this->calSum();
+	}
+	/**
+	 * Setter for the sum
+	 * 
+	 * @param float $sum The sum value
+	 * 
+	 * @return AccountEntry
+	 */
+	public function setSum($sum)
+	{
+	    $this->sum = $sum;
+	    return $this;
+	}
+	/**
+	 * Getting the NextAccountNo for the new children of the provided parent accountentry
+	 * 
+	 * @throws ServiceException
+	 * @return int
+	 */
+	public function getNextAccountNo()
+	{
+	    $parentAccountNumber = $this->getAccountNumber();
+	    $sql="select accountNumber from accountentry where active = 1 and accountNumber like '" . $parentAccountNumber . "____' order by accountNumber asc";
+	    $result = Dao::getResultsNative($sql);
+	    if(count($result) === 0)
+	        return $parent->getAccountNumber() . str_repeat('0', AccountEntry::ACC_NO_LENGTH);
 	    
-		$sql = "select sum(t.value) `sum` from transaction t where t.active = 1 and t.fromId=?";
-		$result = Dao::getSingleResultNative($sql, array($this->getId()));
-		$out = $result === false ? 0 : $result['sum'];
-		$sql = "select sum(t.value) `sum` from transaction t where t.active = 1 and t.toId=?";
-		$result = Dao::getSingleResultNative($sql, array($this->getId()));
-		$in = $result === false ? 0 : $result['sum'];
-		return round($this->getValue() + $in - $out, 2);
+	    $expectedAccountNos = array_map(create_function('$a', 'return "' . $parentAccountNumber . '".str_pad($a, ' . AccountEntry::ACC_NO_LENGTH . ', 0, STR_PAD_LEFT);'), range(0, str_repeat('9', AccountEntry::ACC_NO_LENGTH)));
+	    $usedAccountNos = array_map(create_function('$a', 'return $a["accountNumber"];'), $result);
+	    $unUsed = array_diff($expectedAccountNos, $usedAccountNos);
+	    sort($unUsed);
+	    if (count($unUsed) === 0)
+	        throw new ServiceException("account number over loaded (parentId = " . $this->getId() . ", parentAccNo = $parentAccountNumber)!");
+	    
+	    return $unUsed[0];
+	}
+	/**
+	 * Calculate the sum value
+	 * 
+	 * @return float
+	 */
+	public function calSum()
+	{
+	    $sql = "select distinct id, value from accountentry where rootId = ? and accountNumber like ? and active = 1";
+	    $result = Dao::getResultsNative($sql, array($this->getRoot()->getId(), $this->getAccountNumber() . '%'));
+	    $accIds = array_map(create_function('$a', 'return $a["id"];'), $result);
+	    $accValues = array_map(create_function('$a', 'return $a["value"];'), $result);
+	    $accIds_string = implode(', ', $accIds);
+	    $value = array_sum($accValues);
+	     
+	    $sql = "select sum(t.value) `sum` from transaction t inner join accountentry acc on (acc.id = t.fromId and acc.id in (" . $accIds_string . ") and acc.active = 1) where t.active = 1";
+	    $result = Dao::getSingleResultNative($sql, array());
+	    $out = $result === false ? 0 : $result['sum'];
+	    $sql = "select sum(t.value) `sum` from transaction t inner join accountentry acc on (acc.id = t.toId and acc.id in (" . $accIds_string . ") and acc.active = 1) where t.active = 1";
+	    $result = Dao::getSingleResultNative($sql, array());
+	    $in = $result === false ? 0 : $result['sum'];
+	    return round($value + $in - $out, 2);
 	}
 	/**
 	 * Getting all the children accounts for the current account
@@ -279,18 +336,9 @@ class AccountEntry extends BaseEntityAbstract
 	 * 
 	 * @return string
 	 */
-	public function getSnapshot()
-	{
-		return $this->getRoot() . " - " . $this->getName() . " - $" . $this->getSum(true);
-	}
-	/**
-	 * Getting a snapshot of the current account
-	 * 
-	 * @return string
-	 */
 	public function getLongshot()
 	{
-		return $this->getBreadCrumbs() . " - $" . $this->getSum(true);
+		return $this->getBreadCrumbs() . " - $" . $this->getSum();
 	}
 	/**
 	 * Getting the BreadCrumbs of the current account path
@@ -303,17 +351,10 @@ class AccountEntry extends BaseEntityAbstract
 	 */
 	public function getBreadCrumbs($inclSelf = true, $forId = false, $separator = " / ")
 	{
-		$return = array();
-		$parents = $this->getParents($inclSelf);
-		$parents = array_reverse($parents);
-		foreach($parents as $p)
-		{
-			if($forId)
-				$return[]  = $p->getId();
-			else
-				$return[]  = $p->getName();
-		}
-		return implode($separator,$return);
+	    $requestedNos = $this->_getParentsAccNo($inclSelf);
+	    $sql = "select " . ($forId === true ? 'id' : 'name') . ' `id` from accountentry where rootId = ? and accountNumber in (' . "'" . implode("', '", $requestedNos) . "'" . ') order by accountNumber asc';
+	    $result = Dao::getResultsNative($sql, array($this->getRoot()->getId()));
+		return implode($separator, array_map(create_function('$a', 'return $a["id"];'), $result));
 	}
 	/**
 	 * Getting all the parent accounts
@@ -322,19 +363,56 @@ class AccountEntry extends BaseEntityAbstract
 	 * 
 	 * @return multitype:AccountEntry unknown
 	 */
-	public function getParents($inclSelf=false)
+	public function getParents($inclSelf = false)
 	{
-		$root = $this->getRoot();
-		$parents = array();
-		if($inclSelf)
-			$parents[] = $this;
-		$node = $this;
-		while(trim($node->getAccountNumber()) !== trim($root->getAccountNumber()))
-		{
-			$node = $node->getParent();
-			$parents[] = $node;
-		}
-		return $parents;
+	    $requestedNos = $this->_getParentsAccNo($inclSelf);
+		$dao = new EntityDao(get_class($this));
+		return $dao->findByCriteria('rootId = ? and accountNumber in (' . "'" . implode("', '", $requestedNos) . "'" . ')', array($this->getRoot()->getId()), null, DaoQuery::DEFAUTL_PAGE_SIZE, array("accountNumber" => "asc"));
+	}
+	/**
+	 * Getting all parents' account number
+	 * 
+	 * @param bool $inclSelf Whether to include it own value
+	 * 
+	 * @throws EntityException
+	 */
+	private function _getParentsAccNo($inclSelf = false)
+	{
+	    $root = $this->getRoot();
+	    $rootAccNo = $root->getAccountNumber();
+	    $accountNo = $this->getAccountNumber();
+	    if(((strlen($accountNo) -  strlen($rootAccNo)) % AccountEntry::ACC_NO_LENGTH) !== 0)
+	        throw new EntityException('Account Entry(ID=' . $this->getId() . ') has invalid account no:' . $accountNo);
+	    
+	    $requestedNos = array($accountNo);
+	    for($i = 1, $levels = ((strlen($accountNo) -  strlen($rootAccNo)) / AccountEntry::ACC_NO_LENGTH); $i <= $levels; $i++)
+	    {
+	        $requestedNos[] = substr($accountNo, 0, (0 - AccountEntry::ACC_NO_LENGTH) * $i);
+	    }
+	    if($inclSelf !== true)
+	        $requestedNos = array_filter($requestedNos, create_function('$a', 'return $a == ' . $accountNo . ';'));
+	    return $requestedNos;
+	}
+	/**
+	 * The setter for allow trans
+	 * 
+	 * @param bool $allowTrans Whether we are allowing transaction on this accountentry
+	 * 
+	 * @return AccountEntry
+	 */
+	public function setAllowTrans($allowTrans)
+	{
+	    $this->allowTrans = $allowTrans;
+	    return $this;
+	}
+	/**
+	 * Getter for allowTrans
+	 * 
+	 * @return bool
+	 */
+	public function getAllowTrans()
+	{
+	    return $this->allowTrans;
 	}
 	/**
 	 * getting the account entry for json
@@ -343,7 +421,7 @@ class AccountEntry extends BaseEntityAbstract
 	 * 
 	 * @return multitype:boolean NULL multitype: unknown
 	 */
-	public function getJsonArray($loadParent = true)
+	public function getJsonArray()
 	{
 	    $acc = array();
 	    $thisNo = $this->getAccountNumber();
@@ -358,12 +436,13 @@ class AccountEntry extends BaseEntityAbstract
 	    $acc['value'] = $this->getValue();
 	    $acc['budget'] = $this->getBudget();
 	    $acc['comments'] = $this->getComments();
-	    $acc['sum'] = $this->getSum(true, true);
-	    $acc['gotChildren'] = count($this->getChildren()) !== 0;
+	    $acc['sum'] = $this->getSum();
+	    $acc['allowTrans'] = $this->getAllowTrans();
+	    $acc['noOfChildren'] = Dao::countByCriteria(new DaoQuery('AccountEntry'), 'parentId = ?', array($this->getId()));
 	    $parent = $this->getParent();
 	    $acc['parent'] = array();
 	    if($parent instanceof AccountEntry)
-    	    $acc['parent'] = ($loadParent === true ? $parent->getJsonArray(false) : array('id' => $parent->getId(), 'name' => $parent->getName()));
+    	    $acc['parent'] = array('id' => $parent->getId(), 'name' => $parent->getName());
 	    return $acc;
 	}
 	/**
@@ -388,6 +467,7 @@ class AccountEntry extends BaseEntityAbstract
 		DaoMap::setStringType('budget', 'varchar');
 		DaoMap::setManyToOne("parent", "AccountEntry", "petr", true);
 		DaoMap::setManyToOne("root", "AccountEntry", "petrr");
+		DaoMap::setBoolType("allowTrans");
 		parent::loadDaoMap();
 		DaoMap::commit();
 	}

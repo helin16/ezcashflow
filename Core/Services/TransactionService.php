@@ -166,5 +166,23 @@ class TransactionService extends BaseService
         $this->entityDao->deleteManyToManyJoin($asset, $trans);
         return $this->get($trans->getId());
     }
+    /**
+     * Update all transactions
+     * 
+     * @param AccountEntry $oldAccount The old account
+     * @param AccountEntry $newAccount The new account
+     * 
+     * @return TransactionService
+     */
+    public function moveAllTrans(AccountEntry $oldAccount, AccountEntry $newAccount)
+    {
+        if(!$newAccount->getAllowTrans())
+            throw new ServiceException('The new account(' . $newAccount->getId() . ') is NOT allow to create any transactions!');
+        //move all from accountentry
+        $this->entityDao->updateByCriteria('`fromId` = ?', '`fromId` = ?', array($newAccount->getId(), $oldAccount->getId()));
+        //move all to accounentry
+        $this->entityDao->updateByCriteria('`toId` = ?', '`toId` = ?', array($newAccount->getId(), $oldAccount->getId()));
+        return $this;
+    }
 }
 ?>

@@ -88,7 +88,7 @@ class AccountsController extends PageAbstract
 	    $results = $errors = array();
 	    try 
 	    {
-    	    if(($accountId = trim($param->CallbackParameter->accountId)) === '' && ($parentId = trim($param->CallbackParameter->parentId)) === '')
+    	    if(!($account = $this->_accService->get($param->CallbackParameter->accountId)) instanceof AccountEntry && !($parent = $this->_accService->get($param->CallbackParameter->parentId)) instanceof AccountEntry)
     	        throw new Exception('System Error: we need at least one of them: accountId or parentId!');
     	    if(($accountName = trim($param->CallbackParameter->name)) === '')
     	        throw new Exception('System Error: we need name for the account!');
@@ -96,23 +96,12 @@ class AccountsController extends PageAbstract
     	        throw new Exception('System Error: it is not numeric for the value!');
     	    if(!is_numeric(($accountBudget = trim($param->CallbackParameter->budget))))
     	        throw new Exception('System Error: it is not numeric for the budget!');
+    	    $comments = trim($param->CallbackParameter->comments);
     	    
-    	    $account = new AccountEntry();
-    	    if ($accountId !== '')
-    	        $account = $this->_accService->get($accountId);
+    	    if ($account instanceof AccountEntry)
+    	        $account = $this->_accService->updateAccount($account, $account->getParent(), $accountName, $accountValue, $comments, $accountBudget);
     	    else
-    	    {
-    	        $parent = $this->_accService->get($parentId);
-    	        $account->setParent($parent);
-    	        $account->setRoot($parent->getRoot());
-    	        $accountNumber = $this->_accService->getNextAccountNo($parent);
-    	        $account->setAccountNumber($accountNumber);
-    	    }
-    	    $account->setName($accountName);
-    	    $account->setValue($accountValue);
-    	    $account->setBudget($accountBudget);
-    	    $account->setComments(trim($param->CallbackParameter->comments));
-    	    $this->_accService->save($account);
+    	        $account = $this->_accService->createAccount($parent, $accountName, $accountValue, $comments, $accountBudget);
     	    $results = $this->_jsonAccountEntry($account);
 	    }
 	    catch(Exception $e)

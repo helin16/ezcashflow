@@ -182,48 +182,15 @@ class TransactionPanel extends TTemplateControl
 	private function _getAccountList($rootId)
 	{
 	    $accounts = array();
-	    $results = $this->_accountService->findByCriteria('rootId = :rootId and id != :rootId', array('rootId' => $rootId), true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('rootId' => 'asc'));
+	    $results = $this->_accountService->getAllAllowTransAcc(array($rootId), null, DaoQuery::DEFAUTL_PAGE_SIZE, array('rootId' => 'asc'));
 	    foreach($results as $account)
 	    {
-	        if(!$account instanceof AccountEntry || count($account->getChildren()) > 0 )
-	            continue;
 	        $accArray = $account->getJsonArray(false);
 	        $accounts[$accArray['breadCrumbs']['name']] = $accArray;
 	    }
 	    krsort($accounts);
 	    $accounts = array_reverse($accounts);
 	    return $accounts;
-	}
-	
-	/**
-	 * Loading all the accounts
-	 * 
-	 * @param TDropDownList $list           The list we will bind our account to 
-	 * @param string        $accountRootIds The account root ids
-	 * 
-	 * @return TransactionPanel
-	 */
-	private function _loadAccounts(TDropDownList &$list, $accountRootIds)
-	{
-		if(($accountRootIds = trim($accountRootIds)) == "") return;
-		$accountRootIds = explode(",", $accountRootIds);
-		if(count($accountRootIds)==0) return;
-		
-		$array = array();
-		foreach($accountRootIds as $rootId)
-		{
-			$result = $this->_accountService->findByCriteria("rootId in ($rootId) and id not in (" . implode(",", $accountRootIds) . ")");
-			foreach($result as $a)
-			{
-				if(count($a->getChildren()) === 0 )
-					$array[strtolower(str_replace(" ", "", $a->getBreadCrumbs()))] = $a;
-			}
-		}
-		krsort($array);
-		$array = array_reverse($array);
-		$list->DataSource = $array;
-		$list->DataBind();
-		return $this;
 	}
 	/**
 	 * File upload handler
