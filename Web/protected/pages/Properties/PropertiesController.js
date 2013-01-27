@@ -133,7 +133,7 @@ PropertiesJs.prototype = {
 	//getting the html for the property
 	formatProperty: function(data, rowNo) {
 		var tmp = {};
-		console.debug(data);
+//		console.debug(data);
 		tmp.wrapper = new Element('div', {'class': "property row " + (rowNo % 2 === 0 ? 'odd' : 'even')});
 		
 		//summary div
