@@ -464,7 +464,7 @@ div.content-right .box .content ul li .descr {
 #transpage .box-content.resultlist .row .comments {
     display: block;
 }
-#transpage .box-content.resultlist .showMoreBtn {
+.box-content.resultlist .showMoreBtn {
     width: 100%;
     padding: 8px;
     background: #7DCB39;
