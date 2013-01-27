@@ -61,10 +61,15 @@ class PropertiesController extends PageAbstract
     		$stats = $this->_proService->getPageStats();
     		$results['total'] = $stats['totalRows'];
     		$results['properties'] = array();
+    		$now = new UDate();
     		foreach($properties as $property)
     		{
     		    $pArray = $property->getJsonArray();
-    		    $pArray['currentFY'] = $this->_getCurrentFY($property);
+    		    $currentFYmidYr = new UDate($now->format('Y-07-01 00:00:00'));
+    		    $pArray['currentFY'] = $this->_getFY($property, $currentFYmidYr, $now);
+    		    $currentFYmidYr->modify('-1 year');
+    		    $now->modify('-1 year');
+    		    $pArray['lastFY'] = $this->_getFY($property, $currentFYmidYr, $now);
     		    $results['properties'][] = $pArray;
     		}
 	    }
@@ -82,10 +87,8 @@ class PropertiesController extends PageAbstract
 	 * 
 	 * @return array
 	 */
-	private function _getCurrentFY(Property $property)
+	private function _getFY(Property $property, UDate $midYearDate, UDate $now)
 	{
-	    $now = new UDate();
-	    $midYearDate = new UDate($now->format('Y-07-01 00:00:00'));
 	    $start = new UDate(trim($midYearDate));
 	    $end = new UDate(trim($midYearDate));
 	    //if we passed 1st of July
@@ -103,9 +106,28 @@ class PropertiesController extends PageAbstract
 	    $array = array(
 	            'date' => array('from' => trim($start), 'to' => trim($end)),
 	            'income' => $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, '', $property->getIncomeAcc()),
-	            'outgoing' => $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, '', $property->getOutgoingAcc())
+	            'outgoing' => $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, '', $property->getOutgoingAcc()),
 	    );
 	    return $array;
+	}
+	/**
+	 * Getting the Incomea and Expense account Ids
+	 *
+	 * return array
+	 */
+	private function _getAccIds()
+	{
+	    $accountIds = array();
+	    $sql = "select id, rootId
+	    from accountentry
+	    where active = 1 and rootId in (" . AccountEntry::TYPE_INCOME . ", " . AccountEntry::TYPE_EXPENSE . ") ";
+	    foreach(Dao::getResultsNative($sql) as $row)
+	    {
+	        if(!isset($accountIds[$row["rootId"]]))
+	            $accountIds[$row["rootId"]] = array();
+	        $accountIds[$row["rootId"]][] = $row["id"];
+	    }
+	    return $accountIds;
 	}
 }
 ?>

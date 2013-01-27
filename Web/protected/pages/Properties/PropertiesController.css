@@ -1,5 +1,5 @@
 .property.row {
-	font-size: 12px;
+	font-size: 11px;
 }
 .minusCurrency {
 	color: red;
@@ -9,6 +9,7 @@
 .setup,
 .outgoing,
 .income,
+.returnpercentage,
 .profit{
 	display: inline-block;
 	padding: 3px;
@@ -18,9 +19,13 @@
 	background: #cccccc;
 	color: black;
 }
-
+.returnpercentage {
+	width: 30px;
+	font-style: italic;
+	font-size: 9px;
+	text-align: left;
+}
 .title {
-	width: 200px;
 	font-weight: bold;
 }
 .title .daterange{

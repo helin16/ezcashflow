@@ -44,7 +44,7 @@ PropertiesJs.prototype = {
 	    			item.update(tmp.result.total);
 	    		});
 	    		
-	    		tmp.headerRow = new Element('div', {'class': "property row header"}).update(pageJs.getValueRow('', 'Bought', 'Setup', 'Income', 'Expense', 'Profit'));
+	    		tmp.headerRow = new Element('div', {'class': "property row header"}).update(pageJs.getValueRow('', 'Bought', 'Setup', 'Income', '(%)', 'Expense', 'Profit'));
 	    		$(tmp.resultDivId).update(tmp.headerRow);
 	    		for(tmp.i = 0; tmp.i < tmp.count; tmp.i++) {
 	    			tmp.rowNo = (pageJs.pagination.pageNumber - 1) * pageJs.pagination.pageSize + tmp.i + 1;
@@ -103,21 +103,24 @@ PropertiesJs.prototype = {
     	});
 	},
 	//get the dom element for the 
-	getValueRow: function(title, boughtValue, setup, income, outgoing, profit) {
+	getValueRow: function(title, boughtValue, setup, income, returnp, outgoing, profit) {
 		var tmp = {};
 		tmp.valuesDiv = new Element('div', {'class': "values"});
 		
 		tmp.titleSpan = new Element('span', {'class': "title"}).update(title);
 		tmp.valuesDiv.insert({'bottom': tmp.titleSpan});
 		
-		tmp.boughtValueSpan = new Element('span', {'class': "boughtvalue"}).update(boughtValue);
-		tmp.valuesDiv.insert({'bottom': tmp.boughtValueSpan});
+//		tmp.boughtValueSpan = new Element('span', {'class': "boughtvalue"}).update(boughtValue);
+//		tmp.valuesDiv.insert({'bottom': tmp.boughtValueSpan});
 		
 		tmp.setupSpan = new Element('span', {'class': "setup"}).update(setup);
 		tmp.valuesDiv.insert({'bottom': tmp.setupSpan});
 		
 		tmp.incomeSpan = new Element('span', {'class': "income"}).update(income);
 		tmp.valuesDiv.insert({'bottom': tmp.incomeSpan});
+		
+		tmp.returnpercentageSpan = new Element('span', {'class': "returnpercentage"}).update(returnp);
+		tmp.valuesDiv.insert({'bottom': tmp.returnpercentageSpan});
 		
 		tmp.outgoingSpan = new Element('span', {'class': "outgoing"}).update(outgoing);
 		tmp.valuesDiv.insert({'bottom': tmp.outgoingSpan});
@@ -130,6 +133,7 @@ PropertiesJs.prototype = {
 	//getting the html for the property
 	formatProperty: function(data, rowNo) {
 		var tmp = {};
+		console.debug(data);
 		tmp.wrapper = new Element('div', {'class': "property row " + (rowNo % 2 === 0 ? 'odd' : 'even')});
 		
 		//summary div
@@ -147,9 +151,28 @@ PropertiesJs.prototype = {
 		tmp.titleDiv.insert({'bottom': new Element('div', {'class': 'titlecontent'}).update('Current FY: ')});
 //		tmp.titleDiv.insert({'bottom': new Element('div', {'class': 'daterange'}).update(data.currentFY.date.from + ' ~ ' + data.currentFY.date.to)});
 		tmp.valueRow = this.getValueRow(tmp.titleDiv,
-				data.boughtValue, 
+				appJs.getCurrency(data.boughtValue), 
 				appJs.getCurrency(data.setupAcc.sum), 
 				appJs.getCurrency(tmp.incomeAcc), 
+				'(' + (Math.round(data.boughtValue) === 0 ? 0 : ((tmp.incomeAcc / data.boughtValue) * 100).toFixed(2)) + '%)', 
+				appJs.getCurrency(tmp.outgoingAcc), 
+				tmp.profit
+		);
+		tmp.wrapper.insert({'bottom': tmp.valueRow});
+		
+		//get last financial year's data
+		tmp.incomeAcc = data.lastFY.income;
+		tmp.outgoingAcc = data.lastFY.outgoing;
+		tmp.profit = tmp.incomeAcc - tmp.outgoingAcc;
+		tmp.profit = tmp.profit >= 0 ? appJs.getCurrency(tmp.profit) : new Element('span', {'class': 'minusCurrency'}).update(appJs.getCurrency(tmp.profit));
+		tmp.titleDiv = new Element('span');
+		tmp.titleDiv.insert({'bottom': new Element('div', {'class': 'titlecontent'}).update('Last FY: ')});
+//		tmp.titleDiv.insert({'bottom': new Element('div', {'class': 'daterange'}).update(data.lastFY.date.from + ' ~ ' + data.lastFY.date.to)});
+		tmp.valueRow = this.getValueRow(tmp.titleDiv,
+				appJs.getCurrency(data.boughtValue), 
+				appJs.getCurrency(data.setupAcc.sum), 
+				appJs.getCurrency(tmp.incomeAcc), 
+				'(' + (Math.round(data.boughtValue) === 0 ? 0 : ((tmp.incomeAcc / data.boughtValue) * 100).toFixed(2)) + '%)', 
 				appJs.getCurrency(tmp.outgoingAcc), 
 				tmp.profit
 		);
@@ -161,9 +184,10 @@ PropertiesJs.prototype = {
 		tmp.profit = tmp.incomeAcc - tmp.outgoingAcc;
 		tmp.profit = tmp.profit >= 0 ? appJs.getCurrency(tmp.profit) : new Element('span', {'class': 'minusCurrency'}).update(appJs.getCurrency(tmp.profit));
 		tmp.valueRow = this.getValueRow('Total: ',
-				data.boughtValue, 
+				appJs.getCurrency(data.boughtValue), 
 				appJs.getCurrency(data.setupAcc.sum), 
 				appJs.getCurrency(tmp.incomeAcc), 
+				'(' + (Math.round(data.boughtValue) === 0 ? 0 : ((tmp.incomeAcc / data.boughtValue) * 100).toFixed(2)) + '%)', 
 				appJs.getCurrency(tmp.outgoingAcc), 
 				tmp.profit
 		);
