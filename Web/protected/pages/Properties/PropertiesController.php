@@ -15,6 +15,12 @@ class PropertiesController extends PageAbstract
      */
     private $_proService;
     /**
+     * Transaction service
+     * 
+     * @var TransactionService
+     */
+    private $_transService;
+    /**
      * constructor
      */
 	public function __construct()
@@ -22,6 +28,7 @@ class PropertiesController extends PageAbstract
 		parent::__construct();
 		$this->menuItemName = 'properties';
 		$this->_proService = new PropertyService();
+		$this->_transService = new TransactionService();
 	}
 	/**
 	 * (non-PHPdoc)
@@ -51,11 +58,14 @@ class PropertiesController extends PageAbstract
     	    
     	    $pagination = $param->CallbackParameter->pagination;
     		$properties = $this->_proService->findAll(true, $pagination->pageNumber, $pagination->pageSize);
+    		$stats = $this->_proService->getPageStats();
+    		$results['total'] = $stats['totalRows'];
+    		$results['properties'] = array();
     		foreach($properties as $property)
     		{
-    		    if(!$property instanceof Property)
-    		        continue;
-    		    $results[] = $property->getJsonArray();
+    		    $pArray = $property->getJsonArray();
+    		    $pArray['currentFY'] = $this->_getCurrentFY($property);
+    		    $results['properties'][] = $pArray;
     		}
 	    }
 	    catch(Exception $e)
@@ -64,6 +74,38 @@ class PropertiesController extends PageAbstract
 	    }
 	    $param->ResponseData = $this->_getJson($results, $errors);
 	    return $this;
+	}
+	/**
+	 * Getting the current Financial year's data for a property
+	 * 
+	 * @param Property $property The property
+	 * 
+	 * @return array
+	 */
+	private function _getCurrentFY(Property $property)
+	{
+	    $now = new UDate();
+	    $midYearDate = new UDate($now->format('Y-07-01 00:00:00'));
+	    $start = new UDate(trim($midYearDate));
+	    $end = new UDate(trim($midYearDate));
+	    //if we passed 1st of July
+	    if($now->afterOrEqualTo($midYearDate))
+	    {
+	        $end->modify('+1 year');
+	        $end->modify('-1 second');
+	    }
+	    else //if we are in the first half year 
+	    {
+	        $end->modify('-1 second');
+	        $start->modify('-1 year');
+	    }
+	    
+	    $array = array(
+	            'date' => array('from' => trim($start), 'to' => trim($end)),
+	            'income' => $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, '', $property->getIncomeAcc()),
+	            'outgoing' => $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, '', $property->getOutgoingAcc())
+	    );
+	    return $array;
 	}
 }
 ?>

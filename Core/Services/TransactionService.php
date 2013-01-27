@@ -87,11 +87,11 @@ class TransactionService extends BaseService
      * 
      * @return double
      */
-	public function getSumOfExpenseBetweenDates($startDate, $endDate, $accountTypeId = AccountEntry::TYPE_EXPENSE, $excludePosition = '')
+	public function getSumOfExpenseBetweenDates($startDate, $endDate, $accountTypeId = AccountEntry::TYPE_EXPENSE, $excludePosition = '', AccountEntry $parent = null)
 	{
 		$qry = 'select sum(t.value) as sum 
 				from transaction t 
-				inner join accountentry acc on (acc.active = 1 and acc.id = t.toId {innerJoin})
+				inner join accountentry acc on (acc.active = 1 and acc.id = t.toId {innerJoin} ' . ($parent instanceof AccountEntry ? " AND acc.accountNumber like '" . $parent->getAccountNumber() . "%'" : "") . ')
 				where t.active = 1
 				and (acc.rootId = :accTypeId) 
 				and (t.created between :startDate and :endDate)';
