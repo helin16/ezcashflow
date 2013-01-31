@@ -61,10 +61,10 @@ class ProfitPanel extends TTemplateControl
 	        $start = $today->getDateTime()->format('Y-m-d 00:00:00');
 	        $today->modify("+1 day");
 	        $end = $today->getDateTime()->format('Y-m-d 00:00:00');
-	        $results['day']['range']['start'] = $start;
-	         $results['day']['range']['end'] = $end;
-	        $results['day']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-	        $results['day']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	        $results['day']['range']['start'] = trim($start);
+	         $results['day']['range']['end'] = trim($end);
+	        $results['day']['income'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, $excludeIncomePos);
+	        $results['day']['expense'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, $excludeExpensePos);
 	        
 	        // week
 	        $results['week'] = array();
@@ -77,10 +77,10 @@ class ProfitPanel extends TTemplateControl
 	        $start = $today->getDateTime()->format("Y-m-d 00:00:00");
 	        $today->modify("+1 week");
 	        $end = $today->getDateTime()->format("Y-m-d 00:00:00");
-	        $results['week']['range']['start'] = $start;
-	        $results['week']['range']['end'] = $end;
-	        $results['week']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-	        $results['week']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	        $results['week']['range']['start'] = trim($start);
+	        $results['week']['range']['end'] = trim($end);
+	        $results['week']['income'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, $excludeIncomePos);
+	        $results['week']['expense'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, $excludeExpensePos);
 	        
 	        // month
 	        $results['month'] = array();
@@ -88,21 +88,32 @@ class ProfitPanel extends TTemplateControl
 	        $start = $today->getDateTime()->format("Y-m-01 00:00:00");
 	        $today->modify("+1 month");
 	        $end = $today->getDateTime()->format("Y-m-01 00:00:00");
-	        $results['month']['range']['start'] = $start;
-	        $results['month']['range']['end'] = $end;
-	        $results['month']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-	        $results['month']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	        $results['month']['range']['start'] = trim($start);
+	        $results['month']['range']['end'] = trim($end);
+	        $results['month']['income'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, $excludeIncomePos);
+	        $results['month']['expense'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, $excludeExpensePos);
 	        
 	        // year
 	        $results['year'] = array();
 	        $today = new UDate("now");
-	        $start = $today->getDateTime()->format("Y-01-01 00:00:00");
-	        $today->modify("+1 year");
-	        $end = $today->getDateTime()->format("Y-01-01 00:00:00");
-	        $results['year']['range']['start'] = $start;
-	        $results['year']['range']['end'] = $end;
-	        $results['year']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-	        $results['year']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	        $midYearDate = new UDate($today->getDateTime()->format("Y-07-01 00:00:00"));
+	        $start = new UDate(trim($midYearDate));
+	        $end = new UDate(trim($midYearDate));
+	        //if we passed 1st of July
+	        if($today->afterOrEqualTo($midYearDate))
+	        {
+	            $end->modify('+1 year');
+	            $end->modify('-1 second');
+	        }
+	        else //if we are in the first half year
+	        {
+	            $end->modify('-1 second');
+	            $start->modify('-1 year');
+	        }
+	        $results['year']['range']['start'] = trim($start);
+	        $results['year']['range']['end'] = trim($end);
+	        $results['year']['income'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, $excludeIncomePos);
+	        $results['year']['expense'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, $excludeExpensePos);
 	        
 	        // all
 	        $results['all'] = array();
@@ -110,10 +121,10 @@ class ProfitPanel extends TTemplateControl
 	        $start = $today->getDateTime()->format("1791-01-01 00:00:00");
 	        $today->modify("+1 year");
 	        $end = $today->getDateTime()->format("9999-01-01 00:00:00");
-	        $results['all']['range']['start'] = $start;
-	        $results['all']['range']['end'] = $end;
-	        $results['all']['income'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,3,$excludeIncomePos);
-	        $results['all']['expense'] = $this->_transService->getSumOfExpenseBetweenDates($start,$end,4,$excludeExpensePos);
+	        $results['all']['range']['start'] = trim($start);
+	        $results['all']['range']['end'] = trim($end);
+	        $results['all']['income'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, $excludeIncomePos);
+	        $results['all']['expense'] = $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, $excludeExpensePos);
 	    }
 	    catch(Exception $e)
 	    {
