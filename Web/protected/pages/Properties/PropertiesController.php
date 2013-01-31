@@ -61,9 +61,9 @@ class PropertiesController extends PageAbstract
     		$stats = $this->_proService->getPageStats();
     		$results['total'] = $stats['totalRows'];
     		$results['properties'] = array();
-    		$now = new UDate();
     		foreach($properties as $property)
     		{
+        		$now = new UDate();
     		    $pArray = $property->getJsonArray();
     		    $currentFYmidYr = new UDate($now->format('Y-07-01 00:00:00'));
     		    $pArray['currentFY'] = $this->_getFY($property, $currentFYmidYr, $now);
