@@ -107,6 +107,8 @@ class PropertiesController extends PageAbstract
 	            'date' => array('from' => trim($start), 'to' => trim($end)),
 	            'income' => $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, '', $property->getIncomeAcc()),
 	            'outgoing' => $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, '', $property->getOutgoingAcc()),
+	            'incomeAccIds' => array_map(create_function('$a', 'return $a->getId();'), $property->getIncomeAcc()->getChildren(true)),
+	            'outgoingAccIds' => array_map(create_function('$a', 'return $a->getId();'), $property->getOutgoingAcc()->getChildren(true))
 	    );
 	    return $array;
 	}

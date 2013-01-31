@@ -130,10 +130,19 @@ PropertiesJs.prototype = {
 		
 		return tmp.valuesDiv;
 	},
+	//getting the url to the transactions
+	makeUrl: function(start, end, toAccIds, fromAccIds) {
+		var tmp = {};
+		tmp.array = {"fromAccountIds" : fromAccIds !== undefined ? fromAccIds : [],
+                "toAccountIds": toAccIds,
+                "fromDate": start,
+                "toDate": end
+		};
+		return "/reports/" + Object.toJSON(tmp.array);
+	},
 	//getting the html for the property
 	formatProperty: function(data, rowNo) {
 		var tmp = {};
-//		console.debug(data);
 		tmp.wrapper = new Element('div', {'class': "property row " + (rowNo % 2 === 0 ? 'odd' : 'even')});
 		
 		//summary div
@@ -142,60 +151,81 @@ PropertiesJs.prototype = {
 		tmp.summaryDiv.insert({'bottom': tmp.addressSpan});
 		
 		tmp.wrapper.insert({'bottom': tmp.summaryDiv});
+		
 		//get current financial year's data
-		tmp.incomeAcc = data.currentFY.income;
-		tmp.outgoingAcc = data.currentFY.outgoing;
-		tmp.profit = tmp.incomeAcc - tmp.outgoingAcc;
-		tmp.profit = tmp.profit >= 0 ? appJs.getCurrency(tmp.profit) : new Element('span', {'class': 'minusCurrency'}).update(appJs.getCurrency(tmp.profit));
-		tmp.titleDiv = new Element('span');
-		tmp.titleDiv.insert({'bottom': new Element('div', {'class': 'titlecontent'}).update('Current FY: ')});
-//		tmp.titleDiv.insert({'bottom': new Element('div', {'class': 'daterange'}).update(data.currentFY.date.from + ' ~ ' + data.currentFY.date.to)});
-		tmp.valueRow = this.getValueRow(tmp.titleDiv,
-				appJs.getCurrency(data.boughtValue), 
-				appJs.getCurrency(data.setupAcc.sum), 
-				appJs.getCurrency(tmp.incomeAcc), 
-				'(' + (Math.round(data.boughtValue) === 0 ? 0 : ((tmp.incomeAcc / data.boughtValue) * 100).toFixed(2)) + '%)', 
-				appJs.getCurrency(tmp.outgoingAcc), 
-				tmp.profit
-		);
+		tmp.valueRow = this.getCurrentFYDiv(data);
 		tmp.wrapper.insert({'bottom': tmp.valueRow});
 		
 		//get last financial year's data
-		tmp.incomeAcc = data.lastFY.income;
-		tmp.outgoingAcc = data.lastFY.outgoing;
-		tmp.profit = tmp.incomeAcc - tmp.outgoingAcc;
-		tmp.profit = tmp.profit >= 0 ? appJs.getCurrency(tmp.profit) : new Element('span', {'class': 'minusCurrency'}).update(appJs.getCurrency(tmp.profit));
-		tmp.titleDiv = new Element('span');
-		tmp.titleDiv.insert({'bottom': new Element('div', {'class': 'titlecontent'}).update('Last FY: ')});
-//		tmp.titleDiv.insert({'bottom': new Element('div', {'class': 'daterange'}).update(data.lastFY.date.from + ' ~ ' + data.lastFY.date.to)});
-		tmp.valueRow = this.getValueRow(tmp.titleDiv,
-				appJs.getCurrency(data.boughtValue), 
-				appJs.getCurrency(data.setupAcc.sum), 
-				appJs.getCurrency(tmp.incomeAcc), 
-				'(' + (Math.round(data.boughtValue) === 0 ? 0 : ((tmp.incomeAcc / data.boughtValue) * 100).toFixed(2)) + '%)', 
-				appJs.getCurrency(tmp.outgoingAcc), 
-				tmp.profit
-		);
+		tmp.valueRow = this.getLastFYDiv(data);
 		tmp.wrapper.insert({'bottom': tmp.valueRow});
 		
-		//value div
-		tmp.incomeAcc = data.incomeAcc.sum;
-		tmp.outgoingAcc = data.outgoingAcc.sum;
-		tmp.profit = tmp.incomeAcc - tmp.outgoingAcc;
-		tmp.profit = tmp.profit >= 0 ? appJs.getCurrency(tmp.profit) : new Element('span', {'class': 'minusCurrency'}).update(appJs.getCurrency(tmp.profit));
-		tmp.valueRow = this.getValueRow('Total: ',
-				appJs.getCurrency(data.boughtValue), 
-				appJs.getCurrency(data.setupAcc.sum), 
-				appJs.getCurrency(tmp.incomeAcc), 
-				'(' + (Math.round(data.boughtValue) === 0 ? 0 : ((tmp.incomeAcc / data.boughtValue) * 100).toFixed(2)) + '%)', 
-				appJs.getCurrency(tmp.outgoingAcc), 
-				tmp.profit
-		);
+		//get total data
+		tmp.valueRow = this.getTotalDiv(data);
 		tmp.wrapper.insert({'bottom': tmp.valueRow});
+		
 		return tmp.wrapper;
 	},
 	//show add/edit property panel
 	showPropertyPanel: function(property) {
 		var tmp = {};
+	},
+	//get current financial year's data
+	getCurrentFYDiv: function(data) {
+		var tmp = {};
+		tmp.incomeAcc = data.currentFY.income;
+		tmp.outgoingAcc = data.currentFY.outgoing;
+		tmp.profit = tmp.incomeAcc - tmp.outgoingAcc;
+		tmp.profit = tmp.profit >= 0 ? appJs.getCurrency(tmp.profit) : new Element('span', {'class': 'minusCurrency'}).update(appJs.getCurrency(tmp.profit));
+		tmp.returnP = '(' + (Math.round(data.boughtValue) === 0 ? 0 : ((tmp.incomeAcc / data.boughtValue) * 100).toFixed(2)) + '%)';
+		tmp.titleDiv = new Element('span').update(new Element('div', {'class': 'titlecontent', 'title': (data.currentFY.date.from + ' ~ ' + data.currentFY.date.to)}).update('Current FY: '));
+		tmp.incomeAcc = new Element('a', {'href': pageJs.makeUrl(data.currentFY.date.from, data.currentFY.date.to, data.currentFY.incomeAccIds)}).update(appJs.getCurrency(tmp.incomeAcc));
+		tmp.outgoingAcc = new Element('a', {'href': pageJs.makeUrl(data.currentFY.date.from, data.currentFY.date.to, data.currentFY.outgoingAccIds)}).update(appJs.getCurrency(tmp.outgoingAcc));
+		return this.getValueRow(tmp.titleDiv,
+				appJs.getCurrency(data.boughtValue), 
+				appJs.getCurrency(data.setupAcc.sum), 
+				tmp.incomeAcc, 
+				tmp.returnP, 
+				tmp.outgoingAcc, 
+				tmp.profit
+		);
+	},
+	//get last financial year's data
+	getLastFYDiv: function(data) {
+		var tmp = {};
+		//get last financial year's data
+		tmp.incomeAcc = data.lastFY.income;
+		tmp.outgoingAcc = data.lastFY.outgoing;
+		tmp.profit = tmp.incomeAcc - tmp.outgoingAcc;
+		tmp.profit = tmp.profit >= 0 ? appJs.getCurrency(tmp.profit) : new Element('span', {'class': 'minusCurrency'}).update(appJs.getCurrency(tmp.profit));
+		tmp.returnP = '(' + (Math.round(data.boughtValue) === 0 ? 0 : ((tmp.incomeAcc / data.boughtValue) * 100).toFixed(2)) + '%)';
+		tmp.titleDiv = new Element('span').update(new Element('div', {'class': 'titlecontent', 'title': (data.lastFY.date.from + ' ~ ' + data.lastFY.date.to)}).update('Last FY: '));
+		tmp.incomeAcc = new Element('a', {'href': pageJs.makeUrl(data.lastFY.date.from, data.lastFY.date.to, data.lastFY.incomeAccIds)}).update(appJs.getCurrency(tmp.incomeAcc));
+		tmp.outgoingAcc = new Element('a', {'href': pageJs.makeUrl(data.lastFY.date.from, data.lastFY.date.to, data.lastFY.outgoingAccIds)}).update(appJs.getCurrency(tmp.outgoingAcc));
+		return this.getValueRow(tmp.titleDiv,
+				appJs.getCurrency(data.boughtValue), 
+				appJs.getCurrency(data.setupAcc.sum), 
+				tmp.incomeAcc, 
+				tmp.returnP, 
+				tmp.outgoingAcc, 
+				tmp.profit
+		);
+	},
+	//get total data
+	getTotalDiv: function(data) {
+		var tmp = {};
+		tmp.incomeAcc = data.incomeAcc.sum;
+		tmp.outgoingAcc = data.outgoingAcc.sum;
+		tmp.profit = tmp.incomeAcc - tmp.outgoingAcc;
+		tmp.profit = tmp.profit >= 0 ? appJs.getCurrency(tmp.profit) : new Element('span', {'class': 'minusCurrency'}).update(appJs.getCurrency(tmp.profit));
+		tmp.returnP = '(' + (Math.round(data.boughtValue) === 0 ? 0 : ((tmp.incomeAcc / data.boughtValue) * 100).toFixed(2)) + '%)';
+		return this.getValueRow('Total: ',
+				appJs.getCurrency(data.boughtValue), 
+				appJs.getCurrency(data.setupAcc.sum), 
+				appJs.getCurrency(tmp.incomeAcc), 
+				tmp.returnP, 
+				appJs.getCurrency(tmp.outgoingAcc), 
+				tmp.profit
+		);
 	}
 };

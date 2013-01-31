@@ -19,6 +19,12 @@
 	background: #cccccc;
 	color: black;
 }
+.income a,
+.outgoing a {
+	color: #1E3A7D;
+	text-decoration: none;
+	font-weight:bold;
+}
 .returnpercentage {
 	width: 30px;
 	font-style: italic;
@@ -27,12 +33,7 @@
 }
 .title {
 	font-weight: bold;
-}
-.title .daterange{
-	font-size: 9px;
-	font-style: italic;
-	font-weight: normal;
-	color: #aaaaaa;
+	cursor: pointer;
 }
 .summery{
 	text-align: left;
