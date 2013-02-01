@@ -63,6 +63,11 @@ TransPaneJs.prototype = {
 		});
 	},
 	
+	//reformat the value in the value box
+	stripValue: function(value) {
+		return value.strip().replace(' ', '').replace('$', '').replace(',', '');
+	},
+	
 	//saving the transaction
 	saveTrans: function(btn, postJs) {
 		var tmp = {};
@@ -84,7 +89,7 @@ TransPaneJs.prototype = {
 		}
 		tmp.data = {'fromAccId': $F(tmp.fromAccListBox), 
 				'toAccId': $F(tmp.toAccListBox), 
-				'value': $F(tmp.valueBox).strip(), 
+				'value': transJs.stripValue($F(tmp.valueBox)), 
 				'comments': $F(tmp.commentsBox).strip(), 
 				'fromIds': this.accountIds.from, 
 				'toIds': this.accountIds.to, 
@@ -134,9 +139,9 @@ TransPaneJs.prototype = {
 			tmp.succ = false;
 		}
 		
-		tmp.regex = /^(\d{1,3}(\,\d{3})*|(\d+))(\.\d{1,2})?$/;
-		if(!$F(valueBox).strip().match(tmp.regex)) {
-			$(valueBox).up("div.row").down('span.title').insert({"bottom": new Element("span", {'class': "errorMsg"}).update('Invalid Value')});
+		tmp.regex = /^(\d+)(\.\d{1,2})?$/;
+		if(!transJs.stripValue($F(valueBox)).match(tmp.regex)) {
+			$(valueBox).up("div.row").down('span.title').insert({"bottom": new Element("span", {'class': "errorMsg"}).update('Invalid Value' + transJs.stripValue($F(valueBox)))});
 			tmp.succ = false;
 		}
 		return tmp.succ;
