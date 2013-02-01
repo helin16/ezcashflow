@@ -37,11 +37,15 @@ HomeJs.prototype = {
     		},
 	    	'onComplete': function(sender, param){
 	    		tmp.result = appJs.getResp(param);
+	    		$(tmp.holderDiv).update('');
+	    		if(tmp.result.size() <= 0) {
+	    			$(tmp.holderDiv).update(new Element('div', {'class': 'notrans'}).update('There is NO transactions yet!'));
+	    		}
 	    		tmp.ul = new Element('ul');
 	    		tmp.result.each(function(trans){
 	    			tmp.ul.insert({'bottom': pageJs.getRecentTranRow(trans)});
 	    		});
-	    		$(tmp.holderDiv).update(tmp.ul);
+	    		$(tmp.holderDiv).insert({'bottom': tmp.ul});
 	    	}
     	});
 	},
@@ -49,10 +53,14 @@ HomeJs.prototype = {
 	refreshTrans: function(data) {
 		var tmp = {};
 		$('summaryBtn').click();
+		$(this.recentTrans.holder).getElementsBySelector('.notrans').each(function(item){
+			item.remove();
+		});
 		tmp.ul = $(this.recentTrans.holder).down('ul');
+		tmp.lis = tmp.ul.getElementsBySelector('li');
 		data.each(function(trans){
-			tmp.lastLi = tmp.ul.getElementsBySelector('li').last();
-			if(tmp.lastLi !== undefined)
+			tmp.lastLi = tmp.lis.last();
+			if(tmp.lis.size() >= pageJs.recentTrans.noOfTrans && tmp.lastLi !== undefined)
 				tmp.lastLi.remove();
 			tmp.ul.insert({'top': pageJs.getRecentTranRow(trans)});
 		});
