@@ -152,7 +152,7 @@ abstract class Dao
     public static function findAll(DaoQuery $qry, $pageNumber = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array(), $outputFormat = self::AS_OBJECTS)
     {
         self::connect();
-        $results = self::findByCriteria($qry, 'active = ?', array(1), $pageNumber, $pageSize, $orderBy, $outputFormat);
+        $results = self::findByCriteria($qry, DaoMap::$map[strtolower($qry->getFocusClass())]['_']['alias']  . '.active = ?', array(1), $pageNumber, $pageSize, $orderBy, $outputFormat);
         return $results;
     }
     /**

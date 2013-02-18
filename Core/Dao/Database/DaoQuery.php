@@ -101,6 +101,7 @@ class DaoQuery
 	    list($joinClass, $joinField) = explode('.', $relationship);
 	    if(!isset(DaoMap::$map[strtolower($joinClass)]) || !isset(DaoMap::$map[strtolower($joinClass)][$joinField]))
 	        throw new DaoException('Invalid relationship for: ' . $relationship);
+	    
 	    $alias = DaoMap::$map[strtolower($joinClass)][$joinField]['alias'];
 	    $this->_buildJoin($joinField, $joinClass, $alias, $joinType);
 		return $this;
@@ -345,9 +346,10 @@ class DaoQuery
 		//load the dao map of the join class
 		DaoMap::loadMap($joinClass);
 		$focus = strtolower($this->_focus);
-		$fAlias = DaoMap::$map[$focus]['_']['alias'];
-		$fieldMap = DaoMap::$map[$focus][$field];
-		$ref = DaoMap::$map[$focus][$field]['rel'];
+		$fClass = strtolower($joinClass); // the fieldclass
+		$fAlias = DaoMap::$map[$fClass]['_']['alias']; // the join class's alias
+		$fieldMap = DaoMap::$map[$fClass][$field];
+		$ref = DaoMap::$map[strtolower($joinClass)][$field]['rel'];
 		switch($ref)
 		{
 		    case DaoMap::MANY_TO_MANY:
@@ -355,23 +357,23 @@ class DaoQuery
 	            $joinTableMap = strtolower($fieldMap['class']);
 	            //Join in the many to many join table
 	            if ($fieldMap['side'] == DaoMap::RIGHT_SIDE)
-	                $mtmJoinTable = $focus . '_' . $joinTableMap;
+	                $mtmJoinTable = $fClass . '_' . $joinTableMap;
 	            else
-	                $mtmJoinTable = $joinTableMap . '_' . $focus;
-	            $this->_addJoin($mtmJoinTable, $mtmJoinTable, $fAlias . '.id = ' . $mtmJoinTable . '.' . ucfirst($this->_focus) . 'Id', $joinType);
+	                $mtmJoinTable = $joinTableMap . '_' . $fClass;
+	            $this->_addJoin($mtmJoinTable, $mtmJoinTable, $fAlias . '.id = ' . $mtmJoinTable . '.' . StringUtilsAbstract::lcFirst($joinClass) . 'Id', $joinType);
 	            
 	            //join in the target table
-	            $this->_addJoin($joinTableMap, $fieldMap['alias'], $fieldMap['alias'] . '.id = ' . $mtmJoinTable . '.' . ucfirst($fieldMap['class']) . 'Id', $joinType);
+	            $this->_addJoin($joinTableMap, $fieldMap['alias'], $fieldMap['alias'] . '.id = ' . $mtmJoinTable . '.' . StringUtilsAbstract::lcFirst($fieldMap['class']) . 'Id', $joinType);
 	            break;
 	        }
 		    case DaoMap::ONE_TO_MANY:
 	        {
-	            $this->_addJoin($joinClass, $alias, $fAlias . '.id = ' . $alias . '.' . ucfirst($this->_focus) . 'Id', $joinType);
+	            $this->_addJoin($fieldMap['class'], $alias, $fAlias . '.id = ' . $alias . '.' . StringUtilsAbstract::lcFirst($joinClass) . 'Id', $joinType);
 	            break;
 	        }
 		    case DaoMap::MANY_TO_ONE:
 	        {
-	            $this->_addJoin($joinClass, $alias, $fAlias . '.' . $field . 'Id = ' . $alias . '.id', $joinType);
+	            $this->_addJoin($fieldMap['class'], $alias, $fAlias . '.' . $field . 'Id = ' . $alias . '.id', $joinType);
 	            break;
 	        }
 		    case DaoMap::ONE_TO_ONE:
@@ -379,7 +381,7 @@ class DaoQuery
 	            if($fieldMap['owner']) //like MANY_TO_ONE
 	                $this->_addJoin($joinClass, $alias, $fAlias . '.' . $field . 'Id = ' . $alias . '.id', $joinType);
 	            else //ONE_TO_MANY
-	                $this->_addJoin($joinClass, $alias, $fAlias . '.id = ' . $alias . '.' . ucfirst($this->_focus) . 'Id', $joinType);
+	                $this->_addJoin($joinClass, $alias, $fAlias . '.id = ' . $alias . '.' . StringUtilsAbstract::lcFirst($joinClass) . 'Id', $joinType);
 	            break;
 	        }
 		    default:
