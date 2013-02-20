@@ -328,6 +328,25 @@ abstract class BaseEntityAbstract
 		throw new EntityException("There is NO getJsonArray() defined for: " . get_class($this));
 	}
 	/**
+	 * getting the Json array from all the private memebers of the entity
+	 * 
+	 * @return array The associative arary for json
+	 */
+	protected function _getJsonFromPM()
+	{
+	    $array = array('id' => trim($this->getId()));
+	    DaoMap::loadMap(get_class($this));
+	    foreach(DaoMap::$map[strtolower(get_class($this))] as $field => $fieldMap)
+	    {
+	        if($field === '_' || isset($fieldMap['rel']))
+	            continue;
+	        
+	        $getterMethod = 'get' . ucfirst($field);
+	        $array[$field] = trim($this->$getterMethod());
+	    }
+	    return $array;
+	}
+	/**
 	 * Default toString implementation
 	 *
 	 * @return string

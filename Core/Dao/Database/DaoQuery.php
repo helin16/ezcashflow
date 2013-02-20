@@ -99,6 +99,7 @@ class DaoQuery
 	public function eagerLoad($relationship, $joinType = self::DEFAULT_JOIN_TYPE)
 	{
 	    list($joinClass, $joinField) = explode('.', $relationship);
+	    DaoMap::loadMap($joinClass);
 	    if(!isset(DaoMap::$map[strtolower($joinClass)]) || !isset(DaoMap::$map[strtolower($joinClass)][$joinField]))
 	        throw new DaoException('Invalid relationship for: ' . $relationship);
 	    
