@@ -72,8 +72,8 @@ class ReportsController extends PageAbstract
 	    if(!$trans instanceof Transaction)
 	        throw new Exception('Invalid Transaction with(ID=' . $transId . ')!');
 	    $reportVars = array();
-	    $reportVars["fromDate"] = $trans->getUpdated() . '';
-	    $reportVars["toDate"] = $trans->getUpdated() . '';
+	    $reportVars["fromDate"] = trim($trans->getCreated());
+	    $reportVars["toDate"] = trim($trans->getCreated());
 	    $reportVars["fromAccountIds"] = (($from = $trans->getFrom()) instanceof AccountEntry ? array($from->getId()) : array());
 	    $reportVars["toAccountIds"] = array($trans->getTo()->getId());
 	    return $reportVars;
@@ -199,7 +199,9 @@ class ReportsController extends PageAbstract
     	        $where .= " AND fromId in(" . implode(', ', $fromaccIds) . ")";
     	    if(count($toaccIds) !== 0)
     	        $where .= " AND toId in(" . implode(', ', $toaccIds) . ")";
+    	    Dao::$debug = true;
     	    $trans = $this->_transService->findByCriteria($where, array(), true, $pageNo, $pageSize, array("created" => "desc"));
+    	    Dao::$debug = false;
     	    $stats = $this->_transService->getPageStats();
     	    $results['total'] = $stats['totalRows'];
     	    $results['trans'] = array();
