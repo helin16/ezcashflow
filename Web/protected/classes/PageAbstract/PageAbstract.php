@@ -66,12 +66,27 @@ abstract class PageAbstract extends TPage
 	public function onInit($param)
 	{
 	    parent::onInit($param);
-        $this->getPage()->getClientScript()->registerScriptFile('ezCashflowJs', $this->publishAsset(__CLASS__ . '.js', __CLASS__));
+        $this->getPage()->getClientScript()->registerScriptFile('appJs', $this->publishAsset(__CLASS__ . '.js', __CLASS__));
+        $cScripts = self::getLastestJS(get_class($this));
+        if (isset($cScripts['js']) && ($lastestJs = trim($cScripts['js'])) !== '')
+            $this->getPage()->getClientScript()->registerScriptFile('pageJs', $this->publishAsset($lastestJs));
+        if (isset($cScripts['css']) && ($lastestCss = trim($cScripts['css'])) !== '')
+            $this->getPage()->getClientScript()->registerStyleSheetFile('pageCss', $this->publishAsset($lastestCss));
+        $this->getPage()->getClientScript()->registerEndScript('pageEndJs', '$(document).observe("click", function(){$$(".item-to-hide-when-blur").each(function(i){i.hide();})});');
+	}
+	/**
+	 * Getting the lastest version of Js and Css under the Class'file path
+	 * 
+	 * @param string $className The class name
+	 * 
+	 * @return multitype:string
+	 */
+	public static function getLastestJS($className)
+	{
+	    $array = array('js' => '', 'css' => '');
 	    try
 	    {
-	        
 	        //loading controller.js
-	        $className = get_class($this);
 	        $class = new ReflectionClass($className);
 	        $fileDir = dirname($class->getFileName()) . DIRECTORY_SEPARATOR;
 	        if (is_dir($fileDir))
@@ -90,26 +105,24 @@ abstract class PageAbstract extends TPage
 	                        if ($type === 'js') //if loading a javascript
 	                        {
 	                            if ($lastestJs === '' || $version > $lastestJsVersionNo)
-	                            $lastestJs = trim($versionNo[0]);
+	                            $array['js'] = trim($versionNo[0]);
 	                        }
 	                        else if ($type === 'css')
 	                        {
 	                            if ($lastestCss === '' || $version > $lastestCssVersionNo)
-	                            $lastestCss = trim($versionNo[0]);
+	                            $array['css'] = trim($versionNo[0]);
 	                        }
 	                    }
 	                }
 	            }
-	            if ($lastestJs !== '')
-	                $this->getPage()->getClientScript()->registerScriptFile('pageJs', $this->publishAsset($lastestJs));
-	            if ($lastestCss !== '')
-	                $this->getPage()->getClientScript()->registerStyleSheetFile('pageCss', $this->publishAsset($lastestCss));
 	        }
+	        unset($className, $class, $fileDir, $lastestJs, $lastestJsVersionNo, $lastestCss, $lastestCssVersionNo);
 	    }
 	    catch(Exception $e)
 	    {
 	        //we are not doing anything if we failed here!
 	    }
+	    return $array;
 	}
 	/**
 	 * Setting the information message

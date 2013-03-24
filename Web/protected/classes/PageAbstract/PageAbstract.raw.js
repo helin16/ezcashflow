@@ -15,11 +15,11 @@ AppJs.prototype = {
 		tmp.expectNonJSONResult = (expectNonJSONResult !== true ? false : true);
 		tmp.result = response;
 		if(tmp.result === null || tmp.result.blank()) {
-			tmp.error = 'Your request probably timed out, please try again later!';
-			if (noAlert === true)
-				throw tmp.error;
-			else 
-				return alert(tmp.error );
+//			tmp.error = 'Your request probably timed out, please try again later!';
+//			if (noAlert === true)
+//				throw tmp.error;
+//			else 
+//				return alert(tmp.error );
 		}
 		if(tmp.expectNonJSONResult === true)
 			return tmp.result;
