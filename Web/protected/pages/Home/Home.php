@@ -6,6 +6,7 @@
  * @subpackage Controller
  * @author     lhe<helin16@gmail.com>
  */
+require_once dirname(__FILE__) . '/../../controls/OverdueRental/OverdueRentalPanel.php';
 class Home extends PageAbstract 
 {
     /**
@@ -17,8 +18,18 @@ class Home extends PageAbstract
 	    parent::onLoad($param);
 	    if(!$this->IsPostBack)
 	    {
+	    	$this->_loadOverdueRental();
 	        $this->_addRightPanel($this->_loadRightPanel());
 	    }
+	}
+	/**
+	 * loadding the overdue rental;
+	 */
+	private function _loadOverdueRental()
+	{
+		$this->_addRightPanel('<div class="box"><div class="title">Overdue Rentals</div><div class="content" id="overdueRentals">');
+		$this->_addRightPanel(new OverdueRentalPanel());
+		$this->_addRightPanel('</div></div>');
 	}
 	/**
 	 * Load right panel

@@ -1,0 +1,37 @@
+.overduerentalwrapper {
+	paddin: 0px;
+	margin: 0px;
+}
+
+.overduerentalwrapper a.link {
+	border-bottom: 1px solid #EEEEEE;
+    color: #CCCCCC;
+    display: block;
+    min-height: 30px;
+    padding: 8px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 9px;
+}
+.overduerentalwrapper a.link:hover {
+	background: #CCCCCC;
+	color: white;
+}
+
+.overduerentalwrapper a.link .lastamount{
+	color: red;
+    float: right;
+    font-weight: bold;
+    text-align: right;
+    font-size: 14px;
+}
+
+.overduerentalwrapper a.link .address
+{
+	color: black;
+	font-style: italic;
+	display: inline-block;
+}
+.overduerentalwrapper a.link .lastdate {
+}
+
