@@ -28,7 +28,7 @@ class OverdueRentalPanel extends TPanel
 	 * 
 	 * @param array $overDues The overdue information array
 	 */
-	public function __construct($overDues)
+	public function __construct($overDues = null)
 	{
 		parent::__construct();
 		$this->_overRents = $overDues;

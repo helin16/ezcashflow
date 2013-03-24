@@ -23,7 +23,9 @@ class Home extends PageAbstract
 	    }
 	}
 	/**
-	 * loadding the overdue rental;
+	 * loadding the overdue rental
+	 * 
+	 * @return Home
 	 */
 	private function _loadOverdueRental()
 	{
@@ -34,6 +36,7 @@ class Home extends PageAbstract
 			$this->_addRightPanel(new OverdueRentalPanel($overDues));
 			$this->_addRightPanel('</div></div>');
 		}
+		return $this;
 	}
 	/**
 	 * Load right panel
