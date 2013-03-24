@@ -78,9 +78,7 @@ class Country extends BaseEntityAbstract
 	 */
 	public function getJsonArray()
 	{
-	    $country = array();
-	    $country['id'] = $this->getId();
-	    $country['name'] = $this->getName();
+	    $country = $this->_getJsonFromPM();
 	    return $country;
 	}
 	/**

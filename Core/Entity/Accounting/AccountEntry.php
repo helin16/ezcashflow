@@ -423,19 +423,13 @@ class AccountEntry extends BaseEntityAbstract
 	 */
 	public function getJsonArray()
 	{
-	    $acc = array();
+	    $acc = $this->_getJsonFromPM();
 	    $thisNo = $this->getAccountNumber();
 	    $acc['level'] = ceil((strlen($thisNo) - 1) / 4);
-	    $acc['id'] = $this->getId();
-	    $acc['name'] = $this->getName();
 	    $acc['breadCrumbs'] = array(
 	        'id' => $this->getBreadCrumbs(true, true),
 	    	'name' => $this->getBreadCrumbs(true, false)
 	    );
-	    $acc['accountNumber'] = $thisNo;
-	    $acc['value'] = $this->getValue();
-	    $acc['budget'] = $this->getBudget();
-	    $acc['comments'] = $this->getComments();
 	    $acc['sum'] = $this->getSum();
 	    $acc['allowTrans'] = $this->getAllowTrans();
 	    $acc['noOfChildren'] = Dao::countByCriteria(new DaoQuery('AccountEntry'), 'parentId = ?', array($this->getId()));

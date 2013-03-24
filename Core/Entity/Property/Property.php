@@ -203,15 +203,11 @@ class Property extends BaseEntityAbstract
      */
     public function getJsonArray()
     {
-        $array = array();
-        $array['id'] = $this->getId();
+        $array = $this->_getJsonFromPM();
         $array['address'] = $this->getAddress()->getJsonArray();
-        $array['boughtValue'] = $this->getBoughtValue();
-        $array['comments'] = $this->getComments();
         $array['setupAcc'] = $this->getSetupAcc()->getJsonArray(false);
         $array['incomeAcc'] = $this->getIncomeAcc()->getJsonArray(false);
         $array['outgoingAcc'] = $this->getOutgoingAcc()->getJsonArray(false);
-        $array['created'] = $this->getCreated()->__toString();
         return $array;
     }
     /**

@@ -80,9 +80,7 @@ class State extends BaseEntityAbstract
 	 */
 	public function getJsonArray()
 	{
-	    $state = array();
-	    $state['id'] = $this->getId();
-	    $state['name'] = $this->getName();
+	    $state = $this->_getJsonFromPM();
 	    $state['country'] = $this->getCountry()->getJsonArray();
 	    return $state;
 	}

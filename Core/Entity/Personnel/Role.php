@@ -62,6 +62,15 @@ class Role extends BaseEntityAbstract
 	}
 	/**
 	 * (non-PHPdoc)
+	 * @see BaseEntityAbstract::getJsonArray()
+	 */
+	public function getJsonArray()
+	{
+		$role = $this->_getJsonFromPM();
+		return $role;
+	}
+	/**
+	 * (non-PHPdoc)
 	 * @see BaseEntity::__toString()
 	 */
 	public function __toString()
