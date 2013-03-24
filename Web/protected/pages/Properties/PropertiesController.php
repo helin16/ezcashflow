@@ -41,6 +41,7 @@ class PropertiesController extends PageAbstract
 		if(!$this->IsPostBack)
 	    {
 	    	$this->_loadOverdueRental();
+	    	$this->_loadLastRentalTrans();
 	    }
 	}
 	/**
@@ -53,6 +54,36 @@ class PropertiesController extends PageAbstract
 		$this->_addRightPanel('<div class="box"><div class="title">Overdue Rentals</div><div class="content" id="overdueRentals">');
 		$this->_addRightPanel(new OverdueRentalPanel());
 		$this->_addRightPanel('</div></div>');
+		return $this;
+	}
+	/**
+	 * loadding the last rental transaction
+	 *
+	 * @return PropertiesController
+	 */
+	private function _loadLastRentalTrans()
+	{
+		$html = '<div class="box"><div class="title">Last Rentals</div><div class="content overduerentalwrapper" id="lastRentals">';
+		foreach($this->_proService->findAll() as $property)
+		{
+			$lastestTrans = $property->getLastesIncomeTrans(null, 1, 1);
+			//if we can't find the lastest transaction in the last month, then it's an overdue
+			if(count($lastestTrans) > 0)
+			{
+				$overdue = array('property' => $property->getJsonArray(), 'lastTrans' => $lastestTrans[0]->getJsonArray());
+				$html .= str_replace('#{transId}', $overdue['lastTrans']['id'], 
+						str_replace('#{address.full}', $overdue['property']['address']['full'], 
+							str_replace('#{lastDate}', $overdue['lastTrans']['updated'],
+								str_replace('#{lastAmount}', '$' . number_format($overdue['lastTrans']['value'], 2),
+									OverdueRentalPanel::ITEM_TEMPLATE
+								)
+							)
+						)
+					);
+			}
+		}
+		$html .= '</div></div>';
+		$this->_addRightPanel($html);
 		return $this;
 	}
 	/**
