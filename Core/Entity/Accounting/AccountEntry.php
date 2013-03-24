@@ -266,10 +266,10 @@ class AccountEntry extends BaseEntityAbstract
 	public function getNextAccountNo()
 	{
 	    $parentAccountNumber = $this->getAccountNumber();
-	    $sql="select accountNumber from accountentry where active = 1 and accountNumber like '" . $parentAccountNumber . "____' order by accountNumber asc";
+	    $sql="select accountNumber from accountentry where active = 1 and accountNumber like '" . $parentAccountNumber . str_repeat('_', AccountEntry::ACC_NO_LENGTH). "' order by accountNumber asc";
 	    $result = Dao::getResultsNative($sql);
 	    if(count($result) === 0)
-	        return $parent->getAccountNumber() . str_repeat('0', AccountEntry::ACC_NO_LENGTH);
+	        return $parentAccountNumber . str_repeat('0', AccountEntry::ACC_NO_LENGTH);
 	    
 	    $expectedAccountNos = array_map(create_function('$a', 'return "' . $parentAccountNumber . '".str_pad($a, ' . AccountEntry::ACC_NO_LENGTH . ', 0, STR_PAD_LEFT);'), range(0, str_repeat('9', AccountEntry::ACC_NO_LENGTH)));
 	    $usedAccountNos = array_map(create_function('$a', 'return $a["accountNumber"];'), $result);

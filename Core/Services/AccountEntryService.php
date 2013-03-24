@@ -147,6 +147,11 @@ class AccountEntryService extends BaseService
     	        $account->setAllowTrans(true);
     	        $parent->setAllowTrans(false);
     	        $this->save($parent);
+	    	    $accountNumber = $this->getNextAccountNo($parent);
+    	    }
+    	    else
+    	    {
+    	    	$accountNumber = trim($account->getAccountNumber());
     	    }
     	    $account->setName($name);
     	    $account->setParent($parent);
@@ -154,7 +159,6 @@ class AccountEntryService extends BaseService
     	    $account->setBudget($budget);
     	    $account->setValue($value);
     	    $account->setComments(trim($comments));
-    	    $accountNumber = $this->getNextAccountNo($parent);
     	    $account->setAccountNumber($accountNumber);
     	    $account = $this->save($account);
     	    
