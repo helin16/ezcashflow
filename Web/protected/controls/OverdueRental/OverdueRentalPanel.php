@@ -9,6 +9,11 @@
 class OverdueRentalPanel extends TPanel
 {
 	/**
+	 * The overdue rental information
+	 * @var array
+	 */
+	private $_overRents = null;
+	/**
 	 * The Item template for the Overdued item
 	 * @var string
 	 */
@@ -18,6 +23,16 @@ class OverdueRentalPanel extends TPanel
 	 * @var string
 	 */
 	const CSS_CLASS_WRAPPER = 'overduerentalwrapper';
+	/**
+	 * The constructor
+	 * 
+	 * @param array $overDues The overdue information array
+	 */
+	public function __construct($overDues)
+	{
+		parent::__construct();
+		$this->_overRents = $overDues;
+	}
 	/**
 	 * (non-PHPdoc)
 	 * @see TControl::onLoad()
@@ -49,7 +64,8 @@ class OverdueRentalPanel extends TPanel
 	public function renderContents($writer)
 	{
 		parent::renderContents($writer);
-		foreach(self::getOverdueRentals() as $overdue)
+		$overdues = $this->_overRents === null ? self::getOverdueRentals() : $this->_overRents;
+		foreach($overdues as $overdue)
 		{
 			$writer->write(
 				str_replace('#{transId}', $overdue['lastTrans']['id'], 

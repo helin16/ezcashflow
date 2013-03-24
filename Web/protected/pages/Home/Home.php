@@ -27,9 +27,13 @@ class Home extends PageAbstract
 	 */
 	private function _loadOverdueRental()
 	{
-		$this->_addRightPanel('<div class="box"><div class="title">Overdue Rentals</div><div class="content" id="overdueRentals">');
-		$this->_addRightPanel(new OverdueRentalPanel());
-		$this->_addRightPanel('</div></div>');
+		$overDues = OverdueRentalPanel::getOverdueRentals();
+		if(count($overDues) > 0)
+		{
+			$this->_addRightPanel('<div class="box"><div class="title">Overdue Rentals</div><div class="content" id="overdueRentals">');
+			$this->_addRightPanel(new OverdueRentalPanel($overDues));
+			$this->_addRightPanel('</div></div>');
+		}
 	}
 	/**
 	 * Load right panel
