@@ -214,6 +214,26 @@ class Property extends BaseEntityAbstract
         $array['created'] = $this->getCreated()->__toString();
         return $array;
     }
+    /**
+     * Getting the lastest income tranactions
+     * 
+     * @return Ambigous <multitype:, multitype:BaseEntityAbstract >
+     */
+    public function getLastesIncomeTrans($fromDate = null, $pageNumber = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE)
+    {
+    	$dao = new EntityDao('Transaction');
+    	$dao->getQuery()->eagerLoad("Transaction.to");
+    	$where = 'to.accountNumber like ?';
+    	$params = array($this->getIncomeAcc()->getAccountNumber() . '%');
+    	if($fromDate !== null)
+    	{
+    		$where .= ' AND trans.updated >= ?';
+    		$params[] = $fromDate . '';
+    	}
+    	$result = $dao->findByCriteria($where, $params, $pageNumber, $pageSize, array('trans.id' => 'desc'));
+    	unset($dao);
+    	return $result;
+    }
 	/**
 	 * (non-PHPdoc)
 	 * @see BaseEntity::__loadDaoMap()
