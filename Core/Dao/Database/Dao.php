@@ -255,6 +255,7 @@ abstract class Dao
         else
         {
             $params['id'] = $id;
+            $params['updated'] = new UDate();
             self::_execSql($qry->generateForUpdate(), $params);
         }
         return $entity;
