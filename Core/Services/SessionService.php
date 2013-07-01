@@ -56,7 +56,7 @@ class SessionService extends BaseService
 	 */
 	public function delete($sessionId)
 	{
-        $this->entityDao->deleteByCriteria('`key` = ?', array($sessionId));
+        EntityDao::getInstance('Session')->deleteByCriteria('`key` = ?', array($sessionId));
 	    return $this;
 	}
 	/**
@@ -70,7 +70,7 @@ class SessionService extends BaseService
 	{
 	    $now = new UDate();
 	    $now->modify('-' . $maxTimeOut . ' second');
-	    return $this->entityDao->deleteByCriteria('`active` = 0 and `updated` < ?' , array($now->__toString()));
+	    return EntityDao::getInstance('Session')->deleteByCriteria('`active` = 0 and `updated` < ?' , array($now->__toString()));
 	}
 	/**
 	 * Getting the session object from the session ID

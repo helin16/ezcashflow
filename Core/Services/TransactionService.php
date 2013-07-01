@@ -150,7 +150,7 @@ class TransactionService extends BaseService
 	 */
     public function addAsset(Transaction $trans, Asset $asset)
     {
-        $this->entityDao->saveManyToManyJoin($asset, $trans);
+        EntityDao::getInstance('Transaction')->saveManyToManyJoin($asset, $trans);
         return $this->get($trans->getId());
     }
     /**
@@ -163,7 +163,7 @@ class TransactionService extends BaseService
      */
     public function removeAsset(Transaction $trans, Asset $asset)
     {
-        $this->entityDao->deleteManyToManyJoin($asset, $trans);
+        EntityDao::getInstance('Transaction')->deleteManyToManyJoin($asset, $trans);
         return $this->get($trans->getId());
     }
     /**
@@ -179,10 +179,32 @@ class TransactionService extends BaseService
         if(!$newAccount->getAllowTrans())
             throw new ServiceException('The new account(' . $newAccount->getId() . ') is NOT allow to create any transactions!');
         //move all from accountentry
-        $this->entityDao->updateByCriteria('`fromId` = ?', '`fromId` = ?', array($newAccount->getId(), $oldAccount->getId()));
+        EntityDao::getInstance('Transaction')->updateByCriteria('`fromId` = ?', '`fromId` = ?', array($newAccount->getId(), $oldAccount->getId()));
         //move all to accounentry
-        $this->entityDao->updateByCriteria('`toId` = ?', '`toId` = ?', array($newAccount->getId(), $oldAccount->getId()));
+        EntityDao::getInstance('Transaction')->updateByCriteria('`toId` = ?', '`toId` = ?', array($newAccount->getId(), $oldAccount->getId()));
         return $this;
+    }
+    /**
+     * Finding all transaction between dates
+     * 
+     * @param string $fromDate     The from date
+     * @param string $toDate       The to date
+     * @param array  $toAccRootIds The ids of the to-accounts that we are reporting
+     * @param int    $pageNo       The page number, when pagination is on
+     * @param int    $pageSize     The page size, when pagination is on
+     * @param array  $orderBy      Order clause
+     */
+    public function getTransBetweenDates($fromDate, $toDate, $toAccRootIds = array(), $pageNo = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array())
+    {
+    	$where  = 'trans.created >= ? and trans.created <= ?';
+    	$params = array($fromDate, $toDate);
+    	if(count($toAccRootIds) > 0)
+    	{
+    		$where .=' AND to.rootId in (' . implode(', ', array_fill(0, count($toAccRootIds), '?')) . ')';
+    		$params = array_merge($params, $toAccRootIds);
+    	}
+    	EntityDao::getInstance('Transaction')->getQuery()->eagerLoad('Transaction.to');
+    	return $this->findByCriteria($where, $params, true, $pageNo, $pageSize, $orderBy);
     }
 }
 ?>

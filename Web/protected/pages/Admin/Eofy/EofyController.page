@@ -1,0 +1,14 @@
+<%@MasterClass="Application.layout.admin.AdminLayout"%>
+<com:TContent ID="MainContent">
+	<div class="bodyWrapper">
+		From: <com:TDatePicker ID="fromDate" DateFormat="yyyy-MM-dd 00:00:00" Attributes.readonly="true"/>
+		To: <com:TDatePicker ID="toDate" DateFormat="yyyy-MM-dd 23:59:59" Attributes.readonly="true"/>
+		<com:TButton ID="genBtn" Text="Generate" onclick="genReport"/>
+	</div>
+	<br clear="both" />
+	<br />
+	<com:TClientScript>
+		var pageJs = new EofyControllerJS();
+		pageJs.loadLastFY('<%= $this->fromDate->getClientID()%>', '<%= $this->toDate->getClientID()%>');
+	</com:TClientScript>
+</com:TContent>

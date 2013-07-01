@@ -9,18 +9,11 @@
 class AccountEntryService extends BaseService 
 {
     /**
-     * BaseEntity Dao
-     * 
-     * @var EntityDao
-     */
-    private $_transDao;
-    /**
      * constructor
      */
 	public function __construct()
 	{
-	    parent::__construct("AccountEntry");
-	    $this->_transDao = new EntityDao('Transaction');
+		parent::__construct('AccountEntry');
 	}
 	/**
 	 * Getting the NextAccountNo for the new children of the provided parent accountentry
@@ -134,7 +127,7 @@ class AccountEntryService extends BaseService
 	 */
 	private function _saveAccount(AccountEntry $account, AccountEntry $parent, $name, $value, $comments, $budget)
 	{
-	    $trans = $this->_transDao->findByCriteria('toId = :id or fromId = :id', array('id' => $parent->getId()), 1, 1);
+	    $trans = EntityDao::getInstance('Transaction')->findByCriteria('toId = :id or fromId = :id', array('id' => $parent->getId()), 1, 1);
 	    if(count($trans) > 0)
 	        throw new ServiceException('There are transactions for the parent account, please move those transactions to somewhere else first!');
 	    

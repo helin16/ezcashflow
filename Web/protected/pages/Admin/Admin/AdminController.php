@@ -55,6 +55,12 @@ class AdminController extends PageAbstract
                     $html .= '<p class="descr">Backup or Restore database</p>';
                 $html .= '</a>';
             $html .= '</li>';
+            $html .= '<li>';
+                $html .= '<a href="/admin/eofy" onclick="return pageJs.changePage(this);">';
+                    $html .= '<p class="link">End Of Financial Year</p>';
+                    $html .= '<p class="descr">Income/Expense Report for who Financial Year</p>';
+                $html .= '</a>';
+            $html .= '</li>';
         $html .= '</ul>';
         return $html;
     }

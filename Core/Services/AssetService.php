@@ -9,18 +9,11 @@
 class AssetService extends BaseService
 {
     /**
-     * The asset type dao 
-     * 
-     * @var EntityDao
-     */
-    private $_typeDao;
-    /**
      * constructor
      */
     public function __construct()
     {
         parent::__construct("Asset");
-        $this->_typeDao = new EntityDao('AssetType');
     }
     /**
      * get all asset type
@@ -33,7 +26,7 @@ class AssetService extends BaseService
      */
     public function getAllAssetTypes($pageNumber = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $order = array())
     {
-        return $this->_typeDao->findAll($pageNumber, $pageSize, $order);
+        return EntityDao::getInstance('AssetType')->findAll($pageNumber, $pageSize, $order);
     }
     /**
      * get asset type by id
@@ -44,7 +37,7 @@ class AssetService extends BaseService
      */
     public function getAllAssetType($id)
     {
-        return $this->_typeDao->findById($id);
+        return EntityDao::getInstance('AssetType')->findById($id);
     }
     /**
      * Saving the asset type
@@ -74,7 +67,7 @@ class AssetService extends BaseService
         
         $at->setType($type);
         $at->setPath($path);
-        return $this->_typeDao->save($at);
+        return EntityDao::getInstance('AssetType')->save($at);
     }
     /**
      * Moving all the file from source dir to target dir
@@ -108,7 +101,7 @@ class AssetService extends BaseService
      */
     public function registerFile($assetTypeid, $filePath, $fileName)
     {
-        $assetType = $this->_typeDao->findById($assetTypeid);
+        $assetType = EntityDao::getInstance('AssetType')->findById($assetTypeid);
         if(!$assetType instanceof AssetType)
             throw new ServiceException('Asset Type (ID=' . $assetTypeid . ') does NOT exsits!');
             
@@ -149,7 +142,7 @@ class AssetService extends BaseService
             throw new ServiceException('Asset (key=' . $assetid . ') does NOT exsits!');
 
         unlink($asset->getFilePath());
-        $this->entityDao->delete($asset);
+        EntityDao::getInstance('Asset')->delete($asset);
         return $this;
     }
     /**

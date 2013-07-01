@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<application id="EzCashFlow" mode="Performance">
+<application id="EzCashFlow" mode="Debug">
   <!-- alias definitions and namespace usings
   <paths>
     <alias id="myalias" path="./lib" />
@@ -32,6 +32,7 @@
 			<url ServiceParameter="Admin.Admin.AdminController" pattern="admin/"/>
 			<url ServiceParameter="Admin.Backup.BackupController" pattern="admin/backup"/>
 			<url ServiceParameter="Admin.AssetType.AssetTypeController" pattern="admin/assettype"/>
+			<url ServiceParameter="Admin.Eofy.EofyController" pattern="admin/eofy"/>
 			
 			<url ServiceParameter="FileLoader.FileLoaderController" pattern="asset/{assetId}/{param}" parameters.assetId="\w+"  parameters.param=".+" />
 			<url ServiceId="stream" ServiceParameter="" pattern="asset/{id}" parameters.id="\w+" />

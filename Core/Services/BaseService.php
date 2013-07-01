@@ -9,9 +9,9 @@
 abstract class BaseService
 {
 	/**
-	 * @var EntityDao
+	 * @var EntityName
 	 */
-	protected $entityDao;
+	protected $_entityName;
 	/**
 	 * The pagination stats
 	 *
@@ -19,14 +19,33 @@ abstract class BaseService
 	 */
 	private $_pageStats = array();
 	/**
+	 * The registery of the services
+	 *
+	 * @var array
+	 */
+	private static $_instances = array();
+	/**
 	 * constructor
 	 * 
 	 * @param string $entityName The entity name of the service
 	 */
 	public function __construct($entityName)
 	{
-		$this->entityDao = new EntityDao($entityName);
+		$this->_entityName = $entityName;
 		$this->_pageStats = Dao::getPageStats();
+	}
+	/**
+	 * Singleton Design of the entity Dao
+	 * 
+	 * @param string $entityName The name of the entity
+	 * 
+	 * @return BaseService
+	 */
+	public static function getInstance($serviceName)
+	{
+		if(!array_key_exists($serviceName, self::$_instances))
+			self::$_instances[$serviceName] = new $serviceName();
+		return self::$_instances[$serviceName];
 	}
 	/**
 	 * Get an Entity By its Id
@@ -37,7 +56,7 @@ abstract class BaseService
 	 */
 	public function get($id)
 	{
-		return $this->entityDao->findById($id);
+		return EntityDao::getInstance($this->_entityName)->findById($id);
 	}
 	/**
 	 * Save an Entity
@@ -48,7 +67,7 @@ abstract class BaseService
 	 */
 	public function save(BaseEntityAbstract $entity)
 	{
-	    $this->entityDao->save($entity);
+	    EntityDao::getInstance($this->_entityName)->save($entity);
 	    return $entity;
 	}
 	/**
@@ -63,7 +82,7 @@ abstract class BaseService
 	 */
 	public function findAll($searchActiveOnly = true, $page = null, $pagesize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array())
 	{
-		$temp = $this->entityDao->findAll($page, $pagesize, $orderBy);
+		$temp = EntityDao::getInstance($this->_entityName)->findAll($page, $pagesize, $orderBy);
 		$this->_pageStats = Dao::getPageStats();
 		return $temp;
 	}
@@ -81,7 +100,7 @@ abstract class BaseService
 	 */
 	public function findByCriteria($where, $params = array(), $searchActiveOnly = true, $page = null, $pagesize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array())
 	{
-		$temp = $this->entityDao->findByCriteria($where, $params, $page, $pagesize, $orderBy);
+		$temp = EntityDao::getInstance($this->_entityName)->findByCriteria($where, $params, $page, $pagesize, $orderBy);
 		$this->_pageStats = Dao::getPageStats();
 		return $temp;
 	}
@@ -95,7 +114,7 @@ abstract class BaseService
 	 */
 	public function countByCriteria($where, $params)
 	{
-	    return $this->entityDao->countByCriteria($where, $params);
+	    return EntityDao::getInstance($this->_entityName)->countByCriteria($where, $params);
 	}
 	/**
 	 * Updating a table for the search criteria
@@ -107,7 +126,7 @@ abstract class BaseService
 	 */
 	public function updateByCriteria($setClause, $criteria, $params)
 	{
-	    return $this->entityDao->updateByCriteria($setClause, $criteria, $params);
+	    return EntityDao::getInstance($this->_entityName)->updateByCriteria($setClause, $criteria, $params);
 	}
 	/**
 	 * returning the pagination stats
