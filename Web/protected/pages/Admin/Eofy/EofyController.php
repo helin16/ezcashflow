@@ -8,6 +8,12 @@
  */
 class EofyController extends PageAbstract  
 {
+	/**
+	 * Generating the excel report
+	 * 
+	 * @param TButton            $sender The button when clicked
+	 * @param TCallbackParameter $param  The parameter when clicked fired
+	 */
 	public function genReport($sender, $param)
 	{
 		header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
@@ -21,27 +27,45 @@ class EofyController extends PageAbstract
 		echo "<table>";
 			echo"<thead>";
 				echo "<tr>";
+					echo "<th>Acc Type</th>";
 					echo "<th>Account</th>";
 					echo "<th>Value</th>";
 					echo "<th>Date</th>";
 					echo "<th>Comments</th>";
-				echo "<tr>";
+				echo "</tr>";
 			echo "</thead>";
 			echo "<tbody>";
-			$trans = BaseService::getInstance('TransactionService')->getTransBetweenDates($fromDate, $toDate, array(AccountEntry::TYPE_INCOME, AccountEntry::TYPE_EXPENSE), null, DaoQuery::DEFAUTL_PAGE_SIZE, array('to.accountNumber' => 'asc', 'trans.created' => 'asc'));
-			foreach($trans as $trans)
+			foreach($this->_getTrans($fromDate, $toDate) as $path => $trans)
 			{
 				echo "<tr>";
-					echo "<td>" . $trans->getTo()->getBreadCrumbs(). "</td>";
-					echo "<td>" . $trans->getTo()->getAccountNumber(). "</td>";
-					echo "<td>" . $trans->getValue() . "</td>";
-					echo "<td>" . $trans->getCreated() . "</td>";
-					echo "<td>" . $trans->getComments() . "</td>";
-				echo "<tr>";
+					echo "<td>" . array_shift($trans['path']). "</td>";
+					echo "<td>" . implode(' / ', $trans['path']). "</td>";
+					echo "<td>" . $trans['value'] . "</td>";
+					echo "<td>" . $trans['created'] . "</td>";
+					echo "<td>" . $trans['comments'] . "</td>";
+				echo "</tr>";
 			}
 			echo "</tbody>";
 		echo "</table>";
 		die;
+	}
+	/**
+	 * Getting the transactions for the selected dates
+	 * 
+	 * @param string $fromDate The from date
+	 * @param string $toDate   The to date
+	 * 
+	 * @return array
+	 */
+	private function _getTrans($fromDate, $toDate)
+	{
+		$transArray = array();
+		foreach(BaseService::getInstance('TransactionService')->getTransBetweenDates($fromDate, $toDate, array(AccountEntry::TYPE_INCOME, AccountEntry::TYPE_EXPENSE)) as $trans)
+		{
+			$transArray[] = array('path' => explode(' / ', $trans->getTo()->getBreadCrumbs()), 'created' => $trans->getCreated(), 'value' => $trans->getValue(), 'comments' => $trans->getComments());
+		}
+		ksort($transArray);
+		return $transArray;
 	}
 }
 ?>
