@@ -46,14 +46,6 @@ FileUploaderJs.prototype = {
                 });
             },
             
-//            add: function (e, data) {
-//            	data.formData = {
-//            			'PRADO_CALLBACK_TARGET': tmp.me.callbackId,
-//        				'PRADO_PAGESTATE': $F('PRADO_PAGESTATE')
-//            	}; // e.g. {id: 123}
-//                $j.blueimp.fileupload.prototype.options.add.call(this, e, data);
-//            },
-            
             //showing the progress bar
             progressall: function (e, data) {
                 tmp.progress = parseInt(data.loaded / data.total * 100, 10);
