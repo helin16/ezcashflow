@@ -723,7 +723,7 @@ class UploadHandler
             }
             $file_size = $this->get_file_size($file_path, $append_file);
             if ($file_size === $file->size) {
-                $file->url = $this->get_download_url($file->name);
+//                 $file->url = $this->get_download_url($file->name);
                 list($img_width, $img_height) = @getimagesize($file_path);
                 if (is_int($img_width) &&
                         preg_match($this->options['inline_file_types'], $file->name)) {
@@ -736,7 +736,7 @@ class UploadHandler
                     $file->error = 'abort';
                 }
             }
-            $this->set_additional_file_properties($file);
+//             $this->set_additional_file_properties($file);
         }
         return $file;
     }
