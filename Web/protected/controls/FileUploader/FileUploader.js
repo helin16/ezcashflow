@@ -12,10 +12,15 @@ FileUploaderJs.prototype = {
 	
 	,_getInitHtml: function() {
 		var tmp = {};
-		$(this.totalWrapperId).insert({'bottom': new Element('input', {'class': 'fileInitBtn', 'type': 'file', 'name': 'files[]', 'data-url': this.serverUrl, 'multiple': ''})})
+		$(this.totalWrapperId).update(new Element('div', 'fileUploadWrapper').insert({'bottom': new Element('input', {'class': 'fileInitBtn', 'type': 'file', 'name': 'files[]', 'data-url': this.serverUrl, 'multiple': ''})})
 			.insert({'bottom': new Element('div', {'class': 'progressBarDiv'}).update(new Element('div', {'class': 'bar', 'style': 'width: 0%'}))})
 			.insert({'bottom': new Element('div', {'class': 'uploadedFileList'}) })
-			;
+		);
+	}
+	
+	,reset: function() {
+		$(this.totalWrapperId).down('.fileUploadWrapper').update('');
+		this.uploadedFiles = {};
 	}
 	
 	//initializing the file uploader using jquery

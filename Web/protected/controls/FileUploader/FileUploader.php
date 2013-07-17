@@ -1,6 +1,17 @@
 <?php
+/**
+ * The file uploader for the TClientScript{@see http://blueimp.github.io/jQuery-File-Upload/}
+ * 
+ * @package    Web
+ * @subpackage Controls
+ * @author     lhe
+ */
 class FileUploader extends TClientScript
 {
+    /**
+     * (non-PHPdoc)
+     * @see TControl::onInit()
+     */
     public function onInit($param)
     {
         parent::onInit($param);
