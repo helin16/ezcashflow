@@ -1,0 +1,43 @@
+.fileUploaderWrapper {
+	display:block;
+}
+.bar {
+    background: green;
+    display: block;
+    border-radius: 4px;
+}
+.bar .barTxt {
+	padding: 5px;
+	color: white;
+    display: block;
+    font-size: 12px;
+}
+.uploadedFileList {
+	display: block;
+}
+.delFile {
+	display: none;
+}
+
+.uploadedFileList .uploadedfile{
+	display: inline-block;
+	padding: 4px;
+	margin: 0 4px 4px 4px;
+	background: #cccccc;
+	border-radius: 4px;
+	vertical-align: middle;
+}
+.uploadedFileList .uploadedfile:hover {
+	background: #999999;
+	color: white;
+	cursor: pointer;
+}
+.uploadedFileList .uploadedfile:hover .delFile {
+	display: inline-block;
+	margin-left: 8px;
+	color: red;
+	font-weight: bold;
+}
+.uploadedFileList .uploadedfile:hover .delFile:hover {
+	background: white;
+}
