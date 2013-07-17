@@ -16,8 +16,15 @@ class StreamController extends TService
   	{		
   	    try
   	    {
-      	    $assetService = new AssetService();
-    		echo $assetService->streamFile($this->Request['id']);
+  	        if(isset($this->Request['method']) && trim($this->Request['method']) === 'upload')
+  	        {
+  	            $reporting = error_reporting();
+  	            error_reporting(E_ALL | E_STRICT);
+  	            $upload_handler = new UploadHandler();
+  	            error_reporting($reporting);
+  	        }
+  	        else 
+        		echo BaseService::getInstance('AssetService')->streamFile($this->Request['id']);
     		die;
   	    }
   	    catch(Exception $ex)
