@@ -8,18 +8,21 @@ TransPaneJs.prototype = {
 		'saveTrans': '',
 		'delFileCBId': ''
 	},
+	fileUploader: null, //the file uploader
 	
 	//constructor
-	initialize: function (formDivId, getAccountsCBId, saveTransCBId, delFileCBId) {
+	initialize: function (formDivId, getAccountsCBId, saveTransCBId, delFileCBId, fileUploaderWrapperId) {
 		this.formDivId = formDivId;
 		this.callbackIds.getAccounts = getAccountsCBId;
 		this.callbackIds.saveTrans = saveTransCBId;
 		this.callbackIds.delFileCBId = delFileCBId;
+		this.fileUploader = new FileUploaderJs(fileUploaderWrapperId);
 	},
 	
 	//buildForm
 	buildFrom: function(fromIds, toIds) {
 		var tmp = {};
+		tmp.me = this;
 		this.accountIds.from = fromIds;
 		this.accountIds.to = toIds;
 		tmp.formDivId = this.formDivId;
@@ -39,8 +42,8 @@ TransPaneJs.prototype = {
     		},
 	    	'onComplete': function(sender, param){
 	    		tmp.result = appJs.getResp(param);
-	    		transJs.getAccList(tmp.result.from, tmp.fromAccListBox);
-	    		transJs.getAccList(tmp.result.to, tmp.toAccListBox);
+	    		tmp.me.getAccList(tmp.result.from, tmp.fromAccListBox);
+	    		tmp.me.getAccList(tmp.result.to, tmp.toAccListBox);
 	    		tmp.saveBtn.value = tmp.saveBtnValue;
 	    		tmp.saveBtn.disabled = false;
 	    	}
@@ -71,6 +74,7 @@ TransPaneJs.prototype = {
 	//saving the transaction
 	saveTrans: function(btn, postJs) {
 		var tmp = {};
+		tmp.me = this;
 		tmp.form = $(btn).up("div.transDiv");
 		tmp.fromAccListBox = tmp.form.down("[transpane=fromAccounts]");
 		tmp.toAccListBox = tmp.form.down("[transpane=toAccounts]");
@@ -89,11 +93,11 @@ TransPaneJs.prototype = {
 		}
 		tmp.data = {'fromAccId': $F(tmp.fromAccListBox), 
 				'toAccId': $F(tmp.toAccListBox), 
-				'value': transJs.stripValue($F(tmp.valueBox)), 
+				'value': tmp.me.stripValue($F(tmp.valueBox)), 
 				'comments': $F(tmp.commentsBox).strip(), 
 				'fromIds': this.accountIds.from, 
 				'toIds': this.accountIds.to, 
-				'assets': tmp.assetsJson
+				'assets': tmp.me.fileUploader.uploadedFiles
 		};
 		appJs.postAjax(this.callbackIds.saveTrans, tmp.data, {
     		'onLoading': function(sender, param){
@@ -103,21 +107,20 @@ TransPaneJs.prototype = {
 	    	'onComplete': function(sender, param){
 	    		try{
 	    			tmp.result = appJs.getResp(param, false, true);
+	    			tmp.me.getAccList(tmp.result.from, tmp.fromAccListBox);
+	    			tmp.me.getAccList(tmp.result.to, tmp.toAccListBox);
+	    			tmp.commentsBox.value = tmp.valueBox.value = '';
+	    			tmp.me.fileUploader.reset();
+	    			tmp.saveBtn.value = tmp.saveBtnValue;
+	    			tmp.saveBtn.disabled = false;
+	    			alert('Saved Successfully!');
+	    			if(postJs !== undefined)
+	    				eval(postJs);
 	    		} catch(e) {
 	    			alert(e);
 	    			tmp.saveBtn.value = tmp.saveBtnValue;
 		    		tmp.saveBtn.disabled = false;
-	    			return;
 	    		}
-	    		transJs.getAccList(tmp.result.from, tmp.fromAccListBox);
-	    		transJs.getAccList(tmp.result.to, tmp.toAccListBox);
-	    		tmp.commentsBox.value = tmp.valueBox.value = tmp.assets.value = '';
-	    		$(tmp.assets).up('.fileset').down('.resultList').update('');
-	    		tmp.saveBtn.value = tmp.saveBtnValue;
-	    		tmp.saveBtn.disabled = false;
-	    		alert('Saved Successfully!');
-	    		if(postJs !== undefined)
-	    			eval(postJs);
 	    	}
     	});
 	},
@@ -125,6 +128,7 @@ TransPaneJs.prototype = {
 	//validate Form
 	validForm: function (fromAccountBox, toAccountBox, valueBox) {
 		var tmp = {};
+		tmp.me = this;
 		tmp.succ = true;
 		$(fromAccountBox).up("div.transDiv").getElementsBySelector('.errorMsg').each(function(item){
 			item.remove();
@@ -140,8 +144,8 @@ TransPaneJs.prototype = {
 		}
 		
 		tmp.regex = /^(\d+)(\.\d{1,2})?$/;
-		if(!transJs.stripValue($F(valueBox)).match(tmp.regex)) {
-			$(valueBox).up("div.row").down('span.title').insert({"bottom": new Element("span", {'class': "errorMsg"}).update('Invalid Value' + transJs.stripValue($F(valueBox)))});
+		if(!tmp.me.stripValue($F(valueBox)).match(tmp.regex)) {
+			$(valueBox).up("div.row").down('span.title').insert({"bottom": new Element("span", {'class': "errorMsg"}).update('Invalid Value' + tmp.me.stripValue($F(valueBox)))});
 			tmp.succ = false;
 		}
 		return tmp.succ;
@@ -149,34 +153,11 @@ TransPaneJs.prototype = {
 	
 	//toggling the file upload list
 	toggleFileList: function(btn){
-		var tmp = {};
-		tmp.wrapper = $(btn).up('.fileset').down('.filewrapper');
 		if($(btn).checked) {
-			tmp.wrapper.show();
+			this.fileUploader.initFileUploader();
 		} else {
-			tmp.wrapper.hide();
+			this.fileUploader.reset();
 		}
 		return true;
-	},
-	
-	//remove file from asset list
-	removeFile: function(btn, jsonHolder) {
-		var tmp = {};
-		tmp.key = $(btn).readAttribute('assetkey');
-		tmp.json = $F(jsonHolder).evalJSON();
-		//asking the server to delete the tmp file
-		appJs.postAjax(this.callbackIds.delFileCBId, tmp.json[tmp.key], {
-	    	'onComplete': function(sender, param){
-	    		try{
-	    			tmp.result = appJs.getResp(param, false, true);
-	    		} catch(e) {
-	    			alert(e);
-	    		}
-	    		delete tmp.json[tmp.key];
-	    		$(jsonHolder).value = Object.toJSON(tmp.json);
-	    		$(btn).up('.row').remove();
-	    	}
-    	});
-		return false;
-	},
+	}
 };
