@@ -138,8 +138,14 @@ EofyControllerJS.prototype = {
 	    				tmp.firstRow = tmp.eofyRow.first();
 	    				tmp.eofyRow.first().replace(tmp.me._getEOFYRow(tmp.result, true).addClassName(tmp.firstRow.hasClassName('even') ? 'even' : 'odd'));
 	    			} else { //this is creating new 
-	    				tmp.firstRow = $$('#' + tmp.me.listDivId + ' .eofyrow[eofyid]').first();
-	    				tmp.firstRow.insert({'before': tmp.me._getEOFYRow(tmp.result, true).addClassName(tmp.firstRow.hasClassName('even') ? 'odd' : 'even')});
+	    				tmp.eofyRows = $$('#' + tmp.me.listDivId + ' .eofyrow[eofyid]');
+	    				if(tmp.eofyRows.size() > 0) {
+	    					tmp.firstRow = $$('#' + tmp.me.listDivId + ' .eofyrow[eofyid]').first();
+	    					tmp.firstRow.insert({'before': tmp.me._getEOFYRow(tmp.result, true).addClassName(tmp.firstRow.hasClassName('even') ? 'odd' : 'even')});
+	    				} else {
+	    					$$('#' + tmp.me.listDivId + ' .eofyrow.header').first()
+	    						.insert({'after': tmp.me._getEOFYRow(tmp.result, true).addClassName('odd')});
+	    				}
 	    			}
 	    			tmp.editDiv.remove();
 	    		} catch(e) {
@@ -188,15 +194,15 @@ EofyControllerJS.prototype = {
 					tmp.count = tmp.result.size();
 					
 					//we need to clean up the previouse result
-					$(tmp.me.listDivId).update('');
+					$(tmp.me.listDivId).update('')
+						.insert({'bottom': tmp.me._getEOFYRow({'start': 'Start', 'end': 'End', 'comments': 'Comments'}).addClassName('header') });
 					//if we can't find any Eofys
 					if (tmp.count === 0) {
-						$(tmp.me.listDivId).update('No EOFYs Found!');
+						alert('No EOFYs Found!');
 						return;
 					}
 					
 					// display the result rows
-					$(tmp.me.listDivId).insert({'bottom': tmp.me._getEOFYRow({'start': 'Start', 'end': 'End', 'comments': 'Comments'}).addClassName('header') });
 					for(tmp.i = 0; tmp.i < tmp.count; tmp.i++) {
 						tmp.rowNo = (pageJs.pagination.pageNumber - 1) * pageJs.pagination.pageSize + tmp.i + 1;
 						$(tmp.me.listDivId).insert({'bottom': tmp.me._getEOFYRow(tmp.result[tmp.i], true).addClassName(tmp.rowNo % 2 === 0 ? 'even' : 'odd') });
