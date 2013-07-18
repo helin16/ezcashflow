@@ -10,5 +10,6 @@
 	        </div>
 	    </div>
 	</div>
-    <com:TClientScript ID="script"></com:TClientScript>
+    <com:Application.controls.FileUploader.FileUploader>
+    </com:Application.controls.FileUploader.FileUploader>
 </com:TContent>

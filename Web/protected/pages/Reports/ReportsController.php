@@ -9,26 +9,12 @@
 class ReportsController extends PageAbstract 
 {
     /**
-     * Account service
-     * 
-     * @var AccountEntryService
-     */
-    private $_accService;
-    /**
-     * Transaction Service
-     * 
-     * @var TransactionService
-     */
-    private $_transService;
-    /**
      * construct
      */
 	public function __construct()
 	{
 		parent::__construct();
 		$this->menuItemName='reports';
-		$this->_accService = new AccountEntryService();
-		$this->_transService = new TransactionService();
 	}
 	/**
 	 * (non-PHPdoc)
@@ -56,7 +42,7 @@ class ReportsController extends PageAbstract
 		    else if(isset($this->Request['transid']))
 		        $reportVars = $this->_getVarFromTrans(trim($this->Request['transid']));
 		    $this->seachpage->getControls()->add($this->_getSeachPanel($reportVars));
-		    $this->script->getControls()->add($this->_getJs(count($reportVars) > 0));
+		    $this->getClientScript()->registerEndScript('pageJs', $this->_getJs(count($reportVars) > 0));
 		}
 	}
 	/**
@@ -68,7 +54,7 @@ class ReportsController extends PageAbstract
 	 */
 	private function _getVarFromTrans($transId)
 	{
-	    $trans = $this->_transService->get($transId);
+	    $trans = BaseService::getInstance('TransactionService')->get($transId);
 	    if(!$trans instanceof Transaction)
 	        throw new Exception('Invalid Transaction with(ID=' . $transId . ')!');
 	    $reportVars = array();
@@ -110,7 +96,7 @@ class ReportsController extends PageAbstract
 	        $fromAccountIds = array();
 	    if(!isset($reportVars["toAccountIds"]) || count($toAccountIds = $reportVars["toAccountIds"]) === 0)
 	        $toAccountIds = array();
-	    $accounts = $this->_accService->findByCriteria("active = ?", array(1), true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array("accountNumber" => "asc"));
+	    $accounts = BaseService::getInstance('AccountEntryService')->findByCriteria("active = ?", array(1), true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array("accountNumber" => "asc"));
 	    $html = '<div class="content-box searchPanel" ID="searchPanel">';
 	        $html .= '<h3 class="box-title">Search Transactions</h3>';
 	        $html .= '<div class="box-content">';
@@ -200,9 +186,9 @@ class ReportsController extends PageAbstract
     	    if(count($toaccIds) !== 0)
     	        $where .= " AND toId in(" . implode(', ', $toaccIds) . ")";
     	    Dao::$debug = true;
-    	    $trans = $this->_transService->findByCriteria($where, array(), true, $pageNo, $pageSize, array("created" => "desc"));
+    	    $trans = BaseService::getInstance('TransactionService')->findByCriteria($where, array(), true, $pageNo, $pageSize, array("created" => "desc"));
     	    Dao::$debug = false;
-    	    $stats = $this->_transService->getPageStats();
+    	    $stats = BaseService::getInstance('TransactionService')->getPageStats();
     	    $results['total'] = $stats['totalRows'];
     	    $results['trans'] = array();
     	    foreach($trans as $tran)
@@ -233,9 +219,9 @@ class ReportsController extends PageAbstract
 	        if(!isset($param->CallbackParameter->transId) || ($transId = trim($param->CallbackParameter->transId)) === '')
     	        throw new Exception('System Error: transId not found!');
     	    
-    	    $trans = $this->_transService->get($transId);
+    	    $trans = BaseService::getInstance('TransactionService')->get($transId);
     	    $trans->setActive(false);
-    	    $this->_transService->save($trans);
+    	    BaseService::getInstance('TransactionService')->save($trans);
     	    $results = $this->_getJsonTrans($trans);
 	    }
 	    catch(Exception $e)
@@ -258,31 +244,49 @@ class ReportsController extends PageAbstract
 	    $results = $errors = array();
 	    try 
 	    {
-	        if(!isset($param->CallbackParameter->transId) || ($transId = trim($param->CallbackParameter->transId)) === '')
+	        Dao::beginTransaction();
+	        if(!isset($param->CallbackParameter->transId) || ($transId = trim($param->CallbackParameter->transId)) === '' || !($trans = BaseService::getInstance('TransactionService')->get($transId)) instanceof Transaction)
     	        throw new Exception('System Error: trans Id not found!');
-	        
-	        if(($date = trim($param->CallbackParameter->date)) === '')
+	        if(!isset($param->CallbackParameter->date) || ($date = trim($param->CallbackParameter->date)) === '')
     	        throw new Exception('System Error: date can not be empty!');
-	        
-	        if(($fromaccId = trim($param->CallbackParameter->fromacc)) === '' || !($fromAcc = $this->_accService->get($fromaccId)) instanceof AccountEntry)
-    	        $fromAcc = null;
-	        if(($toaccId = trim($param->CallbackParameter->toacc)) === '' || !($toAcc = $this->_accService->get($toaccId)) instanceof AccountEntry)
+	        if(!isset($param->CallbackParameter->toacc) || ($toaccId = trim($param->CallbackParameter->toacc)) === '' || !($toAcc = BaseService::getInstance('AccountEntryService')->get($toaccId)) instanceof AccountEntry)
     	        throw new Exception('System Error: to account can not be empty!');
-	        if(($value = trim($param->CallbackParameter->value)) === '')
+	        if(!isset($param->CallbackParameter->value) || ($value = trim($param->CallbackParameter->value)) === '')
     	        throw new Exception('System Error: value can not be empty!');
-	        if(($comments = trim($param->CallbackParameter->comments)) === '')
-    	        $comments = '';
-    	    $trans = $this->_transService->get($transId);
+	        $fromAcc = ((isset($param->CallbackParameter->fromacc) && ($fromaccId = trim($param->CallbackParameter->fromacc)) !== '') && (($fromAcc = BaseService::getInstance('AccountEntryService')->get($fromaccId)) instanceof AccountEntry)) ? $fromAcc : null;
+	        $comments = (isset($param->CallbackParameter->comments) && ($comments = trim($param->CallbackParameter->comments)) !== '') ? $comments : '';
+	        $assets = (isset($param->CallbackParameter->assets) && count($assets = $param->CallbackParameter->assets) !== 0) ? $assets : array();
+	        $attachments = (isset($param->CallbackParameter->attachments) && count($attachments = $param->CallbackParameter->attachments) !== 0) ? json_decode(json_encode($attachments), true) : array();
+	        
     	    $trans->setCreated($date);
     	    $trans->setFrom($fromAcc);
     	    $trans->setTo($toAcc);
     	    $trans->setValue($value);
     	    $trans->setComments($comments);
-    	    $this->_transService->save($trans);
+    	    BaseService::getInstance('TransactionService')->save($trans);
+    	    
+    	    //update existing assets
+    	    foreach($assets as $assetkey => $active)
+    	    {
+    	        if(($active !== false) || !($asset = BaseService::getInstance('AssetService')->getAssetByKey($assetkey)) instanceof Asset)
+    	            continue;
+        	    BaseService::getInstance('TransactionService')->removeAsset($trans, $asset);
+    	        $asset->setActive($active);
+    	        BaseService::getInstance('AssetService')->save($asset);
+    	    }
+    	    //creating new assets
+    	    foreach($attachments as $fileKey => $asset)
+    	    {
+    	        $filePath = trim($asset['tmpDir']) . DIRECTORY_SEPARATOR . trim($asset['filepath']);
+                if(is_file($filePath))
+                    $trans = BaseService::getInstance('TransactionService')->addAsset($trans, BaseService::getInstance('AssetService')->registerFile(AssetType::ID_DOC, $filePath, trim($asset['name'])));
+    	    }
+	        Dao::commitTransaction();
     	    $results = $this->_getJsonTrans($trans);
 	    }
 	    catch(Exception $e)
 	    {
+	        Dao::rollbackTransaction();
 	        $errors[] = $e->getMessage();
 	    }
 	    $param->ResponseData = $this->_getJson($results, $errors);

@@ -27,7 +27,6 @@ FileUploaderJs.prototype = {
 	//initializing the file uploader using jquery
 	,initFileUploader: function() {
 		this._getInitHtml();
-		
 		var tmp = {};
 		tmp.me = this;
 		$j('#' + this.totalWrapperId + ' .fileInitBtn[type=file]').fileupload({
@@ -55,6 +54,7 @@ FileUploaderJs.prototype = {
                 }
             }
         });
+		return this;
 	}
 	
 	,delFile: function(btn) {
