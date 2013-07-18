@@ -185,9 +185,7 @@ class ReportsController extends PageAbstract
     	        $where .= " AND fromId in(" . implode(', ', $fromaccIds) . ")";
     	    if(count($toaccIds) !== 0)
     	        $where .= " AND toId in(" . implode(', ', $toaccIds) . ")";
-    	    Dao::$debug = true;
     	    $trans = BaseService::getInstance('TransactionService')->findByCriteria($where, array(), true, $pageNo, $pageSize, array("created" => "desc"));
-    	    Dao::$debug = false;
     	    $stats = BaseService::getInstance('TransactionService')->getPageStats();
     	    $results['total'] = $stats['totalRows'];
     	    $results['trans'] = array();
@@ -281,8 +279,8 @@ class ReportsController extends PageAbstract
                 if(is_file($filePath))
                     $trans = BaseService::getInstance('TransactionService')->addAsset($trans, BaseService::getInstance('AssetService')->registerFile(AssetType::ID_DOC, $filePath, trim($asset['name'])));
     	    }
-	        Dao::commitTransaction();
     	    $results = $this->_getJsonTrans($trans);
+	        Dao::commitTransaction();
 	    }
 	    catch(Exception $e)
 	    {
