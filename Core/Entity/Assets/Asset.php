@@ -20,6 +20,12 @@ class Asset extends BaseEntityAbstract
      * @var array[Property]
      */
     protected $propertys;
+    /**
+     * Linked EOFYs
+     * 
+     * @var array[EOFY]
+     */
+    protected $eOFYs;
 	/**
 	 * @var AssetType
 	 */
@@ -190,6 +196,28 @@ class Asset extends BaseEntityAbstract
 	    return $this;
 	}
 	/**
+	 * Getting the linked eofys
+	 * 
+	 * @return multitype:Property
+	 */
+	public function getEOFYs()
+	{
+	    $this->loadManyToMany('eOFYs');
+	    return $this->eOFYs;
+	}
+	/**
+	 * Getting the linked eofys
+	 * 
+	 * @param array $eofys The linked property
+	 * 
+	 * @return Asset
+	 */
+	public function setEOFYs($eofys)
+	{
+	    $this->eOFYs = $eofys;
+	    return $this;
+	}
+	/**
 	 * Getting the file path of the content
 	 * 
 	 * @return The file path
@@ -238,6 +266,7 @@ class Asset extends BaseEntityAbstract
 		DaoMap::setStringType('path', 'varchar', 255);
 		DaoMap::setManyToMany('transactions', 'Transaction', DaoMap::RIGHT_SIDE, 'xt', true);
 		DaoMap::setManyToMany('propertys', 'Property', DaoMap::RIGHT_SIDE, 'xp', true);
+		DaoMap::setManyToMany('eOFYs', 'EOFY', DaoMap::RIGHT_SIDE, 'eofy', true);
 		
 		parent::loadDaoMap();
 		DaoMap::createUniqueIndex('assetKey');
