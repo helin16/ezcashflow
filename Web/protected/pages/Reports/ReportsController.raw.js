@@ -324,6 +324,8 @@ ReportJs.prototype = {
 				.update(item.filename)
 				.insert({'bottom': new Element('span', {'class': 'delFile'}).update('x')
 					.observe('click', function() {
+						if(!confirm('Are you sure you want to delete this asset?'))
+							return;
 						$(this).up('.uploadedfile').hide().writeAttribute('delete', true);
 					})
 				})
