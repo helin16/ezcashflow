@@ -1,14 +1,16 @@
 <%@MasterClass="Application.layout.admin.AdminLayout"%>
 <com:TContent ID="MainContent">
-	<div class="bodyWrapper">
-		From: <com:TDatePicker ID="fromDate" DateFormat="yyyy-MM-dd 00:00:00" Attributes.readonly="true"/>
-		To: <com:TDatePicker ID="toDate" DateFormat="yyyy-MM-dd 23:59:59" Attributes.readonly="true"/>
-		<com:TButton ID="genBtn" Text="Generate" onclick="genReport"/>
+    <div class="pageWrapper">
+		<com:TCallback ID="getEOFYsBtn" OnCallback="getEOFYs" />
+		<com:TCallback ID="saveEOFYBtn" OnCallback="saveEOFY" />
+		<div class="createBtnDiv">
+		    <input type="button" value="Create" class="submitBtn addBtn" onclick="pageJs.createEOFY(this); return false;" />
+		</div>
+		<div id="list">
+		</div>
+		<com:Application.controls.FileUploader.FileUploader>
+			var pageJs = new EofyControllerJS('list', '<%= $this->saveEOFYBtn->getUniqueID()%>');
+			pageJs.getEOFYs('<%= $this->getEOFYsBtn->getUniqueID()%>');
+		</com:Application.controls.FileUploader.FileUploader>
 	</div>
-	<br clear="both" />
-	<br />
-	<com:TClientScript>
-		var pageJs = new EofyControllerJS();
-		pageJs.loadLastFY('<%= $this->fromDate->getClientID()%>', '<%= $this->toDate->getClientID()%>');
-	</com:TClientScript>
 </com:TContent>

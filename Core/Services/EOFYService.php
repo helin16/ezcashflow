@@ -26,7 +26,7 @@ class EOFYService extends BaseService
 	public function addAsset(EOFY $eofy, Asset $asset)
 	{
 	    EntityDao::getInstance($this->_entityName)->saveManyToManyJoin($asset, $eofy);
-	    return $this->get($trans->getId());
+	    return $this->get($eofy->getId());
 	}
 	/**
 	 * removing an asset to a eofy
@@ -39,6 +39,6 @@ class EOFYService extends BaseService
 	public function removeAsset(EOFY $eofy, Asset $asset)
 	{
 	    EntityDao::getInstance($this->_entityName)->deleteManyToManyJoin($asset, $eofy);
-	    return $this->get($trans->getId());
+	    return $this->get($eofy->getId());
 	}
 }
