@@ -20,7 +20,11 @@ FileUploaderJs.prototype = {
 	}
 	
 	,reset: function() {
-		$(this.totalWrapperId).down('.fileUploadWrapper').update('');
+		var tmp = {};
+		tmp.wrapper = $(this.totalWrapperId).down('.fileUploadWrapper');
+		if(tmp.wrapper) {
+			tmp.wrapper.update('');
+		}
 		this.uploadedFiles = {};
 	}
 	
