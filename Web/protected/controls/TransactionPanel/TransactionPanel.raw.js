@@ -80,17 +80,11 @@ TransPaneJs.prototype = {
 		tmp.toAccListBox = tmp.form.down("[transpane=toAccounts]");
 		tmp.valueBox = tmp.form.down("[transpane=value]");
 		tmp.commentsBox = tmp.form.down("[transpane=description]");
-		tmp.assets = tmp.form.down("[transpane=assets]");
 		tmp.saveBtn = tmp.form.down("[transpane=saveBtn]");
 		if(this.validForm(tmp.fromAccListBox, tmp.toAccListBox, tmp.valueBox) === false)
 			return false;
 		
 		tmp.saveBtnValue =tmp.saveBtn.value;
-		try{
-			tmp.assetsJson = $F(tmp.assets).evalJSON();
-		} catch(e) {
-			tmp.assetsJson = {};
-		}
 		tmp.data = {'fromAccId': $F(tmp.fromAccListBox), 
 				'toAccId': $F(tmp.toAccListBox), 
 				'value': tmp.me.stripValue($F(tmp.valueBox)), 
