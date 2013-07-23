@@ -58,6 +58,42 @@ class AccountEntryService extends BaseService
 		return $accounts[0];
 	}
 	/**
+	 * Moving an account to another acocunt
+	 * 
+	 * @param AccountEntry $parent       The move to account
+	 * @param AccountEntry $childAccount The moving account
+	 * 
+	 * @return AccountEntry
+	 */
+	public function moveAccount(AccountEntry $parent, AccountEntry $childAccount)
+	{
+	    $transStarted = false;
+	    try { Dao::beginTransaction(); } catch (Exception $ex) {$transStarted = true;}
+	    try 
+	    {
+    	    $newAccountNumber = trim($this->getNextAccountNo($parent));
+    	    $oldAccountNumber = trim($childAccount->getAccountNumber());
+    	    Dao::$debug = true;
+    	    $this->updateByCriteria('accountNumber = CONCAT("' . $newAccountNumber . '", SUBSTRING("' . $newAccountNumber . '", LOCATE("' . $newAccountNumber . '", accountNumber)))', 'accountNumber like ?', array($oldAccountNumber . '%'));
+    	    Dao::$debug = false;
+    	    
+    	    $childAccount = $this->get($childAccount->getId());
+    	    $childAccount->setParent($parent);
+    	    $childAccount->setRoot($parent->getRoot());
+    	    $this->save($childAccount);
+    	    
+    	    if($transStarted === false)
+    	        Dao::commitTransaction();
+    	    return $childAccount;
+	    }
+	    catch(Exception $ex)
+	    {
+    	    if($transStarted === false)
+    	        Dao::rollbackTransaction();
+	        throw $ex;
+	    }
+	}
+	/**
 	 * Creating an accountentry
 	 * 
 	 * @param AccountEntry $account  The accountentry that we are trying to save
@@ -131,7 +167,8 @@ class AccountEntryService extends BaseService
 	    if(count($trans) > 0)
 	        throw new ServiceException('There are transactions for the parent account, please move those transactions to somewhere else first!');
 	    
-        Dao::beginTransaction();
+	    $transStarted = false;
+	    try { Dao::beginTransaction();} catch (Exception $ex) { $transStarted = true;   }
 	    try 
 	    {
 	        //if this is a new account
@@ -155,12 +192,14 @@ class AccountEntryService extends BaseService
     	    $account->setAccountNumber($accountNumber);
     	    $account = $this->save($account);
     	    
-    	    Dao::commitTransaction();
+    	    if($transStarted === false)
+    	        Dao::commitTransaction();
     	    return $account;
 	    }
 	    catch(Exception $ex)
 	    {
-	        Dao::rollbackTransaction();
+	        if($transStarted === false)
+	            Dao::rollbackTransaction();
 	        throw $ex;
 	    }
 	}
