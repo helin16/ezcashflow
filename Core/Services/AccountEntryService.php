@@ -74,7 +74,7 @@ class AccountEntryService extends BaseService
     	    $newAccountNumber = trim($this->getNextAccountNo($parent));
     	    $oldAccountNumber = trim($childAccount->getAccountNumber());
     	    Dao::$debug = true;
-    	    $this->updateByCriteria('accountNumber = CONCAT("' . $newAccountNumber . '", SUBSTRING("' . $newAccountNumber . '", LOCATE("' . $newAccountNumber . '", accountNumber)))', 'accountNumber like ?', array($oldAccountNumber . '%'));
+    	    $this->updateByCriteria('accountNumber = CONCAT("' . $newAccountNumber . '", substring(accountNumber, length("' . $oldAccountNumber . '") + 1  ))', 'accountNumber like ?', array($oldAccountNumber . '%'));
     	    Dao::$debug = false;
     	    
     	    $childAccount = $this->get($childAccount->getId());
