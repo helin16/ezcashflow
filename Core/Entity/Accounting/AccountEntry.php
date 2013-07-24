@@ -433,10 +433,12 @@ class AccountEntry extends BaseEntityAbstract
 	    $acc['sum'] = $this->getSum();
 	    $acc['allowTrans'] = $this->getAllowTrans();
 	    $acc['noOfChildren'] = Dao::countByCriteria(new DaoQuery('AccountEntry'), 'parentId = ?', array($this->getId()));
-	    $parent = $this->getParent();
 	    $acc['parent'] = array();
-	    if($parent instanceof AccountEntry)
+	    if(($parent = $this->getParent()) instanceof AccountEntry)
     	    $acc['parent'] = array('id' => $parent->getId(), 'name' => $parent->getName());
+	    $acc['root'] = array();
+	    if(($root = $this->getRoot()) instanceof AccountEntry)
+    	    $acc['root'] = array('id' => $root->getId(), 'name' => $root->getName());
 	    return $acc;
 	}
 	/**

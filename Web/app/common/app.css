@@ -76,14 +76,14 @@
 	/* Text position */
 	#mainMenuPage .ui-listview .ui-li-heading {
 		margin: 0;
-		padding: 10px 20px;
-		bottom: 20%;
+		padding: 5px 20px;
+		bottom: 10%;
 		color: white;
 	}
 	#mainMenuPage .ui-listview .ui-li-desc {
 		margin: 0;
 		padding: 0 20px;
-		min-height: 20%;
+		min-height: 10%;
 		bottom: 0;
 		line-height: 1.5;
 	}

@@ -12,7 +12,7 @@ var BKAppPage = function(wrapperId) {
 	}
 	
 	//private function: getting the header div
-	getHeader = function(title, leftbtn, rightbtn) {
+	getHeader = function(title, leftbtn, rightbtn, navbar) {
 		var tmp = {};
 		tmp.div = $('<div />').attr('data-role', 'header').addClass('appPageHeader');
 		if(leftbtn)
@@ -21,6 +21,8 @@ var BKAppPage = function(wrapperId) {
 			tmp.div.append($('<h1 />').append(title));
 		if(rightbtn)
 			tmp.div.append(rightbtn);
+		if(navbar)
+			tmp.div.append(navbar);
 		return tmp.div;
 	};
 	
@@ -115,18 +117,67 @@ var BKAppPage = function(wrapperId) {
 		tmp.header = getHeader('Welcome, ' + user.person);
 		tmp.content = $('<div />').append(
 			$('<ul data-role="listview" data-inset="true" />').append(
-				getMainMenuItem('Record Trans', 'http://view.jquerymobile.com/master/demos/_assets/img/apple.png', 'Recording Transactions')
+				getMainMenuItem('Record Trans', './common/img/trans.png', 'Recording Transactions')
 			)
 			.append(
-				getMainMenuItem('menu 2', 'http://view.jquerymobile.com/master/demos/_assets/img/apple.png', 'description', 'aside')
+				getMainMenuItem('Accounts', './common/img/accounts.png', 'Account Entries')
 			)
 			.append(
-				getMainMenuItem('menu 3', 'http://view.jquerymobile.com/master/demos/_assets/img/apple.png', 'description', 'aside')
+				getMainMenuItem('Transactions', './common/img/trans.png', '&nbsp;')
 			)
 			.append(
-				getMainMenuItem('menu 4', 'http://view.jquerymobile.com/master/demos/_assets/img/apple.png', 'description', 'aside')
+				getMainMenuItem('Settings', './common/img/settings.png', '&nbsp;')
 			)
 		);
 		return getPage('mainMenuPage', tmp.header, tmp.content).appendTo(this.getWrapper());
+	};
+	
+	getRecAccList = function(accounts, rootIds, selectboxid, labeltext) {
+		var tmp = {};
+		tmp.accountList = $('<select />').attr('id', selectboxid)
+			.attr('data-native-menu', "false")
+			.attr('data-mini', "true")
+			.append($('<option />').html('Choose ...'))
+		;
+		$.each(accounts, function(rootId, accs) {
+			if($.inArray(rootId * 1, rootIds) >= 0) {
+				tmp.optGroup = $('<optgroup />').attr('label', accs[rootId].name).appendTo(tmp.accountList);
+				$.each(accs, function(accountId, account){
+					if(account.noOfChildren * 1 === 0) {
+						tmp.optGroup.append($('<option />').attr('value', accountId).html(account.breadCrumbs.name));
+					}
+				})
+			}
+		});
+		tmp.rowDiv = getFieldContainer()
+			.append($('<label />').attr('for', selectboxid).html(labeltext) )
+			.append(tmp.accountList);
+		return tmp.rowDiv;
+	};
+	
+	//getting the main menu page
+	this.getRecordTransPage = function(user, accounts) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.navBar = $('<div />').attr('data-role', 'navbar')
+			.append($('<ul />').append($('<li />').append(
+						$('<a />').addClass('ui-btn-active').attr('data-theme', 'd').html('Spend')
+					)
+				)
+				.append($('<li />').append(
+						$('<a />').attr('data-theme', 'd').html('Income')
+					)
+				)
+				.append($('<li />').append(
+						$('<a />').attr('data-theme', 'd').html('Transfer')
+					)
+				)
+			);
+		tmp.header = getHeader('Welcome, ' + user.person, null, null, tmp.navBar);
+		tmp.content = $('<div />').addClass('recordDiv')
+			.append(getRecAccList(accounts, [1, 2], 'fromAccount', 'From: '))
+			.append(getRecAccList(accounts, [4], 'toAccount', 'To: '))
+		;
+		return getPage('recordPage', tmp.header, tmp.content).appendTo(this.getWrapper());
 	};
 };

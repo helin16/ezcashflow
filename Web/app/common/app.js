@@ -22,6 +22,17 @@
 			});
 		};
 		
+		//format the account into associative array
+		formatAccounts = function(accounts) {
+			var tmp = {};
+			$.each(accounts, function(index, item) {
+				if(!tmp[item.root.id])
+					tmp[item.root.id] = {};
+				tmp[item.root.id][item.id] = item;
+			});
+			return tmp;
+		};
+		
 		this.login = function(username, password) {
 			var tmp = {};
 			tmp.me = this;
@@ -35,7 +46,7 @@
 						if(!data.resultData.accounts)
 							throw 'System Error: accounts found!';
 						//record the accounts
-						tmp.me.accounts = data.resultData.accounts;
+						tmp.me.accounts = formatAccounts(data.resultData.accounts);
 						settings.addToStorage('accounts', tmp.me.accounts);
 						//record the user
 						tmp.requestData.user.id = data.resultData.id;
@@ -44,7 +55,7 @@
 						tmp.me.getSettings().addToStorage('user', tmp.me.user);
 						
 						pageGenerator.hideLoading();
-						pageGenerator.changePage(pageGenerator.getMainMenuPage(tmp.me.user));
+						pageGenerator.changePage(pageGenerator.getRecordTransPage(tmp.me.user, tmp.me.accounts));
 					} catch (e) {
 						pageGenerator.hideLoading();
 						alert(e);
@@ -72,7 +83,7 @@
 		if(tmp.bkApp.user.id === undefined) {
 			tmp.bkApp.getPageGenerator().getLoginPage();
 		} else {
-			tmp.bkApp.getPageGenerator().getMainMenuPage(tmp.bkApp.user);
+			tmp.bkApp.getPageGenerator().getRecordTransPage(tmp.bkApp.user, tmp.bkApp.accounts);
 		}
 		try {
 			// check to support local storage
