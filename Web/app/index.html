@@ -1,39 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="viewport" content="initial-scale=1, maximum-scale=1">
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>BookKeeping</title>
+    <meta charset="utf-8">
+	<meta content="width=device-width, initial-scale=1" name="viewport">
+	<title>BSuite App</title>
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.css" />
-    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
-    <script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
-	<script type="text/javascript" src="./common/js/bookkeeping.js"></script>
+	<link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+	<link rel="stylesheet" href="./common/app.css" />
+	<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
+	<script type="text/javascript" src="./common/BKAppSettings.js"></script>
+	<script type="text/javascript" src="./common/BKAppPage.js"></script>
+	<script type="text/javascript" src="./common/app.js"></script>
 </head>
 <body>
-    <div id="pageWrapper">
-		<div data-role="page" id="loginPage">
-			<div data-role="header">
-				<h3>Bookkeeping</h3>
-			</div>
-			<div data-role="content">
-				<ul data-role="listview" data-inset="true">
-					<li data-role="fieldcontain" class="ui-hide-label" role="heading" data-role="list-divider" data-theme="a">Login</li>
-					<li data-role="fieldcontain" class="ui-hide-label">
-						<label for="username">Username:</label> 
-						<input type="text" name="username" id="username" value="" placeholder="Username" />
-					</li>
-					<li data-role="fieldcontain" class="ui-hide-label">
-						<label for="password">Password:</label>
-						<input type="password" name="password" id="password" value="" placeholder="Password" />
-					</li>
-					<li data-role="fieldcontain" class="ui-hide-label">
-						<div>
-							<input type="button" data-theme="b" onclick="pageJs.login($('#loginPage:jqmData(role=page) input#username'), $('#loginPage:jqmData(role=page) input#password'));" value="Login" />
-						</div>
-					</li>
-				</ul>
-			</div>
-		</div>
-    </div>
+	<div id="pageWrapper"></div>
+	<script type="text/javascript">
+		var pageJs = $(document).bkApp({'url': 'app.php', 'totalWrapperId': 'pageWrapper'});
+	</script>
 </body>
 </html>

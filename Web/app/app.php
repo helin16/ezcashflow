@@ -1,6 +1,17 @@
 <?php
+/**
+ * The app server end
+ * 
+ * @package    App
+ * @subpackage Service
+ * @author     lhe<helin16@gmail.com>
+ */
 class App
 {
+    /**
+     * autoload function for the spl_autoload_register()
+     * @param unknown_type $className
+     */
 	public static function autoload($className)
 	{
 		$base = dirname(__FILE__);
@@ -9,23 +20,20 @@ class App
 			$base . '/service/User/',
 			$base . '/service/Trans/',
 		);
-	
-		$found = false;
-	
 		foreach ($autoloadPaths as $path)
 		{
 			if (file_exists($path . $className . '.php'))
 			{
 				require_once $path . $className . '.php';
-				$found = true;
-				break;
+				return true;
 			}
 		}
-	
-		return $found;
+		return false;
 	}
-	
-	public static function run()
+	/**
+	 * The runner
+	 */
+	public static function run($doLog = false)
 	{
 		$results = $errors = array();
 		try
@@ -37,15 +45,10 @@ class App
 		{
 			$errors[] = $e->getMessage();
 		}
-		
 		$return = json_encode(array('errors'=>$errors, 'resultData' => $results));
-		file_put_contents('/tmp/test.json', $return, FILE_APPEND);
+		if($doLog === true)
+		    file_put_contents('/tmp/test.json', $return, FILE_APPEND);
 		echo $return;
-	}
-	
-	private static function _getJson($result, $errors = array())
-	{
-		return json_encode(array('result' => $result, 'errors' => $errors));
 	}
 }
 

@@ -15,12 +15,10 @@ class AppUserService extends AppService
 	protected function getUser($param)
 	{
 		$user = Core::getUser();
-		$accountService = new AccountEntryService();
 		$accounts = array();
-		foreach($accountService->findByCriteria("active = 1", true, null, 30, array("AccountEntry.rootId" => "asc", "AccountEntry.accountNumber" => "asc")) as $account)
+		foreach(BaseService::getInstance('AccountEntryService')->findAll() as $account)
 		{
-			$rootId = $account->getRoot()->getId();
-			$accounts[$rootId][$account->getAccountNumber()] = AppAccountService::formatAccountEntry($account);
+			$accounts[] = $account->getJsonArray();
 		}
 		return array('id' => $user->getId(), 'person' => $user->getPerson() . '', 'accounts' => $accounts);
 	}

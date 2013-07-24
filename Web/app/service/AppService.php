@@ -1,6 +1,19 @@
 <?php
+/**
+ * The app server end
+ *
+ * @package    App
+ * @subpackage Service
+ * @author     lhe<helin16@gmail.com>
+ */
 class AppService
 {
+    /**
+     * The main execution function
+     * 
+     * @return array
+     * @throws Exception
+     */
 	public function run()
 	{
 		//authenticate the user
@@ -8,31 +21,28 @@ class AppService
 			throw new Exception("Invalid user info!");
 		$this->_authenticateUser($_REQUEST["user"]);
 			
-		$methods = explode(".", (isset($_REQUEST["method"]) ? trim($_REQUEST["method"]) : ''));
-		$serviceName = isset($methods[0]) ? trim($methods[0]) : '';
-		$func = isset($methods[1]) ? trim($methods[1]) : '';
-			
-		if(!isset($serviceName) || $serviceName === '')
-			throw new Exception("Empty Service!");
+		list($serviceName, $func) = explode(".", (isset($_REQUEST["method"]) ? trim($_REQUEST["method"]) : ''));
 		if (!class_exists($serviceName = "App" . ucfirst($serviceName) . "Service"))
 			throw new Exception("Service Unknown!");
 		$service = new $serviceName();
-			
-		if(!isset($func) || $func === '')
-			throw new Exception("Empty Function!");
-		if (!method_exists($service,$func))
+		if (!method_exists($service, $func))
 			throw new Exception("Requested Method Unknown!");
-			
 		return $service->$func($_REQUEST);
 	}
-	
+	/**
+	 * authenticateUser the current user
+	 * 
+	 * @param array $userParam The user information
+	 * 
+	 * @return AppService
+	 * @throws Exception
+	 */
 	private function _authenticateUser($userParam)
 	{
-		$userService = new UserAccountService();
-		$userAccount = $userService->getUserByUsernameAndPassword(isset($userParam['username']) ? $userParam['username'] : '', isset($userParam['password']) ? $userParam['password'] : '', false, false);
+		$userAccount = BaseService::getInstance('UserAccountService')->getUserByUsernameAndPassword(isset($userParam['username']) ? $userParam['username'] : '', isset($userParam['password']) ? $userParam['password'] : '', false, false);
 		if(!$userAccount instanceof UserAccount)
 			throw new Exception("Invalid UserAccount!");
-	
 		Core::setUser($userAccount);
+		return $this;
 	}
 }
