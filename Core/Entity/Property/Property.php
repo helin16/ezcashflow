@@ -208,6 +208,11 @@ class Property extends BaseEntityAbstract
         $array['setupAcc'] = $this->getSetupAcc()->getJsonArray(false);
         $array['incomeAcc'] = $this->getIncomeAcc()->getJsonArray(false);
         $array['outgoingAcc'] = $this->getOutgoingAcc()->getJsonArray(false);
+        $array['assets'] = array();
+    	foreach($this->getAssets() as $asset)
+    	{
+    	    $array['assets'][] = $asset->getJsonArray();
+    	}
         return $array;
     }
     /**

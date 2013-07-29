@@ -10,26 +10,13 @@ require_once dirname(__FILE__) . '/../../controls/OverdueRental/OverdueRentalPan
 class PropertiesController extends PageAbstract 
 {
     /**
-     * Property service
-     * 
-     * @var PropertyService
-     */
-    private $_proService;
-    /**
-     * Transaction service
-     * 
-     * @var TransactionService
-     */
-    private $_transService;
-    /**
      * constructor
      */
 	public function __construct()
 	{
 		parent::__construct();
 		$this->menuItemName = 'properties';
-		$this->_proService = new PropertyService();
-		$this->_transService = new TransactionService();
+		
 	}
 	/**
 	 * (non-PHPdoc)
@@ -64,7 +51,7 @@ class PropertiesController extends PageAbstract
 	private function _loadLastRentalTrans()
 	{
 		$html = '<div class="box"><div class="title">Last Rentals</div><div class="content overduerentalwrapper" id="lastRentals">';
-		foreach($this->_proService->findAll() as $property)
+		foreach(BaseService::getInstance('PropertyService')->findAll() as $property)
 		{
 			$lastestTrans = $property->getLastesIncomeTrans(null, 1, 1);
 			//if we can't find the lastest transaction in the last month, then it's an overdue
@@ -87,7 +74,7 @@ class PropertiesController extends PageAbstract
 		return $this;
 	}
 	/**
-	 * Event: ajax call to get all the accounts
+	 * Event: ajax call to get all the properties
 	 * 
 	 * @param TCallback          $sender The event sender
 	 * @param TCallbackParameter $param  The event params
@@ -103,20 +90,13 @@ class PropertiesController extends PageAbstract
     	        throw new Exception('Pagination not found!');
     	    
     	    $pagination = $param->CallbackParameter->pagination;
-    		$properties = $this->_proService->findAll(true, $pagination->pageNumber, $pagination->pageSize);
-    		$stats = $this->_proService->getPageStats();
+    		$properties = BaseService::getInstance('PropertyService')->findAll(true, $pagination->pageNumber, $pagination->pageSize);
+    		$stats = BaseService::getInstance('PropertyService')->getPageStats();
     		$results['total'] = $stats['totalRows'];
     		$results['properties'] = array();
     		foreach($properties as $property)
     		{
-        		$now = new UDate();
-    		    $pArray = $property->getJsonArray();
-    		    $currentFYmidYr = new UDate($now->format('Y-07-01 00:00:00'));
-    		    $pArray['currentFY'] = $this->_getFY($property, $currentFYmidYr, $now);
-    		    $currentFYmidYr->modify('-1 year');
-    		    $now->modify('-1 year');
-    		    $pArray['lastFY'] = $this->_getFY($property, $currentFYmidYr, $now);
-    		    $results['properties'][] = $pArray;
+    		    $results['properties'][] = $this->_formatProperty($property);
     		}
 	    }
 	    catch(Exception $e)
@@ -126,6 +106,121 @@ class PropertiesController extends PageAbstract
 	    $param->ResponseData = $this->_getJson($results, $errors);
 	    return $this;
 	}
+	/**
+	 * Prepare the property json
+	 * 
+	 * @param Property $property The property object to format
+	 * 
+	 * @return array
+	 */
+	private function _formatProperty(Property $property)
+	{
+	    $now = new UDate();
+	    $pArray = $property->getJsonArray();
+	    $currentFYmidYr = new UDate($now->format('Y-07-01 00:00:00'));
+	    $pArray['currentFY'] = $this->_getFY($property, $currentFYmidYr, $now);
+	    $currentFYmidYr->modify('-1 year');
+	    $now->modify('-1 year');
+	    $pArray['lastFY'] = $this->_getFY($property, $currentFYmidYr, $now);
+	    return $pArray;
+	}
+	/**
+	 * Event: ajax call to get all the accounts
+	 * 
+	 * @param TCallback          $sender The event sender
+	 * @param TCallbackParameter $param  The event params
+	 * 
+	 * @throws Exception
+	 */
+	public function getAccEntries($sender, $param)
+	{
+	    $results = $errors = array();
+	    try 
+	    {
+    		$results['accounts'] = array();
+    		foreach(BaseService::getInstance('AccountEntryService')->findAll() as $account) 
+		        $results['accounts'][$account->getRoot()->getId()][$account->getId()] = $account->getJsonArray();
+    		$results['states'] = array();
+    		foreach(BaseService::getInstance('StateService')->findAll() as $state)
+		        $results['states'][$state->getId()] = $state->getJsonArray();
+	    }
+	    catch(Exception $e)
+	    {
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = $this->_getJson($results, $errors);
+	    return $this;
+	}
+	/**
+	 * Event: ajax call to save the property
+	 * 
+	 * @param TCallback          $sender The event sender
+	 * @param TCallbackParameter $param  The event params
+	 * 
+	 * @throws Exception
+	 */
+	public function saveProperty($sender, $param)
+	{
+	    $results = $errors = array();
+	    try 
+	    {
+	        $transStarted = false;
+	        try {Dao::beginTransaction(); } catch(Exception $e) {$transStarted = true;}
+	        $params = json_decode(json_encode($param->CallbackParameter), true);
+	        if(!isset($params['id']) || !($property = BaseService::getInstance('PropertyService')->get($params['id'])) instanceof Property)
+	            throw new Exception('Invalid property ID: ' . $params['id']);
+            $property->setBoughtValue(trim($params['boughtValue']));
+            $property->setComments(trim($params['comments']));
+            $property->setSetupAcc(BaseService::getInstance('AccountEntryService')->get(trim($params['setupAcc'])));
+            $property->setIncomeAcc(BaseService::getInstance('AccountEntryService')->get(trim($params['incomeAcc'])));
+            $property->setOutgoingAcc(BaseService::getInstance('AccountEntryService')->get(trim($params['outgoingAcc'])));
+            
+            $address = (($address = $property->getAddress()) instanceof Address) ? $address : new Address();
+            $address->setLine1(trim($params['address']['line1']));
+            $address->setSuburb(trim($params['address']['suburb']));
+            $address->setPostCode(trim($params['address']['postcode']));
+            $address->setState(BaseService::getInstance('StateService')->get(trim($params['address']['stateId'])));
+            BaseService::getInstance('AddressService')->save($address);
+            $property->setAddress($address);
+            
+            BaseService::getInstance('PropertyService')->save($property);
+            //update existing assets
+            $assets = (isset($params['assets']['assets']) && count($assets = $params['assets']['assets']) !== 0) ? $assets : array();
+            foreach($assets as $assetkey => $active)
+            {
+                if(($active !== false) || !($asset = BaseService::getInstance('AssetService')->getAssetByKey($assetkey)) instanceof Asset)
+                continue;
+                BaseService::getInstance('PropertyService')->removeAsset($property, $asset);
+                $asset->setActive($active);
+                BaseService::getInstance('AssetService')->save($asset);
+            }
+            //creating new assets
+            var_dump($params['assets']);
+            var_dump($params['assets']['attachments']);
+            $attachments = (isset($params['assets']['attachments']) && count($attachments = $params['assets']['attachments']) !== 0) ? $attachments : array();
+            foreach($attachments as $fileKey => $asset)
+            {
+                $filePath = trim($asset['tmpDir']) . DIRECTORY_SEPARATOR . trim($asset['filepath']);
+                if(is_file($filePath))
+                $trans = BaseService::getInstance('PropertyService')->addAsset($property, BaseService::getInstance('AssetService')->registerFile(AssetType::ID_DOC, $filePath, trim($asset['name'])));
+            }
+            
+            $results = $this->_formatProperty($property);
+            
+	       
+	       if($transStarted === false)
+	           Dao::commitTransaction();
+	    }
+	    catch(Exception $e)
+	    {
+	        if($transStarted === false)
+	            Dao::rollbackTransaction();
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = $this->_getJson($results, $errors);
+	    return $this;
+	}
+	
 	/**
 	 * Getting the current Financial year's data for a property
 	 * 
@@ -151,8 +246,8 @@ class PropertiesController extends PageAbstract
 	    
 	    $array = array(
 	            'date' => array('from' => trim($start), 'to' => trim($end)),
-	            'income' => $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, '', $property->getIncomeAcc()),
-	            'outgoing' => $this->_transService->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, '', $property->getOutgoingAcc()),
+	            'income' => BaseService::getInstance('TransactionService')->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_INCOME, '', $property->getIncomeAcc()),
+	            'outgoing' => BaseService::getInstance('TransactionService')->getSumOfExpenseBetweenDates(trim($start), trim($end), AccountEntry::TYPE_EXPENSE, '', $property->getOutgoingAcc()),
 	            'incomeAccIds' => array_map(create_function('$a', 'return $a->getId();'), $property->getIncomeAcc()->getChildren(true)),
 	            'outgoingAccIds' => array_map(create_function('$a', 'return $a->getId();'), $property->getOutgoingAcc()->getChildren(true))
 	    );
