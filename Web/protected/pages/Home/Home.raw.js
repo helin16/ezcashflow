@@ -7,50 +7,59 @@ HomeJs.prototype = {
 		callback: ''  //the call back id to get recent trans
 	},
 	//constructor
-	initialize: function (recentTransDiv, recentTransCBId) {
-		this.recentTrans.holder = recentTransDiv;
-		this.recentTrans.callback = recentTransCBId;
-	},
+	initialize: function () {}
+	,getAccounts: function(getAccsBtn, afterFunc) {
+		appJs.postAjax(getAccsBtn, {}, {
+			'onComplete': function(sender, param){
+				console.debug(appJs.getResp(param));
+				appJs.setPageData('accounts', appJs.getResp(param));
+				afterFunc();
+	    	}
+		});
+	}
 	/**
 	 * click event for the table in the .box-title
 	 */
-	selectSummary: function (btn, postScript) {
+	,selectSummary: function (btn, postFunc) {
         var tmp = {};
         tmp.clickedBtn = $(btn);
         tmp.clickedBtn.up('ul').getElementsBySelector('li').each(function(item){
             item.down('a').removeAttribute('selected');
         });
         tmp.clickedBtn.writeAttribute('selected');
-        eval(postScript);
+        if(typeof(postFunc) === 'function')
+        	postFunc();
         return false;
-    },
+    }
     /**
      * loading the recent trans
      * @returns
      */
-	loadRecentTrans: function() {
+	,loadRecentTrans: function(recentTransDiv, recentTransCBId) {
 		var tmp = {};
-		tmp.holderDiv = this.recentTrans.holder;
+		this.recentTrans.holder = recentTransDiv;
+		this.recentTrans.callback = recentTransCBId;
+		tmp.me = this;
 		appJs.postAjax(this.recentTrans.callback, {'noOfTrans': this.recentTrans.noOfTrans }, {
     		'onLoading': function(sender, param){
-    			$(tmp.holderDiv).update('<img src="/contents/images/loading.gif" style="display:block; with:150px; height:150px;"/>');
+    			$(tmp.me.recentTrans.holder).update('<img src="/contents/images/loading.gif" style="display:block; with:150px; height:150px;"/>');
     		},
 	    	'onComplete': function(sender, param){
 	    		tmp.result = appJs.getResp(param);
-	    		$(tmp.holderDiv).update('');
+	    		$(tmp.me.recentTrans.holder).update('');
 	    		if(tmp.result.size() <= 0) {
-	    			$(tmp.holderDiv).update(new Element('div', {'class': 'notrans'}).update('There is NO transactions yet!'));
+	    			$(tmp.me.recentTrans.holder).update(new Element('div', {'class': 'notrans'}).update('There is NO transactions yet!'));
 	    		}
 	    		tmp.ul = new Element('ul');
 	    		tmp.result.each(function(trans){
 	    			tmp.ul.insert({'bottom': pageJs.getRecentTranRow(trans)});
 	    		});
-	    		$(tmp.holderDiv).insert({'bottom': tmp.ul});
+	    		$(tmp.me.recentTrans.holder).insert({'bottom': tmp.ul});
 	    	}
     	});
-	},
+	}
 	//refereshing transaction list with the new results
-	refreshTrans: function(data) {
+	,refreshTrans: function(data) {
 		var tmp = {};
 		$('summaryBtn').click();
 		$(this.recentTrans.holder).getElementsBySelector('.notrans').each(function(item){
@@ -64,11 +73,11 @@ HomeJs.prototype = {
 				tmp.lastLi.remove();
 			tmp.ul.insert({'top': pageJs.getRecentTranRow(trans)});
 		});
-	},
+	}
 	/**
 	 * getRecentTranRow
 	 */
-	getRecentTranRow: function(trans) {
+	,getRecentTranRow: function(trans) {
 		var tmp = {};
 		tmp.li = new Element('li', {'class': "row", 'transid': trans.id});
 		tmp.href = new Element('a', {'href': trans.link});

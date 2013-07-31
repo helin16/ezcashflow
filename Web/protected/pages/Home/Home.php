@@ -101,13 +101,38 @@ class Home extends PageAbstract
 	    $results = $errors = array();
 	    try
 	    {
-	        $service = new TransactionService();
-	        $trans = $service->findByCriteria("active = ?", array(1), false, 1, 5, array("id" => "desc"));
+	        $trans = BaseService::getInstance('TransactionService')->findByCriteria("active = ?", array(1), false, 1, 5, array("id" => "desc"));
 	        foreach($trans as $tran)
 	        {
 	            $transArray = $tran->getJsonArray();
 	            $transArray['link'] = '/trans/' . $tran->getId();
 	            $results[] = $transArray;
+	        }
+	    }
+	    catch(Exception $e)
+	    {
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = Core::getJson($results, $errors);
+	    return $this;
+	}
+	/**
+	 * Event: ajax call to get all the AccountEntries
+	 *
+	 * @param TCallback          $sender The event sender
+	 * @param TCallbackParameter $param  The event params
+	 *
+	 * @throws Exception
+	 */
+	public function getAccounts($sender, $param)
+	{
+	    $results = $errors = array();
+	    try
+	    {
+	        $accounts = BaseService::getInstance('AccountEntryService')->findAll();
+	        foreach($accounts as $account)
+	        {
+	            $results[$account->getRoot()->getId()][$account->getId()] = $account->getJsonArray();
 	        }
 	    }
 	    catch(Exception $e)

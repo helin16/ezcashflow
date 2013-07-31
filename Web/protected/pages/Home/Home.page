@@ -2,8 +2,8 @@
     <div class="content-box listheader">
         <h3 class="box-title">
             <ul>
-                <li><a href="#" selected onclick="return pageJs.selectSummary(this, profitJs.loadInfo('30003', '40002'));" id="summaryBtn">Summary</a></li>
-                <li><a href="#" onclick="return pageJs.selectSummary(this, profitJs.loadInfo());">Summary with Invest</a></li>
+                <li><a href="#" selected onclick="return pageJs.selectSummary(this, function(){profitJs.loadInfo('30003', '40002')});" id="summaryBtn">Summary</a></li>
+                <li><a href="#" onclick="return pageJs.selectSummary(this, function(){profitJs.loadInfo()});">Summary with Invest</a></li>
             </ul>
         </h3>
         <div class="box-content">
@@ -23,9 +23,12 @@
         </div>
 	</div>
 	
+	<com:TCallback ID="getAccountsBtn" OnCallback="Page.getAccounts" />
 	<com:TCallback ID="getRecentTransBtn" OnCallback="Page.getRecentTrans" />
     <com:TClientScript>
-        var pageJs = new HomeJs('recentTransList', '<%= $this->getRecentTransBtn->getUniqueID()%>');
-        pageJs.loadRecentTrans();
+        var pageJs = new HomeJs();
+        pageJs.getAccounts('<%= $this->getAccountsBtn->getUniqueID()%>', function() {
+            pageJs.loadRecentTrans('recentTransList', '<%= $this->getRecentTransBtn->getUniqueID()%>')
+        });
     </com:TClientScript>
 </com:TContent>
