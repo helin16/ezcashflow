@@ -11,7 +11,6 @@ HomeJs.prototype = {
 	,getAccounts: function(getAccsBtn, afterFunc) {
 		appJs.postAjax(getAccsBtn, {}, {
 			'onComplete': function(sender, param){
-				console.debug(appJs.getResp(param));
 				appJs.setPageData('accounts', appJs.getResp(param));
 				afterFunc();
 	    	}
