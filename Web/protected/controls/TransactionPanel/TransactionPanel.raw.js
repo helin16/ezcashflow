@@ -1,7 +1,8 @@
 //this is the source file for the FieldTaskListController
 var TransPaneJs = new Class.create();
 TransPaneJs.prototype = {
-	accountIds: {'from': [], 'to': []},
+	accountIds: {'fromRootIds': [], 'toRootIds': []}, //this is what the user selected as the transaction type
+	recentTrans: [], //the most recent transactions
 	formDivId: '',
 	callbackIds: {
 		'getAccounts': '',
@@ -21,48 +22,33 @@ TransPaneJs.prototype = {
 	
 	//buildForm
 	buildFrom: function(fromIds, toIds) {
-		var tmp = {};
-		tmp.me = this;
-		this.accountIds.from = fromIds;
-		this.accountIds.to = toIds;
-		tmp.formDivId = this.formDivId;
-		tmp.fromAccListBox = $(tmp.formDivId).down("[transpane=fromAccounts]");
-		tmp.toAccListBox = $(tmp.formDivId).down("[transpane=toAccounts]");
-		tmp.valueBox = $(tmp.formDivId).down("[transpane=value]");
-		tmp.commentsBox = $(tmp.formDivId).down("[transpane=description]");
-		tmp.saveBtn = $(tmp.formDivId).down("[transpane=saveBtn]");
-		tmp.saveBtnValue = tmp.saveBtn.value;
-		appJs.postAjax(this.callbackIds.getAccounts, {'fromIds': fromIds, 'toIds': toIds}, {
-    		'onLoading': function(sender, param){
-    			tmp.fromAccListBox.update(new Element('option').update('Loading ...'));
-    			tmp.toAccListBox.update(new Element('option').update('Loading ...'));
-    			tmp.commentsBox.value = tmp.valueBox.value = '';
-    			tmp.saveBtn.value = 'Loading ...';
-    			tmp.saveBtn.disabled = true;
-    		},
-	    	'onComplete': function(sender, param){
-	    		tmp.result = appJs.getResp(param);
-	    		tmp.me.getAccList(tmp.result.from, tmp.fromAccListBox);
-	    		tmp.me.getAccList(tmp.result.to, tmp.toAccListBox);
-	    		tmp.saveBtn.value = tmp.saveBtnValue;
-	    		tmp.saveBtn.disabled = false;
-	    	}
-    	});
+		this.accountIds.fromRootIds = fromIds;
+		this.accountIds.toRootIds = toIds;
+		
+		this.getAccList(this.accountIds.fromRootIds, $(this.formDivId).down("[transpane=fromAccounts]"));
+		this.getAccList(this.accountIds.toRootIds, $(this.formDivId).down("[transpane=toAccounts]"));
+		$(this.formDivId).down("[transpane=value]").setValue('');
+		$(this.formDivId).down("[transpane=description]").setValue('');
+		$(this.formDivId).down("#chk_Expense").checked = false;
+		this.fileUploader.reset();
     	return false;
 	},
 	
 	//formating the account info for the dropdownlist
-	getAccList: function(accounts, listBox)
-	{
+	getAccList: function(rootIds, listBox) {
 		var tmp = {};
 		$(listBox).update('');
-		$H(accounts).each(function(acc){
-			tmp.rootName = acc.key;
-			tmp.optGroup = new Element('optgroup', {'label': tmp.rootName});
-			$H(acc.value).each(function(item){
-				tmp.optGroup.insert({'bottom': new Element('option', {'value': item.value.id}).update(item.value.breadCrumbs.name.replace(tmp.rootName + ' / ', '') +  ' - $' + item.value.sum)});
-			});
-			$(listBox).insert({'bottom': tmp.optGroup});
+		tmp.accounts = appJs.getPageData('accounts');
+		$H(tmp.accounts).each(function(acc){
+			tmp.rootId = acc.key * 1;
+			if(rootIds.indexOf(tmp.rootId) >= 0) {
+				tmp.optGroup = new Element('optgroup', {'label': tmp.accounts[tmp.rootId][tmp.rootId].name});
+				$H(acc.value).each(function(item){
+					if(item.value.allowTrans === true)
+						tmp.optGroup.insert({'bottom': new Element('option', {'value': item.value.id}).update(item.value.breadCrumbs.name.replace(tmp.rootName + ' / ', '') +  ' - $' + item.value.sum)});
+				});
+				$(listBox).insert({'bottom': tmp.optGroup});
+			}
 		});
 	},
 	
@@ -72,7 +58,7 @@ TransPaneJs.prototype = {
 	},
 	
 	//saving the transaction
-	saveTrans: function(btn, postJs) {
+	saveTrans: function(btn, postJsFunc) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.form = $(btn).up("div.transDiv");
@@ -89,8 +75,6 @@ TransPaneJs.prototype = {
 				'toAccId': $F(tmp.toAccListBox), 
 				'value': tmp.me.stripValue($F(tmp.valueBox)), 
 				'comments': $F(tmp.commentsBox).strip(), 
-				'fromIds': this.accountIds.from, 
-				'toIds': this.accountIds.to, 
 				'assets': tmp.me.fileUploader.uploadedFiles
 		};
 		appJs.postAjax(this.callbackIds.saveTrans, tmp.data, {
@@ -99,28 +83,39 @@ TransPaneJs.prototype = {
     			tmp.saveBtn.disabled = true;
     		},
 	    	'onComplete': function(sender, param){
-	    		try{
+	    		try {
 	    			tmp.result = appJs.getResp(param, false, true);
-	    			tmp.me.getAccList(tmp.result.from, tmp.fromAccListBox);
-	    			tmp.me.getAccList(tmp.result.to, tmp.toAccListBox);
-	    			tmp.commentsBox.value = tmp.valueBox.value = '';
-	    			tmp.me.fileUploader.reset();
+	    			tmp.me.recentTrans = tmp.result.trans;
+	    			tmp.me.refreshAccounts(tmp.result.accounts);
+	    			tmp.me.buildFrom(tmp.me.accountIds.fromRootIds, tmp.me.accountIds.toRootIds);
 	    			tmp.saveBtn.value = tmp.saveBtnValue;
 	    			tmp.saveBtn.disabled = false;
 	    			alert('Saved Successfully!');
-	    			if(postJs !== undefined)
-	    				eval(postJs);
+	    			if(typeof(postJsFunc) === 'function')
+	    				postJsFunc();
 	    		} catch(e) {
-	    			alert(e);
+	    			console.error(e);
 	    			tmp.saveBtn.value = tmp.saveBtnValue;
 		    		tmp.saveBtn.disabled = false;
 	    		}
 	    	}
     	});
-	},
+	}
+	
+	//refresh Accounts
+	,refreshAccounts: function(returnAccounts) {
+		var tmp = {};
+		tmp.accounts = appJs.getPageData('accounts');
+		$H(returnAccounts).each(function(account){
+			$H(account.value).each(function(acc){
+				tmp.accounts[account.key][acc.value.id] = acc.value;
+			});
+		});
+		appJs.setPageData('accounts', tmp.accounts);
+	}
 	
 	//validate Form
-	validForm: function (fromAccountBox, toAccountBox, valueBox) {
+	,validForm: function (fromAccountBox, toAccountBox, valueBox) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.succ = true;

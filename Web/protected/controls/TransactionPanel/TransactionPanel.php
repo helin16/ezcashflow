@@ -67,10 +67,6 @@ class TransactionPanel extends TTemplateControl
 	    try
 	    {
 	        Dao::beginTransaction();
-	        if(!isset($param->CallbackParameter->fromIds) || count($fromIds = $param->CallbackParameter->fromIds) === 0)
-	            throw new Exception('fromIds not found!');
-	        if(!isset($param->CallbackParameter->toIds) || count($toIds = $param->CallbackParameter->toIds) === 0)
-	            throw new Exception('toIds not found!');
 	        if(!isset($param->CallbackParameter->fromAccId) || !($fromAccount = (BaseService::getInstance('AccountEntryService')->get($param->CallbackParameter->fromAccId))) instanceof AccountEntry)
 	            throw new Exception('fromAccId not found!');
 	        if(!isset($param->CallbackParameter->toAccId) || !($toAccount = (BaseService::getInstance('AccountEntryService')->get($param->CallbackParameter->toAccId))) instanceof AccountEntry)
@@ -99,7 +95,16 @@ class TransactionPanel extends TTemplateControl
 	            $transArray['link'] = '/trans/' . $trans->getId();
 	            $results['trans'][] = $transArray;
 	        }
-	        $results = array_merge($results, $this->_getAccList($fromIds, $toIds));
+	        
+	        $results['accounts'] = array();
+	        foreach($fromAccount->getParents(true) as $account)
+	        {
+	            $results['accounts'][$account->getRoot()->getId()][$account->getId()] = $account->getJsonArray();
+	        }
+	        foreach($toAccount->getParents(true) as $account)
+	        {
+	            $results['accounts'][$account->getRoot()->getId()][$account->getId()] = $account->getJsonArray();
+	        }
 	        Dao::commitTransaction();
 	    }
 	    catch(Exception $e)
@@ -109,72 +114,6 @@ class TransactionPanel extends TTemplateControl
 	    }
 	    $param->ResponseData = Core::getJson($results, $errors);
 	    return $this;
-	}
-	/**
-	 * Event: ajax call to get all the accounts
-	 *
-	 * @param TCallback          $sender The event sender
-	 * @param TCallbackParameter $param  The event params
-	 *
-	 * @throws Exception
-	 */
-	public function getAccounts($sender, $param)
-	{
-	    $results = $errors = array();
-	    try
-	    {
-	        if(!isset($param->CallbackParameter->fromIds) || count($fromIds = $param->CallbackParameter->fromIds) === 0)
-	            throw new Exception('fromIds not found!');
-	        if(!isset($param->CallbackParameter->toIds) || count($toIds = $param->CallbackParameter->toIds) === 0)
-	            throw new Exception('toIds not found!');
-	        $results = $this->_getAccList($fromIds, $toIds);
-	    }
-	    catch(Exception $e)
-	    {
-	        $errors[] = $e->getMessage();
-	    }
-	    $param->ResponseData = Core::getJson($results, $errors);
-	    return $this;
-	}
-	/**
-	 * Getting the account list
-	 * 
-	 * @param array $fromIds The rootId for the from account
-	 * @param array $toIds   The rootId fro the to account
-	 * 
-	 * @return Ambigous <multitype:multitype: , multitype:>
-	 */
-	private function _getAccList($fromIds, $toIds)
-	{
-	    $results = array();
-	    $results['from'] = array();
-	    foreach(BaseService::getInstance('AccountEntryService')->findByCriteria('id in (' . implode(', ', $fromIds) . ')') as $root)
-	        $results['from'][$root->getName()] = $this->_getAccountList($root->getId());
-	     
-	    $results['to'] = array();
-	    foreach(BaseService::getInstance('AccountEntryService')->findByCriteria('id in (' . implode(', ', $toIds) . ')') as $root)
-	        $results['to'][$root->getName()] = $this->_getAccountList($root->getId());
-	    return $results;
-	}
-	/**
-	 * Getting the acocunt list
-	 * 
-	 * @param int $rootId The root Id
-	 * 
-	 * @return array
-	 */
-	private function _getAccountList($rootId)
-	{
-	    $accounts = array();
-	    $results = BaseService::getInstance('AccountEntryService')->getAllAllowTransAcc(array($rootId), null, DaoQuery::DEFAUTL_PAGE_SIZE, array('rootId' => 'asc'));
-	    foreach($results as $account)
-	    {
-	        $accArray = $account->getJsonArray(false);
-	        $accounts[$accArray['breadCrumbs']['name']] = $accArray;
-	    }
-	    krsort($accounts);
-	    $accounts = array_reverse($accounts);
-	    return $accounts;
 	}
 }
 

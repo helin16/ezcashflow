@@ -25,7 +25,7 @@
        </fieldset>
 	   <div class="row">
 	       <span class="title"></span>
-	       <span class="item"><input value="save" type="button" transpane="saveBtn" class="submitBtn" onclick="transJs.saveTrans(this, '<%= $this->getPostJs()%>');return false;"/></span>
+	       <span class="item"><input value="save" type="button" transpane="saveBtn" class="submitBtn" onclick="transJs.saveTrans(this, function(){<%= $this->getPostJs()%>;return false;})"/></span>
 	   </div>
     </div>
 </com:TPanel>
