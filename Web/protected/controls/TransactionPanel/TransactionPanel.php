@@ -31,6 +31,11 @@ class TransactionPanel extends TTemplateControl
 	    parent::onInit($param);
 	    $this->getPage()->getClientScript()->registerStyleSheetFile('TransPanelCss', $this->publishAsset(__CLASS__ . '.css'));
 	    $this->getPage()->getClientScript()->registerScriptFile('TransPanelJs', $this->publishAsset(__CLASS__ . '.js'));
+	    
+	    $td = new TDatePicker();
+	    $this->getPage()->getClientScript()->registerPradoScript('datepicker');
+	    $tdpUrl = $this->getPage()->getClientScript()->getPradoScriptAssetUrl() . '/' . TDatePicker::SCRIPT_PATH . '/' . $td->getCalendarStyle() . '.css';
+	    $this->getPage()->getClientScript()->registerStyleSheetFile($tdpUrl, $tdpUrl);
 	}
 	/**
 	 * Getter for the postJs
@@ -73,14 +78,16 @@ class TransactionPanel extends TTemplateControl
 	            throw new Exception('toAccId not found!');
 	        if(!isset($param->CallbackParameter->value) || ($value = trim($param->CallbackParameter->value)) <= 0)
 	            throw new Exception('value not found!');
+	        if(!isset($param->CallbackParameter->transDate) || ($transDate = trim($param->CallbackParameter->transDate)) <= 0)
+	            throw new Exception('transDate not found!');
 	        if(!isset($param->CallbackParameter->assets))
 	            throw new Exception('assets not found!');
 	        $assets = json_decode(json_encode($param->CallbackParameter->assets), true);
 	        $comments = !isset($param->CallbackParameter->comments) ? '' : trim($param->CallbackParameter->comments);
 	        if($fromAccount->getRoot()->getId() == AccountEntry::TYPE_INCOME)
-    	        $transArray = BaseService::getInstance('TransactionService')->earnMoney($fromAccount, $toAccount, $value, $comments);
+    	        $transArray = BaseService::getInstance('TransactionService')->earnMoney($fromAccount, $toAccount, $value, $comments, $transDate);
 	        else
-	            $transArray = array(BaseService::getInstance('TransactionService')->transferMoney($fromAccount, $toAccount, $value, $comments));
+	            $transArray = array(BaseService::getInstance('TransactionService')->transferMoney($fromAccount, $toAccount, $value, $comments, $transDate));
 	        
 	        $results['trans'] = array();
 	        foreach($transArray as $trans)

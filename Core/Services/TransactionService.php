@@ -23,14 +23,15 @@ class TransactionService extends BaseService
 	 * @param AccountEntry $toAccount   The to account of the transaction
 	 * @param string       $value       The value of the transaction
 	 * @param string       $comments    The comments of the transaction
+	 * @param string       $transDate   The date of the transaction
 	 * 
 	 * @throws Exception
 	 * @return Transaction The new transaction
 	 * 
 	 */
-	public function transferMoney(AccountEntry $fromAccount, AccountEntry $toAccount, $value, $comments = "")
+	public function transferMoney(AccountEntry $fromAccount, AccountEntry $toAccount, $value, $comments = "", $transDate = '')
 	{
-		return $this->_createTrans($toAccount, $value, $fromAccount, $comments);
+		return $this->_createTrans($toAccount, $value, $fromAccount, $comments, $transDate);
 	}
 	/**
 	 * earn Money
@@ -39,14 +40,15 @@ class TransactionService extends BaseService
 	 * @param AccountEntry $toAccount   The to account of the transaction
 	 * @param string       $value       The value of the transaction
 	 * @param string       $comments    The comments of the transaction
+	 * @param string       $transDate   The date of the transaction
 	 * 
 	 * @throws Exception
 	 * @return Transaction The new transaction
 	 */
-	public function earnMoney(AccountEntry $fromAccount, AccountEntry $toAccount, $value, $comments="")
+	public function earnMoney(AccountEntry $fromAccount, AccountEntry $toAccount, $value, $comments="", $transDate = '')
 	{
-		$trans = $this->_createTrans($fromAccount, $value, null, $comments);
-		$trans1 = $this->_createTrans($toAccount, $value, null, $comments);
+		$trans = $this->_createTrans($fromAccount, $value, null, $comments, $transDate);
+		$trans1 = $this->_createTrans($toAccount, $value, null, $comments, $transDate);
 		return array($trans, $trans1);
 	}
 	/**
@@ -56,11 +58,12 @@ class TransactionService extends BaseService
 	 * @param AccountEntry $toAccount   The to account of the transaction
 	 * @param string       $value       The value of the transaction
 	 * @param string       $comments    The comments of the transaction
+	 * @param string       $transDate   The date of the transaction
 	 * 
 	 * @throws Exception
 	 * @return Transaction The new transaction
 	 */
-	private function _createTrans(AccountEntry $toAccount, $value, AccountEntry $fromAccount = null, $comments = "")
+	private function _createTrans(AccountEntry $toAccount, $value, AccountEntry $fromAccount = null, $comments = "", $transDate = '')
 	{
 	    $comments = htmlentities($comments);
 	    $value = trim($value);
@@ -75,6 +78,7 @@ class TransactionService extends BaseService
 	    $transation->setTo($toAccount);
 	    $transation->setValue($value);
 	    $transation->setComments($comments);
+	    $transation->setCreated(new UDate($transDate));
 	    return $this->save($transation);
 	}
     /**

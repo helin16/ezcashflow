@@ -29,6 +29,7 @@ TransPaneJs.prototype = {
 		this.getAccList(this.accountIds.toRootIds, $(this.formDivId).down("[transpane=toAccounts]"));
 		$(this.formDivId).down("[transpane=value]").setValue('');
 		$(this.formDivId).down("[transpane=description]").setValue('');
+		$(this.formDivId).down("[transpane=transDate]").setValue(new Date().SimpleFormat('yyyy-MM-dd'));
 		$(this.formDivId).down("#chk_Expense").checked = false;
 		this.fileUploader.reset();
     	return false;
@@ -43,9 +44,12 @@ TransPaneJs.prototype = {
 			tmp.rootId = acc.key * 1;
 			if(rootIds.indexOf(tmp.rootId) >= 0) {
 				tmp.optGroup = new Element('optgroup', {'label': tmp.accounts[tmp.rootId][tmp.rootId].name});
-				$H(acc.value).each(function(item){
-					if(item.value.allowTrans === true)
-						tmp.optGroup.insert({'bottom': new Element('option', {'value': item.value.id}).update(item.value.breadCrumbs.name.replace(tmp.rootName + ' / ', '') +  ' - $' + item.value.sum)});
+				tmp.orderedAccounts = Object.keys(acc.value).map(function(k) { return acc.value[k]; }).sortBy(function(value) {
+					return value.breadCrumbs.name;
+				});
+				tmp.orderedAccounts.each(function(item){
+					if(item.allowTrans === true)
+						tmp.optGroup.insert({'bottom': new Element('option', {'value': item.id}).update(item.breadCrumbs.name.replace(tmp.rootName + ' / ', '') +  ' - $' + item.sum)});
 				});
 				$(listBox).insert({'bottom': tmp.optGroup});
 			}
@@ -66,8 +70,9 @@ TransPaneJs.prototype = {
 		tmp.toAccListBox = tmp.form.down("[transpane=toAccounts]");
 		tmp.valueBox = tmp.form.down("[transpane=value]");
 		tmp.commentsBox = tmp.form.down("[transpane=description]");
+		tmp.transDate = tmp.form.down("[transpane=transDate]");
 		tmp.saveBtn = tmp.form.down("[transpane=saveBtn]");
-		if(this.validForm(tmp.fromAccListBox, tmp.toAccListBox, tmp.valueBox) === false)
+		if(this.validForm(tmp.fromAccListBox, tmp.toAccListBox, tmp.valueBox, tmp.transDate) === false)
 			return false;
 		
 		tmp.saveBtnValue =tmp.saveBtn.value;
@@ -75,7 +80,8 @@ TransPaneJs.prototype = {
 				'toAccId': $F(tmp.toAccListBox), 
 				'value': tmp.me.stripValue($F(tmp.valueBox)), 
 				'comments': $F(tmp.commentsBox).strip(), 
-				'assets': tmp.me.fileUploader.uploadedFiles
+				'assets': tmp.me.fileUploader.uploadedFiles,
+				'transDate': $F(tmp.transDate)
 		};
 		appJs.postAjax(this.callbackIds.saveTrans, tmp.data, {
     		'onLoading': function(sender, param){
@@ -115,7 +121,7 @@ TransPaneJs.prototype = {
 	}
 	
 	//validate Form
-	,validForm: function (fromAccountBox, toAccountBox, valueBox) {
+	,validForm: function (fromAccountBox, toAccountBox, valueBox, transDate) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.succ = true;
@@ -134,7 +140,13 @@ TransPaneJs.prototype = {
 		
 		tmp.regex = /^(\d+)(\.\d{1,2})?$/;
 		if(!tmp.me.stripValue($F(valueBox)).match(tmp.regex)) {
-			$(valueBox).up("div.row").down('span.title').insert({"bottom": new Element("span", {'class': "errorMsg"}).update('Invalid Value' + tmp.me.stripValue($F(valueBox)))});
+			$(valueBox).up(".inline").down('span.title').insert({"bottom": new Element("span", {'class': "errorMsg"}).update('Invalid' + tmp.me.stripValue($F(valueBox)))});
+			tmp.succ = false;
+		}
+		
+		tmp.regex = /^(\d){4}-(\d){2}-(\d){2}$/;
+		if(!tmp.me.stripValue($F(transDate)).match(tmp.regex)) {
+			$(transDate).up(".inline").down('span.title').insert({"bottom": new Element("span", {'class': "errorMsg"}).update('Invalid') });
 			tmp.succ = false;
 		}
 		return tmp.succ;

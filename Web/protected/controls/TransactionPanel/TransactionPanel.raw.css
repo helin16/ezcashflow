@@ -3,43 +3,39 @@
     padding: 0px;
     font-size: 11px;
 }
-.TransPanel .transDiv .row {
+.TransPanel .inputtxt {
+    border: 1px #cccccc solid;
+    border-radius: 4px;
+    font-size: 16px;
+    padding: 4px;
+}
+.TransPanel .row {
     padding: 4px 0 0 0; 
 }
-.TransPanel .transDiv .inline {
+.TransPanel .inline {
     display: inline-block;
 }
-.TransPanel .transDiv fieldset {
+.TransPanel fieldset {
     border: 1px #cccccc solid;
     border-radius: 4px;
 }
-.TransPanel .transDiv [transpane=fromAccounts],
-.TransPanel .transDiv [transpane=toAccounts] {
+.TransPanel .transDiv [transpane] {
     width: 100%;
-    font-size: 16px;
-    padding: 4px;
-    border: 1px #cccccc solid;
-    border-radius: 4px;
 }
-.TransPanel .transDiv .row.inline.value{
-    width: 160px;
+.TransPanel .transDiv .row .inline.date {
+    width: 15%;
 }
-.TransPanel .transDiv [transpane=value] {
-    font-size: 16px;
-    padding: 4px;
-    border: 1px #cccccc solid;
-    border-radius: 4px;
+.TransPanel .transDiv .row .inline.date [transpane]{
+    cursor: pointer;
+}
+.TransPanel .transDiv .row .inline.value {
+    width: 20%;
+}
+.TransPanel .transDiv .row .inline.description {
+    width: 64%;
+}
+.TransPanel .transDiv .row .inline [transpane]{
     width: 90%;
-}
-.TransPanel .transDiv .row.inline.description {
-    width: 460px;
-}
-.TransPanel .transDiv [transpane=description] {
-    font-size: 16px;
-    padding: 4px;
-    width: 98%;
-    border: 1px #cccccc solid;
-    border-radius: 4px;
 }
 
 .TransPanel .transDiv .fileList .row {

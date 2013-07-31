@@ -2,19 +2,25 @@
     <div class="transDiv">
 		<div class="row">
 	       <span class="title">From:</span>
-	       <span class="item"><select Id="fromAccounts_<%= $this->getId()%>" transpane="fromAccounts" ></select></span>
+	       <span class="item"><select Id="fromAccounts_<%= $this->getId()%>" transpane="fromAccounts" class="inputtxt"></select></span>
        </div>
 		<div class="row">
 	       <span class="title">To:</span>
-	       <span class="item"><select Id="toAccounts_<%= $this->getId()%>" transpane="toAccounts" ></select></span>
+	       <span class="item"><select Id="toAccounts_<%= $this->getId()%>" transpane="toAccounts" class="inputtxt"></select></span>
        </div>
-	   <div class="row inline value">
-	       <span class="title">Value($):</span>
-	       <span class="item"><input type="text" transpane="value" placeholder="0.00"/></span>
-	   </div>
-	   <div class="row inline description">
-	       <span class="title">Description:</span>
-	       <span class="item"><input type="text" transpane="description" placeholder="comments"/></span>
+       <div class="row">
+		   <div class="inline date">
+		       <span class="title">Date:</span>
+		       <span class="item"><input type="text" transpane="transDate" placeholder="Transaction Date" class="inputtxt" readonly /></span>
+		   </div>
+		   <div class="inline value">
+		       <span class="title">Value($):</span>
+		       <span class="item"><input type="text" transpane="value" placeholder="0.00"  class="inputtxt"/></span>
+		   </div>
+		   <div class="inline description">
+		       <span class="title">Description:</span>
+		       <span class="item"><input type="text" transpane="description" placeholder="comments"  class="inputtxt"/></span>
+		   </div>
 	   </div>
        <fieldset class="fileset">
            <legend>
@@ -40,4 +46,7 @@
         '<%= $this->deleteFile->getUniqueID()%>',
         'fileUploaderWrapper');
     transJs.buildFrom([1,2], [4]);
+    $$('.inputtxt[transpane="transDate"]').each(function(item){
+	    new Prado.WebUI.TDatePicker({'ID': item,'InputMode':'TextBox','Format':'yyyy-MM-dd','FirstDayOfWeek':1,'ClassName':'datePicker','CalendarStyle':'default','FromYear':2007,'UpToYear':2030});
+    });
 </com:Application.controls.FileUploader.FileUploader>
