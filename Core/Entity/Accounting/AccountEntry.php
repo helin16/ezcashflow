@@ -311,7 +311,6 @@ class AccountEntry extends BaseEntityAbstract
 	 */
 	public function getChildren($includeSelf = false, $directChildrenOnly = true, $pageNumber = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array())
 	{
-		$dao = new EntityDao(get_class($this));
 	    if($directChildrenOnly === true)
 	    {
 	        $where = 'parentId = :id';
@@ -329,7 +328,7 @@ class AccountEntry extends BaseEntityAbstract
     		    $params['id'] = $this->getId();
 		    }
 		}
-        return $dao->findByCriteria($where, $params, $pageNumber, $pageSize, $orderBy);
+        return EntityDao::getInstance(get_class($this))->findByCriteria($where, $params, $pageNumber, $pageSize, $orderBy);
 	}
 	/**
 	 * Getting a snapshot of the current account
@@ -363,11 +362,10 @@ class AccountEntry extends BaseEntityAbstract
 	 * 
 	 * @return multitype:AccountEntry unknown
 	 */
-	public function getParents($inclSelf = false)
+	public function getParents($inclSelf = false, $pageNumber = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array("accountNumber" => "asc"))
 	{
 	    $requestedNos = $this->_getParentsAccNo($inclSelf);
-		$dao = new EntityDao(get_class($this));
-		return $dao->findByCriteria('rootId = ? and accountNumber in (' . "'" . implode("', '", $requestedNos) . "'" . ')', array($this->getRoot()->getId()), null, DaoQuery::DEFAUTL_PAGE_SIZE, array("accountNumber" => "asc"));
+		return EntityDao::getInstance(get_class($this))->findByCriteria('rootId = ? and accountNumber in (' . "'" . implode("', '", $requestedNos) . "'" . ')', array($this->getRoot()->getId()), $pageNumber, $pageSize, $orderBy);
 	}
 	/**
 	 * Getting all parents' account number
@@ -431,7 +429,6 @@ class AccountEntry extends BaseEntityAbstract
 	    	'name' => $this->getBreadCrumbs(true, false)
 	    );
 	    $acc['sum'] = $this->getSum();
-	    $acc['allowTrans'] = $this->getAllowTrans();
 	    $acc['noOfChildren'] = Dao::countByCriteria(new DaoQuery('AccountEntry'), 'parentId = ?', array($this->getId()));
 	    $acc['parent'] = array();
 	    if(($parent = $this->getParent()) instanceof AccountEntry)
