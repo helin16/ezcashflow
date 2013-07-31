@@ -245,7 +245,6 @@ abstract class Dao
         {
             $now = new UDate();
             $params['active'] = 1;
-            $entity->setId($id);
             $entity->setActive(true);
             $params['created'] = $entity->getCreated();
             if(!$params['created'] instanceof UDate)
@@ -260,6 +259,7 @@ abstract class Dao
                 $entity->setUpdated($now);
             }
             self::_execSql($qry->generateForInsert(), $params, $id);
+            $entity->setId($id);
         }
         else
         {
