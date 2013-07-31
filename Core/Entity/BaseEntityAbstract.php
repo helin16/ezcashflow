@@ -340,9 +340,10 @@ abstract class BaseEntityAbstract
 	    {
 	        if($field === '_' || isset($fieldMap['rel']))
 	            continue;
-	        
 	        $getterMethod = 'get' . ucfirst($field);
 	        $array[$field] = trim($this->$getterMethod());
+	        if(trim($fieldMap['type']) === 'bool')
+	            $array[$field] = (trim($array[$field]) === '1' ? true : false);
 	    }
 	    return $array;
 	}
