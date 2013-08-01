@@ -39,6 +39,7 @@
 <com:TCallback ID="getAccountsBtn" OnCallback="getAccounts" />
 <com:TCallback ID="saveTrans" OnCallback="saveTrans" />
 <com:TCallback ID="deleteFile" OnCallback="delFile" />
+<com:Application.controls.Chosen.Chosen />
 <com:Application.controls.FileUploader.FileUploader>
     var transJs = new TransPaneJs('<%= $this->TransPanel->getClientId()%>', 
         '<%= $this->getAccountsBtn->getUniqueID()%>', 

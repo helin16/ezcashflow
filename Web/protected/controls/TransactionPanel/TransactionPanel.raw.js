@@ -38,6 +38,8 @@ TransPaneJs.prototype = {
 	//formating the account info for the dropdownlist
 	getAccList: function(rootIds, listBox) {
 		var tmp = {};
+		if($(listBox).retrieve('chosen'))
+			$(listBox).retrieve('chosen').destroy();
 		$(listBox).update('');
 		tmp.accounts = appJs.getPageData('accounts');
 		$H(tmp.accounts).each(function(acc){
@@ -54,6 +56,7 @@ TransPaneJs.prototype = {
 				$(listBox).insert({'bottom': tmp.optGroup});
 			}
 		});
+		$(listBox).store('chosen', new Chosen($(listBox)));
 	},
 	
 	//reformat the value in the value box
