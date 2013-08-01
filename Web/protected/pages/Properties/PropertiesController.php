@@ -137,9 +137,6 @@ class PropertiesController extends PageAbstract
 	    $results = $errors = array();
 	    try 
 	    {
-    		$results['accounts'] = array();
-    		foreach(BaseService::getInstance('AccountEntryService')->findAll() as $account) 
-		        $results['accounts'][$account->getRoot()->getId()][$account->getId()] = $account->getJsonArray();
     		$results['states'] = array();
     		foreach(BaseService::getInstance('StateService')->findAll() as $state)
 		        $results['states'][$state->getId()] = $state->getJsonArray();
