@@ -1,5 +1,4 @@
 <com:TContent ID="MainContent">
-    <com:TCallback ID="getAccountsBtn" OnCallback="Page.getAccounts"/>
     <com:TCallback ID="saveAccountsBtn" OnCallback="Page.saveAccount"/>
     <com:TCallback ID="delAccountsBtn" OnCallback="Page.delAccount"/>
     <com:TCallback ID="moveAccountBtn" OnCallback="Page.moveAccount"/>
@@ -18,7 +17,7 @@
         </div>
     </div>
     <com:TClientScript>
-        var pageJs = new AccountsJs('accountList', '<%= $this->getAccountsBtn->getUniqueId()%>', '<%= $this->saveAccountsBtn->getUniqueId()%>', '<%= $this->delAccountsBtn->getUniqueId()%>', '<%= $this->moveAccountBtn->getUniqueId()%>');
+        var pageJs = new AccountsJs('accountList', '<%= $this->saveAccountsBtn->getUniqueId()%>', '<%= $this->delAccountsBtn->getUniqueId()%>', '<%= $this->moveAccountBtn->getUniqueId()%>');
         $$(".content-box.listheader .box-title ul li a[selected]").first().click();
     </com:TClientScript>
 </com:TContent>

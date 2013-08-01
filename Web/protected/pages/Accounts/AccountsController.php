@@ -27,61 +27,6 @@ class AccountsController extends PageAbstract
 		}
 	}
 	/**
-	 * Event: ajax call to get all the accounts
-	 * 
-	 * @param TCallback          $sender The event sender
-	 * @param TCallbackParameter $param  The event params
-	 * 
-	 * @throws Exception
-	 */
-	public function getAccounts($sender, $param)
-	{
-	    $results = $errors = array();
-	    try 
-	    {
-    	    if(!isset($param->CallbackParameter->rootId) || ($rootId = trim($param->CallbackParameter->rootId)) === '')
-    	        throw new Exception('rootId not found!');
-    	    
-    		$results = $this->_getAccounts($rootId);
-	    }
-	    catch(Exception $e)
-	    {
-	        $errors[] = $e->getMessage();
-	    }
-	    $param->ResponseData = $this->_getJson($results, $errors);
-	    return $this;
-	}
-	/**
-	 * Getting the account info for a rootid
-	 * 
-	 * @param int $rootId The id of the root
-	 * 
-	 * @return multitype:Ambigous <multitype:number, multitype:boolean, multitype:, multitype:number Ambigous <name, string> >
-	 */
-	private function _getAccounts($rootId)
-	{
-	    $results = array();
-	    $accounts = BaseService::getInstance('AccountEntryService')->get($rootId)->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc'));
-	    foreach($accounts as $account)
-	    {
-	        if(!$account instanceof AccountEntry)
-	            continue;
-	        $results[] = $this->_jsonAccountEntry($account);
-	    }
-	    return $results;
-	}
-	/**
-	 * formatting the account entry for the json
-	 * 
-	 * @param AccountEntry $account The account entry that we are try to format for
-	 * 
-	 * @return multitype:number NULL Ambigous <name, string> Ambigous <value, string> Ambigous <budget, string> Ambigous <comments, string> Ambigous <accountNumber, string>
-	 */
-	private function _jsonAccountEntry(AccountEntry $account)
-	{
-	    return $account->getJsonArray();
-	}
-	/**
 	 * Event: ajax call to save Account
 	 * 
 	 * @param TCallback          $sender The event sender
@@ -108,11 +53,10 @@ class AccountsController extends PageAbstract
     	        $account = BaseService::getInstance('AccountEntryService')->updateAccount($account, $account->getParent(), $accountName, $accountValue, $comments, $accountBudget);
     	    else
     	        $account = BaseService::getInstance('AccountEntryService')->createAccount($parent, $accountName, $accountValue, $comments, $accountBudget);
-    	    $results = $this->_getAccounts($account->getRoot()->getId());
+    	    $results = $account->getJsonArray();
 	    }
 	    catch(Exception $e)
 	    {
-	        echo('<pre>' . $e->getTraceAsString());
 	        $errors[] = $e->getMessage();
 	    }
 	    $param->ResponseData = $this->_getJson($results, $errors);
@@ -134,11 +78,13 @@ class AccountsController extends PageAbstract
     	    if(!($account = BaseService::getInstance('AccountEntryService')->get($param->CallbackParameter->accountId)) instanceof AccountEntry || !($parent = BaseService::getInstance('AccountEntryService')->get($param->CallbackParameter->parentId)) instanceof AccountEntry)
     	        throw new Exception('System Error: we need both them: accountId and parentId!');
     	    $account = BaseService::getInstance('AccountEntryService')->moveAccount($parent, $account);
-    	    $results = $this->_getAccounts($account->getRoot()->getId());
+    	    foreach($account->getRoot()->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc')) as $acc)
+    	    {
+    	        $results[$acc->getId()] = $acc->getJsonArray();
+    	    }
 	    }
 	    catch(Exception $e)
 	    {
-	        echo('<pre>' . $e->getTraceAsString());
 	        $errors[] = $e->getMessage();
 	    }
 	    $param->ResponseData = $this->_getJson($results, $errors);
@@ -161,8 +107,8 @@ class AccountsController extends PageAbstract
     	    if(($accountId = trim($param->CallbackParameter->accountId)) === '' || !( $account = BaseService::getInstance('AccountEntryService')->get($accountId)) instanceof AccountEntry)
     	        throw new Exception('System Error: Invalid account id provided!');
     	    $account->setActive(false);
+    	    $results = $account->getJsonArray();
     	    BaseService::getInstance('AccountEntryService')->save($account);
-    	    $results = $this->_getAccounts($account->getRoot()->getId());
 	        Dao::commitTransaction();
 	    }
 	    catch(Exception $e)

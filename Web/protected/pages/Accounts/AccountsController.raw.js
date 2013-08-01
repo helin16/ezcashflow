@@ -6,16 +6,14 @@ AccountsJs.prototype = {
 		list: ''
 	}
 	,callBackIds: {
-		getAccounts: '',
 		saveAccount: '',
 		deleteAccounts: '',
 		moveAccounts: ''
 	}
 	
 	//constructor
-	,initialize: function (accountListId, getAccCallBackId, saveAccCallBackId, delAccCallBackId, moveAccCallBackId) {
+	,initialize: function (accountListId, saveAccCallBackId, delAccCallBackId, moveAccCallBackId) {
 		this.divIds.list = accountListId;
-		this.callBackIds.getAccounts = getAccCallBackId;
 		this.callBackIds.saveAccount = saveAccCallBackId;
 		this.callBackIds.deleteAccounts = delAccCallBackId;
 		this.callBackIds.moveAccounts = moveAccCallBackId;
@@ -40,37 +38,27 @@ AccountsJs.prototype = {
     ,showAccounts: function(btn) {
     	var tmp = {};
     	tmp.me = this;
-    	appJs.postAjax(this.callBackIds.getAccounts, {'rootId': tmp.me._selectAccountType(btn)}, {
-    		'onLoading': function(sender, param){
-    			$(tmp.me.divIds.list).update('<img src="/contents/images/loading.gif" />');
-    		},
-	    	'onComplete': function(sender, param){
-	    		try {
-	    			tmp.me._showAccList(appJs.getResp(param, false, true));
-	    		} catch (e) {
-	    			alert(e);
-	    		}
-	    	}
-    	});
+    	tmp.accounts = appJs.getPageData('accounts');
+    	tmp.me.rootId = tmp.me._selectAccountType(btn);
+		tmp.me._showAccList(tmp.accounts[tmp.me.rootId]);
     	return false;
     }
     
     //showing the result
-    ,_showAccList: function (result) {
+    ,_showAccList: function (accounts) {
     	var tmp = {};
     	tmp.me = this;
-    	tmp.accCount = result.size();
 		$(tmp.me.divIds.list).update('');
-		if(tmp.accCount === 0) {
-			$(tmp.me.divIds.list).update('No Accounts Found!');
-			return;
-		}
-		for(tmp.i = 0; tmp.i < tmp.accCount; tmp.i++) {
-			$(tmp.me.divIds.list).insert({'bottom': tmp.me._formatAccountRow(result[tmp.i])
-				.addClassName(tmp.i % 2 === 0 ? 'even' : 'odd')
-				.store('account', result[tmp.i])
+		tmp.i = 0;
+		tmp.orderedAccounts = Object.keys(accounts).map(function(k) { return accounts[k]; }).sortBy(function(account) {
+			return account.accountNumber + '';
+		});
+		tmp.orderedAccounts.each(function(account){
+			$(tmp.me.divIds.list).insert({'bottom': tmp.me._formatAccountRow(account)
+				.addClassName((tmp.i++) % 2 === 0 ? 'even' : 'odd')
+				.store('account', account)
 			});
-		}
+		});
     }
     
     /**
@@ -80,7 +68,7 @@ AccountsJs.prototype = {
     	var tmp = {};
     	tmp.me = this;
     	tmp.leftMargin = account.level * 4 ;
-    	tmp.newRow = new Element('div', {'class': 'row', 'accountId': account.id, 'accountno': account.accountNumber})
+    	tmp.newRow = new Element('div', {'class': 'row', 'accountid': account.id, 'accountno': account.accountNumber, 'parentid': account.parent.id})
 	    	.insert({'bottom': new Element('div', {'class': 'space rowDivd', 'style': 'width: ' + tmp.leftMargin + '%'}).update('&nbsp;')})
 	    	.insert({'bottom': new Element('div', {'class': 'content rowDivd', 'style': 'width: ' + (100 - tmp.leftMargin - 5) + '%'})
 	    		.insert({'bottom': new Element('div', {'class': 'accountname'}).update( account.name ) })
@@ -182,7 +170,7 @@ AccountsJs.prototype = {
     	$$('.row[accountid]').each(function(item){
     		tmp.moveToAcc = item.retrieve('account');
     		if(!tmp.moveToAcc.accountNumber.startsWith(account.accountNumber) && account.parent.id !== tmp.moveToAcc.id) {
-    			tmp.selectBox.insert({'bottom': new Element('option', {'value': tmp.moveToAcc.id}).update(tmp.moveToAcc.breadCrumbs.name) })
+    			tmp.selectBox.insert({'bottom': new Element('option', {'value': tmp.moveToAcc.id}).update(tmp.moveToAcc.breadCrumbs.name) });
     		}
     	});
     	tmp.newDiv = new Element('div')
@@ -192,33 +180,33 @@ AccountsJs.prototype = {
 			.insert({'bottom': tmp.me._getAccountEditRow(' ',tmp.selectBox ) })
     		.insert({'bottom': new Element('div', {'class': 'newRow'})
 	    		.insert({'bottom': new Element('input', {'class': 'submitBtn', 'type': 'button', 'value': 'Save'}).observe('click', function(){
-	    			tmp.me.moveAccount(this, account.id, $F($(this).up('.newAccDiv').down('.moveToAccs')));
+	    			tmp.me.moveAccount(this, account, $F($(this).up('.newAccDiv').down('.moveToAccs')));
 	    		})})
 		    	.insert({'bottom': new Element('input', {'class': 'submitBtn', 'type': 'button', 'value': 'Cancel', 'style': 'float:right;'}).observe('click', function(){
 		    		$(this).up('.newAccDiv').remove();
 		    	})})
 		    });
-    	$$('.row[accountId=' + account.id + ']').first().insert({'bottom':  tmp.newDiv.wrap(new Element('div', {'class': 'newAccDiv'})) });
+    	$$('.row[accountid=' + account.id + ']').first().insert({'bottom':  tmp.newDiv.wrap(new Element('div', {'class': 'newAccDiv'})) });
     }
     /**
      * submitting the the data to the backend to move the account
      */
-    ,moveAccount: function(btn, moveAccountId, moveToAccountId) {
+    ,moveAccount: function(btn, moveAccount, moveToAccountId) {
     	var tmp = {};
     	tmp.me = this;
     	tmp.row = $(btn).up('.newRow');
     	tmp.savingInfo = new Element('div').update('saving ...');
-    	appJs.postAjax(this.callBackIds.moveAccounts, {'accountId': moveAccountId, 'parentId': moveToAccountId}, {
-    		'onLoading': function(sender, param){
+    	tmp.accounts = appJs.getPageData('accounts');
+    	appJs.postAjax(this.callBackIds.moveAccounts, {'accountId': moveAccount.id, 'parentId': moveToAccountId}, {
+    		'onLoading': function(sender, param) {
     			tmp.row.hide().insert({'after': tmp.savingInfo});
     		},
-	    	'onComplete': function(sender, param){
+	    	'onComplete': function(sender, param) {
 	    		try{
-	    			tmp.me._showAccList(appJs.getResp(param, false, true));
+	    			tmp.accounts[moveAccount.root.id] = appJs.getResp(param, false, true);
+	    			appJs.setPageData('accounts', tmp.accounts);
     				alert('Moved successfully!');
-    				$$('.row[accountid=' + moveAccountId + ']').first().scrollTo();
-    				//remove the saving panel
-    				tmp.row.up('.newAccDiv').remove();
+    				tmp.me._showAccList(tmp.accounts[moveAccount.root.id]);
 	    		} catch(e) {
 	    			tmp.savingInfo.remove();
 	    			tmp.row.show();
@@ -269,13 +257,13 @@ AccountsJs.prototype = {
 			new Element('input', {'accinfo': 'comments', 'type': 'text', 'class': 'accComments inputbox', 'placeholder': 'Comments', 'value': tmp.comments}) ) })
 		.insert({'bottom': new Element('div', {'class': 'newRow'})
     		.insert({'bottom': new Element('input', {'class': 'submitBtn', 'type': 'button', 'value': 'Save'}).observe('click', function(){
-    			tmp.me.saveAccount(this, tmp.accId, tmp.parentId)
+    			tmp.me.saveAccount(this, tmp.accId, tmp.parentId);
     		})})
 	    	.insert({'bottom': new Element('input', {'class': 'submitBtn', 'type': 'button', 'value': 'Cancel', 'style': 'float:right;'}).observe('click', function(){
 	    		$(this).up('.newAccDiv').remove();
 	    	})})
 	    });
-    	$$('.row[accountId=' + account.id + ']').first().insert({'bottom': tmp.newDiv});
+    	$$('.row[accountid=' + account.id + ']').first().insert({'bottom': tmp.newDiv});
     }
     
     ,_getAccountEditRow: function(label, typein) {
@@ -324,18 +312,19 @@ AccountsJs.prototype = {
     	if(tmp.hasError === true) {
     		return;
     	}
+    	
+    	tmp.accounts = appJs.getPageData('accounts');
     	appJs.postAjax(this.callBackIds.saveAccount, tmp.accInfo, {
     		'onLoading': function(sender, param){
     			tmp.row.hide().insert({'after': tmp.savingInfo});
     		},
 	    	'onComplete': function(sender, param){
 	    		try{
-	    			tmp.me._showAccList(appJs.getResp(param, false, true));
+	    			tmp.account = appJs.getResp(param, false, true);
+	    			tmp.accounts[tmp.account.root.id][tmp.account.id] = tmp.account;
+	    			appJs.setPageData('accounts', tmp.accounts);
+	    			tmp.me._showAccList(tmp.accounts[tmp.account.root.id]);
     				alert('Saved successfully!');
-    				
-    				tmp.editRow = $$('.row[accountid=' + accId + ']').first();
-    				if(tmp.editRow)
-    					tmp.editRow.scrollTo();
     				//remove the saving panel
     				tmp.savingPanel.remove();
 	    		} catch(e) {
@@ -355,10 +344,15 @@ AccountsJs.prototype = {
     	if(!confirm('Are you sure you want to delete this account?'))
     		return;
     	$(btn).up('.btnListDiv').remove();
+    	
+    	tmp.accounts = appJs.getPageData('accounts');
     	appJs.postAjax(this.callBackIds.deleteAccounts, {'accountId': accId}, {
 	    	'onComplete': function(sender, param){
-	    		try{
-	    			tmp.me._showAccList(appJs.getResp(param, false, true));
+	    		try {
+	    			tmp.account = appJs.getResp(param, false, true);
+	    			delete tmp.accounts[tmp.account.root.id][tmp.account.id];
+	    			appJs.setPageData('accounts', tmp.accounts);
+	    			tmp.me._showAccList(tmp.accounts[tmp.account.root.id]);
 	    		} catch(e) {
 	    			alert(e);
 	    		}
