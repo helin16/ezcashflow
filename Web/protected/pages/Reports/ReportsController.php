@@ -37,121 +37,39 @@ class ReportsController extends PageAbstract
 		if(!$this->IsPostBack)
 		{
 		    $reportVars = array();
-		    if(isset($this->Request['reportVars']))
+		    if(isset($this->Request['transid']))
+		        $reportVars['transId'] = trim($this->Request['transid']);
+		    else if(isset($this->Request['reportVars']))
 		        $reportVars = json_decode($this->Request['reportVars'], true);
-		    else if(isset($this->Request['transid']))
-		        $reportVars = $this->_getVarFromTrans(trim($this->Request['transid']));
-		    $this->seachpage->getControls()->add($this->_getSeachPanel($reportVars));
-		    $this->getClientScript()->registerEndScript('pageJs', $this->_getJs(count($reportVars) > 0));
+		    $this->getClientScript()->registerEndScript('pageJs', $this->_getJs($reportVars));
 		}
-	}
-	/**
-	 * translate a transaction id into search variables
-	 * 
-	 * @param int $transId The ID of a transaction
-	 * 
-	 * @throws Exception
-	 */
-	private function _getVarFromTrans($transId)
-	{
-	    $trans = BaseService::getInstance('TransactionService')->get($transId);
-	    if(!$trans instanceof Transaction)
-	        throw new Exception('Invalid Transaction with(ID=' . $transId . ')!');
-	    $reportVars = array();
-	    $reportVars["fromDate"] = trim($trans->getCreated());
-	    $reportVars["toDate"] = trim($trans->getCreated());
-	    $reportVars["fromAccountIds"] = (($from = $trans->getFrom()) instanceof AccountEntry ? array($from->getId()) : array());
-	    $reportVars["toAccountIds"] = array($trans->getTo()->getId());
-	    return $reportVars;
 	}
 	/**
 	 * generate the javascript
 	 * 
-	 * @param bool $clickSearch Whether we are cliking on the seach btn automatically
+	 * @param array $reportVars The variables passed in via URL
 	 * 
 	 * @return string
 	 */
-	private function _getJs($clickSearch = false)
+	private function _getJs($reportVars)
 	{
-	    $js = "var pageJs = new ReportJs('transResults', '" . $this->searchBtn->getUniqueId() . "', '" . $this->editBtn->getUniqueId() . "', '" . $this->deleteBtn->getUniqueId() . "');";
+	    $fromAccountIds = isset($reportVars['fromAccountIds']) ? $reportVars['fromAccountIds'] : array();
+	    $toAccountIds = isset($reportVars['toAccountIds']) ? $reportVars['toAccountIds'] : array();
+	    $fromDate = isset($reportVars['fromDate']) ? trim($reportVars['fromDate']) : '';
+	    $toDate = isset($reportVars['toDate']) ? trim($reportVars['toDate']) : '';
+	    $transId = isset($reportVars['transId']) ? trim($reportVars['transId']) : '';
+	    $js = " pageJs.initSearchPane('$transId', '$fromDate', '$toDate', [" . implode(',', $fromAccountIds) . "], [" . implode(',', $toAccountIds) . "]);";
+        $js .= "pageJs.initChosen('.chosen-select');";
         $js .= "pageJs.initialDatePicker('input.searchdate');";
-        if($clickSearch === true)
-            $js .= "$('searchPanel').down('input.submitBtn').click();";
+        if(count($reportVars) > 0)
+        {
+            if($transId === '')
+                $js .= "pageJs.getSearchPanel().down('.hidesearchbtn').click();";
+            else 
+                $js .= "pageJs.getSearchPanel().hide();";
+            $js .= "pageJs.search();";
+        }
         return $js;
-	}
-	/**
-	 * getting the search panel's html
-	 * 
-	 * @param array $reportVars The variables that passed in via url
-	 * 
-	 * @return string The html code
-	 */
-	private function _getSeachPanel($reportVars = array()) 
-	{
-	    if(!isset($reportVars["fromDate"]) || ($fromDate = trim($reportVars["fromDate"])) === '')
-	        $fromDate = '';
-	    if(!isset($reportVars["toDate"]) || ($toDate = trim($reportVars["toDate"])) === '')
-	        $toDate = '';
-	    if(!isset($reportVars["fromAccountIds"]) || count($fromAccountIds = $reportVars["fromAccountIds"]) === 0)
-	        $fromAccountIds = array();
-	    if(!isset($reportVars["toAccountIds"]) || count($toAccountIds = $reportVars["toAccountIds"]) === 0)
-	        $toAccountIds = array();
-	    $accounts = BaseService::getInstance('AccountEntryService')->findByCriteria("active = ?", array(1), true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array("accountNumber" => "asc"));
-	    $html = '<div class="content-box searchPanel" ID="searchPanel">';
-	        $html .= '<h3 class="box-title">Search Transactions</h3>';
-	        $html .= '<div class="box-content">';
-    	        $html .= '<div class="row">';
-    	        $html .= '<span class="halfcut">';
-        	        $html .= '<span class="label">From Date:</span>';
-        	        $html .= '<span class="input"><input type="text" searchpane="date_start" class="searchdate" value="' . $fromDate . '"/></span>';
-    	        $html .= '</span>';
-    	        $html .= '<span class="halfcut">';
-        	        $html .= '<span class="label">To Date:</span>';
-        	        $html .= '<span class="input"><input type="text" searchpane="date_end" class="searchdate" value="' . $toDate . '"/></span>';
-    	        $html .= '</span>';
-    	        $html .= '</div>';
-    	        $html .= '<div class="row">';
-        	        $html .= '<span class="label">From Account:</span>';
-        	        $html .= '<span class="input accountselection">';
-            	        $html .= '<select multiple="multiple" searchpane="fromacc" >';
-            	            $html .= $this->_getAccountsList($accounts, $fromAccountIds);
-            	        $html .= '</select>';
-        	        $html .= '</span>';
-    	        $html .= '</div>';
-    	        $html .= '<div class="row">';
-        	        $html .= '<span class="label">To Account:</span>';
-        	        $html .= '<span class="input accountselection">';
-            	        $html .= '<select multiple="multiple" searchpane="toacc" >';
-            	            $html .= $this->_getAccountsList($accounts, $toAccountIds);
-            	        $html .= '</select>';
-        	        $html .= '</span>';
-    	        $html .= '</div>';
-    	        $html .= '<div class="row">';
-    	            $html .= '<input type="button" value="Search" class="submitBtn" onclick="pageJs.search(this); return false;"/>';
-    	        $html .= '</div>';
-	        $html .= '</div>';
-	    $html .= '</div>';
-	    return $html;
-	}
-	/**
-	 * getting all the list of item for the select dropdown box
-	 * 
-	 * @param array $accounts       The array of account entries
-	 * @param array $selectedValues The selected values
-	 * 
-	 * @return string The html
-	 */
-	private function _getAccountsList(array $accounts, $selectedValues = array())
-	{
-	    $html = '';
-	    foreach($accounts as $account)
-	    {
-	        $selected = '';
-	        if(in_array(($id = trim($account->getId())), $selectedValues))
-	            $selected = 'selected';
-	        $html .= "<option value='" . $id . "' $selected>" . $account->getLongshot() . "</option>";
-	    }
-	    return $html;
 	}
 	/**
 	 * Event: ajax call to get all the accounts
@@ -166,33 +84,44 @@ class ReportsController extends PageAbstract
 	    $results = $errors = array();
 	    try 
 	    {
-	        $date_start = trim($param->CallbackParameter->search->date_start);
-    	    $date_end = trim($param->CallbackParameter->search->date_end);
-    	    $fromaccIds = $param->CallbackParameter->search->fromacc;
-    	    $toaccIds = $param->CallbackParameter->search->toacc;
-    	    $pageNo = trim($param->CallbackParameter->pagination->pageNo);
-    	    $pageSize = trim($param->CallbackParameter->pagination->pageSize);
-    	    
-    	    if($date_start === '' && $date_end === '' && count($fromaccIds) === 0 && count($toaccIds) === 0)
-    	        throw new Exception('We need at least one search criteria to search!');
-    	    
-    	    $where = 'active = 1';
-    	    if($date_start !== '')
-    	        $where .= " AND created >= '$date_start'";
-    	    if($date_end !== '')
-    	        $where .= " AND created <= '$date_end'";
-    	    if(count($fromaccIds) !== 0)
-    	        $where .= " AND fromId in(" . implode(', ', $fromaccIds) . ")";
-    	    if(count($toaccIds) !== 0)
-    	        $where .= " AND toId in(" . implode(', ', $toaccIds) . ")";
-    	    $trans = BaseService::getInstance('TransactionService')->findByCriteria($where, array(), true, $pageNo, $pageSize, array("created" => "desc"));
-    	    $stats = BaseService::getInstance('TransactionService')->getPageStats();
-    	    $results['total'] = $stats['totalRows'];
-    	    $results['trans'] = array();
-    	    foreach($trans as $tran)
-    	    {
-    	        $results['trans'][] = $this->_getJsonTrans($tran);
-    	    }
+	        $transId = trim($param->CallbackParameter->search->transId);
+	        if($transId !== '') 
+	        {
+	            if(!($trans = BaseService::getInstance('TransactionService')->get($transId)) instanceof Transaction)
+	                throw new Exception('Invalid transaction ID:' . $transId);
+	            $results['total'] = 1;
+	            $results['trans'] = array($trans->getJsonArray());
+	        }
+	        else
+	        {
+    	        $date_start = trim($param->CallbackParameter->search->date_start);
+        	    $date_end = trim($param->CallbackParameter->search->date_end);
+        	    $fromaccIds = $param->CallbackParameter->search->fromacc;
+        	    $toaccIds = $param->CallbackParameter->search->toacc;
+        	    $pageNo = trim($param->CallbackParameter->pagination->pageNo);
+        	    $pageSize = trim($param->CallbackParameter->pagination->pageSize);
+        	    
+        	    if($date_start === '' && $date_end === '' && count($fromaccIds) === 0 && count($toaccIds) === 0)
+        	        throw new Exception('We need at least one search criteria to search!');
+        	    
+        	    $where = 'active = 1';
+        	    if($date_start !== '')
+        	        $where .= " AND created >= '$date_start'";
+        	    if($date_end !== '')
+        	        $where .= " AND created <= '$date_end'";
+        	    if(count($fromaccIds) !== 0)
+        	        $where .= " AND fromId in(" . implode(', ', $fromaccIds) . ")";
+        	    if(count($toaccIds) !== 0)
+        	        $where .= " AND toId in(" . implode(', ', $toaccIds) . ")";
+        	    $trans = BaseService::getInstance('TransactionService')->findByCriteria($where, array(), true, $pageNo, $pageSize, array("created" => "desc"));
+        	    $stats = BaseService::getInstance('TransactionService')->getPageStats();
+        	    $results['total'] = $stats['totalRows'];
+        	    $results['trans'] = array();
+        	    foreach($trans as $tran)
+        	    {
+        	        $results['trans'][] = $tran->getJsonArray();
+        	    }
+	        }
 	    }
 	    catch(Exception $e)
 	    {
@@ -220,7 +149,7 @@ class ReportsController extends PageAbstract
     	    $trans = BaseService::getInstance('TransactionService')->get($transId);
     	    $trans->setActive(false);
     	    BaseService::getInstance('TransactionService')->save($trans);
-    	    $results = $this->_getJsonTrans($trans);
+    	    $results = $trans->getJsonArray();
 	    }
 	    catch(Exception $e)
 	    {
@@ -279,7 +208,7 @@ class ReportsController extends PageAbstract
                 if(is_file($filePath))
                     $trans = BaseService::getInstance('TransactionService')->addAsset($trans, BaseService::getInstance('AssetService')->registerFile(AssetType::ID_DOC, $filePath, trim($asset['name'])));
     	    }
-    	    $results = $this->_getJsonTrans($trans);
+    	    $results = $trans->getJsonArray();
 	        Dao::commitTransaction();
 	    }
 	    catch(Exception $e)
@@ -289,17 +218,6 @@ class ReportsController extends PageAbstract
 	    }
 	    $param->ResponseData = $this->_getJson($results, $errors);
 	    return $this;
-	}
-	/**
-	 * Getting the array for a transaction for the json string
-	 * 
-	 * @param Transaction $trans The transaction
-	 * 
-	 * @return array
-	 */
-	private function _getJsonTrans(Transaction $trans)
-	{
-	    return $trans->getJsonArray();
 	}
 }
 ?>

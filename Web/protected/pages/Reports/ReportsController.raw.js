@@ -1,6 +1,7 @@
 var ReportJs = new Class.create();
 ReportJs.prototype = {
 	resultPanelId: '',
+	searchPanelId: '',
 	searchCriteria:{
 		search:{},
 		pagination: {
@@ -14,30 +15,115 @@ ReportJs.prototype = {
 		del: ''
 	},
 	//constructor
-	initialize: function(resultPanelId, searchCallbackId, editCallbackId, delCallbackId){
+	initialize: function(resultPanelId, searchPanelId, searchCallbackId, editCallbackId, delCallbackId){
 		this.resultPanelId = resultPanelId;
+		this.searchPanelId = searchPanelId;
 		this.callbackIds.search = searchCallbackId;
 		this.callbackIds.edit = editCallbackId;
 		this.callbackIds.del = delCallbackId;
-	},
-	//initialising the date picker
-	initialDatePicker: function(selector) {
+	}
+	//getting the edit panel row
+	,_getRowDiv: function(title, content) {
+		return new Element('div', {'class': 'rowwrapper'})
+			.insert({'bottom': new Element('span', {'class': 'label'}).update(title) })
+			.insert({'bottom': new Element('span', {'class': 'input'}).update(content) });
+	}
+	//initialize the search panel
+	,initSearchPane: function(transId, fromDate, toDate, fromAccIds, toAccIds) {
 		var tmp = {};
+		tmp.me = this;
+		tmp.fromDate = (fromDate || '');
+		tmp.toDate = (toDate || '');
+		tmp.fromAccIds = (fromAccIds || []);
+		tmp.toAccIds = (toAccIds || []);
+		tmp.transId = (transId || '');
+		$(tmp.me.searchPanelId).update(new Element('div', {'class': 'content-box searchPanel'})
+			.insert({'bottom': new Element('h3', {'class': 'box-title'}).update('Search Criterias: ')
+				.insert({'bottom': new Element('span', {'class': 'inlineblock hidesearchwrapper'})
+					.insert({'bottom': new Element('input', {'type': 'checkbox', 'class': 'hidesearchbtn', 'checked': true}) 
+						.observe('click', function () {
+							$(this).up('.content-box').down('.box-content').toggle();
+						})
+					})
+					.insert({'bottom': new Element('label').update('Show Search') })
+				})
+			})
+			.insert({'bottom': new Element('div', {'class': 'box-content'})
+				.insert({'bottom': new Element('div', {'class': 'row fullwidth'})
+					.insert({'bottom': tmp.me._getRowDiv('From Date:', 
+							new Element('input', {'class': 'searchdate rndcnr fullwidth', 'type': 'text', 'searchpane': 'date_start', 'value': tmp.fromDate, 'readyonly': true})
+					).addClassName('halfcut') })
+					.insert({'bottom': tmp.me._getRowDiv('To Date:', 
+							new Element('input', {'class': 'searchdate rndcnr fullwidth', 'type': 'text', 'searchpane': 'date_end', 'value': tmp.toDate, 'readyonly': true})
+					).addClassName('halfcut') })
+				})
+				.insert({'bottom': tmp.me._getRowDiv('From Account:', tmp.me._getAccList('Select some AccountEntries', tmp.fromAccIds).writeAttribute('searchpane', 'fromacc')).addClassName('row fullwidth') })
+				.insert({'bottom': tmp.me._getRowDiv('To Account:', tmp.me._getAccList('Select some AccountEntries', tmp.toAccIds).writeAttribute('searchpane', 'toacc')).addClassName('row fullwidth') })
+				.insert({'bottom': new Element('div', {'class': 'row'})
+					.insert({'bottom': new Element('input', {'type': 'hidden', 'value': tmp.transId, 'searchpane': 'transId'}) })
+					.insert({'bottom': new Element('input', {'type': 'button', 'value': 'Search', 'class': 'submitBtn'})
+						.observe('click', function() {
+							tmp.me.search();
+						})
+					})
+				})
+			})
+		);
+		return this;
+	}
+	,getSearchPanel: function() {
+		return $(this.searchPanelId);
+	}
+	//get the account list
+	,_getAccList: function(placeholder, selectedValues) {
+		var tmp = {};
+		tmp.selectedValues = selectedValues || [];
+		tmp.selectBox = new Element('select', {'class': 'chosen-select', 'multiple': true, 'data-placeholder': placeholder});
+		tmp.accounts = appJs.getPageData('accounts');
+		$H(tmp.accounts).each(function(account){
+			tmp.optgroup = new Element('optgroup', {'label': tmp.accounts[account.key][account.key].name});
+			$H(account.value).each(function(acc){
+				if(account.key !== acc.value.id) {
+					tmp.option = new Element('option', {'value': acc.key}).update(acc.value.breadCrumbs.name);
+					if(tmp.selectedValues.indexOf(acc.key * 1) >= 0) {
+						tmp.option.writeAttribute('selected', true);
+					}
+					tmp.optgroup.insert({'bottom': tmp.option });
+				}
+			});
+			tmp.selectBox.insert({'bottom': tmp.optgroup });
+		});
+		return tmp.selectBox;
+	}
+	//initialising the date picker
+	,initialDatePicker: function(selector) {
+		var tmp = {};
+		tmp.results = [];
 		$$(selector).each(function(item){
 			tmp.hourString = '00:00:00';
 			tmp.searchPanelAttr = item.readAttribute('searchpane');
 			if (tmp.searchPanelAttr !== undefined && tmp.searchPanelAttr !== null) {
 				tmp.hourString = tmp.searchPanelAttr.strip().include('_start') ? '00:00:00' : '23:59:59';
 			}
-			new Prado.WebUI.TDatePicker({'ID': item,'InputMode':'TextBox','Format':'yyyy-MM-dd ' + tmp.hourString,'FirstDayOfWeek':1,'ClassName':'datePicker','CalendarStyle':'default','FromYear':2007,'UpToYear':2030});
+			tmp.results.push(new Prado.WebUI.TDatePicker({'ID': item,'InputMode':'TextBox','Format':'yyyy-MM-dd ' + tmp.hourString,'FirstDayOfWeek':1,'ClassName':'datePicker','CalendarStyle':'default','FromYear':2007,'UpToYear':2030}));
 		});
-	},
+		return tmp.results;
+	}
+	,initChosen: function(selector) {
+		var tmp = {};
+		tmp.results = [];
+		$$(selector).each(function(item){
+			tmp.results.push(new Chosen(item, {'over-flow': "auto"}));
+		});
+	    return tmp.results;
+	}
 	//click on the search btn
-	search: function(btn) {
+	,search: function() {
 		var tmp = {};
 		tmp.me = this;
 		tmp.resultPanel = $(this.resultPanelId);
-		tmp.searchPane = $(btn).up('.searchPanel');
+		tmp.searchPane = $(this.searchPanelId);
+		
 		//collects information
 		tmp.searchCriterias = {};
 		tmp.searchPane.getElementsBySelector('[searchpane]').each(function(item){
@@ -46,8 +132,8 @@ ReportJs.prototype = {
 			tmp.searchCriterias[tmp.field] = tmp.value;
 		});
 		
-		this.searchCriteria.search = tmp.searchCriterias;
-		this.searchCriteria.pagination.pageNo = 1;
+		tmp.me.searchCriteria.search = tmp.searchCriterias;
+		tmp.me.searchCriteria.pagination.pageNo = 1;
 		appJs.postAjax(this.callbackIds.search, this.searchCriteria, {
     		'onLoading': function(sender, param){
     			tmp.resultPanel.show().down('.box-content').update('<img src="/contents/images/loading.gif" />');
@@ -103,7 +189,7 @@ ReportJs.prototype = {
 		tmp.newRowContent.insert({'bottom': new Element('span', {'class': 'comments'}).update(trans.comments)});
 		tmp.assetsDiv = new Element('ul', {'class': 'assets'});
 		trans.assets.each(function(item){
-			tmp.assetsDivLi = new Element('li', {'class': 'assets'})
+			tmp.assetsDivLi = new Element('li', {'class': 'assets'});
 			tmp.assetsDivLi.update(new Element('a', {'class': 'assetlink', 'href': '/asset/' + item.assetKey, 'target': '_blank'}).update(item.filename));
 			tmp.assetsDiv.insert({'bottom':tmp.assetsDivLi});
 		});
@@ -178,7 +264,7 @@ ReportJs.prototype = {
 					//remove that transaction
 					$$('.row[transid=' + tmp.result.id + ']').each(function(item){
 						item.remove();
-					})
+					});
 				} catch(e) {
 					alert(e);
 					if($(btn) !== undefined && $(btn) !== null) {
@@ -192,8 +278,8 @@ ReportJs.prototype = {
 	saveTrans: function(btn, transId) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.row = $(btn).up('.newRow');
-    	tmp.savingPanel = tmp.row.up('.newAccDiv');
+		tmp.row = $(btn).up('.editrow');
+    	tmp.savingPanel = tmp.row.up('.editDiv');
     	
     	//removing the errors
     	tmp.savingPanel.getElementsBySelector('.newAccError').each(function(item){item.remove();});
@@ -213,7 +299,7 @@ ReportJs.prototype = {
     			case 'toacc': {
     				tmp.value = $F(item);
     				if(tmp.value.blank()) {
-    					item.insert({'after': new Element('span',{'class': 'newAccError'}).update( tmp.field + ' is needed!')});
+    					item.up('.rowwrapper').down('.label').insert({'bottom': new Element('span',{'class': 'newAccError'}).update( tmp.field + ' is needed!')});
     					tmp.hasError = true;
     				}
     				tmp.transInfo[tmp.field] = tmp.value;
@@ -222,7 +308,7 @@ ReportJs.prototype = {
     			case 'value': {
     				tmp.value = $F(item);
     				if(!tmp.value.match(/^\d*(\.|)\d{0,2}$/g)) {
-    					item.insert({'after': new Element('span',{'class': 'newAccError'}).update('Invalid value, expected: 0.00!')});
+    					item.up('.rowwrapper').down('.label').insert({'bottom': new Element('span',{'class': 'newAccError'}).update('Invalid value, expected: 0.00!')});
     					tmp.hasError = true;
     				}
     				tmp.transInfo[tmp.field] = tmp.value;
@@ -231,7 +317,7 @@ ReportJs.prototype = {
     			case 'assets': {
     				tmp.assets = {};
     				item.getElementsBySelector('.uploadedfile').each(function(fileItem) {
-    					tmp.assets[fileItem.readAttribute('assetkey')] = (fileItem.readAttribute('delete') ? false : true)
+    					tmp.assets[fileItem.readAttribute('assetkey')] = (fileItem.readAttribute('delete') ? false : true);
     				});
     				tmp.transInfo[tmp.field] = tmp.assets;
     				break;
@@ -277,39 +363,49 @@ ReportJs.prototype = {
 		var tmp = {};
 		tmp.me = this;
 		//removing all opened editing panel
-		$$('.newAccDiv').each(function(item){ item.remove();});
+		$$('.editDiv').each(function(item){ item.remove();});
 		
 		tmp.accSelect = $$('select[searchpane="fromacc"]').first();
 		tmp.fileUploaderWrapperId = 'attachments_' + trans.id;
 		//creating a new div for the transaction
 		tmp.transRow = $(btn).up('.row');
-		tmp.transRow.insert({'bottom': new Element('div', {'id': 'edittrans_' + trans.id, 'class': 'newAccDiv'})
-			//getting the date row
-	    	.insert({'bottom': tmp.me._getEditPanelRow('Date: ', new Element('input', {'transinfo': 'date', 'type': 'text', 'class': 'transdate inputbox', 'placeholder': 'Created Date', 'value': trans.created})) })
+		tmp.transRow.insert({'bottom': new Element('div', {'id': 'edittrans_' + trans.id, 'class': 'editDiv'})
 	    	//gett the from account
-	    	.insert({'bottom': tmp.me._getEditPanelRow('From: ', tmp.me._getAccSelectBox(tmp.accSelect.innerHTML, trans.fromAcc.id).writeAttribute('transinfo', 'fromacc') ) })
+	    	.insert({'bottom': tmp.me._getRowDiv('From: ', tmp.me._getAccSelectBox(tmp.accSelect.innerHTML, trans.fromAcc.id).writeAttribute('transinfo', 'fromacc').addClassName('editrow') ) })
 	    	//gett the to account
-			.insert({'bottom': tmp.me._getEditPanelRow('To: ', tmp.me._getAccSelectBox(tmp.accSelect.innerHTML, trans.toAcc.id).writeAttribute('transinfo', 'toacc') ) })
-	    	//getting the value row
-	    	.insert({'bottom': tmp.me._getEditPanelRow('Value: $', new Element('input', {'transinfo': 'value', 'type': 'text', 'class': 'transvalue inputbox', 'placeholder': 'Value', 'value': trans.value}) ) })
-	    	//getting the comments row
-	    	.insert({'bottom': tmp.me._getEditPanelRow('Comments: ', new Element('input', {'transinfo': 'comments', 'type': 'text', 'class': 'transcomments inputbox', 'placeholder': 'Comments', 'value': trans.comments}) ) })
-	    	//getting the comments row
-	    	.insert({'bottom': tmp.me._getEditPanelRow('Attachments: ', new Element('div')
+			.insert({'bottom': tmp.me._getRowDiv('To: ', tmp.me._getAccSelectBox(tmp.accSelect.innerHTML, trans.toAcc.id).writeAttribute('transinfo', 'toacc').addClassName('editrow') ) })
+			.insert({'bottom': new Element('div').addClassName('editrow')
+				//getting the date row
+				.insert({'bottom': new Element('span', {'class': 'date inlineblock'}).update(
+					tmp.me._getRowDiv('Date: ', new Element('input', {'transinfo': 'date', 'type': 'text', 'class': 'transdate inputbox fullwidth rndcnr', 'placeholder': 'Created Date', 'value': trans.created}))
+				) })
+				//getting the value row
+				.insert({'bottom': new Element('span', {'class': 'amount inlineblock'}).update(
+						tmp.me._getRowDiv('Value: $', new Element('input', {'transinfo': 'value', 'type': 'text', 'class': 'transvalue inputbox fullwidth rndcnr', 'placeholder': 'Value', 'value': trans.value}) )
+				) })
+				//getting the comments row
+				.insert({'bottom': new Element('span', {'class': 'descr inlineblock'}).update(
+						tmp.me._getRowDiv('Comments: ', new Element('input', {'transinfo': 'comments', 'type': 'text', 'class': 'transcomments inputbox fullwidth rndcnr', 'placeholder': 'Comments', 'value': trans.comments}) )
+				) })
+			})
+	    	//getting the attachment row
+	    	.insert({'bottom': tmp.me._getRowDiv('Attachments: ', new Element('div').addClassName('editrow')
 		    	.insert({'bottom': tmp.me._getAssetListDiv(trans.assets) }) 
 	    		.insert({'bottom': new Element('span', {'transinfo': 'attachments', 'id': tmp.fileUploaderWrapperId}) }) 
 	    	) })
 	    	//getting the button row
-	    	.insert({'bottom': new Element('div', {'class': 'newRow'})
+	    	.insert({'bottom': new Element('div').addClassName('editrow')
 	    		.insert({'bottom': new Element('input', {'class': 'submitBtn', 'type': 'button', 'value': 'Save'}).observe('click', function(){
-	    			tmp.me.saveTrans(this, trans.id)
+	    			tmp.me.saveTrans(this, trans.id);
 	    		})})
 		    	.insert({'bottom': new Element('input', {'class': 'submitBtn', 'type': 'button', 'value': 'Cancel', 'style': 'float:right;'}).observe('click', function(){
-		    		$(btn).up('.row').down('.newAccDiv').remove();
+		    		$(btn).up('.row').down('.editDiv').remove();
 		    	})})
 	    	})
 		});
 		tmp.me.initialDatePicker('input[transinfo=date]');
+		tmp.me.initChosen('[transinfo=fromacc]');
+		tmp.me.initChosen('[transinfo=toacc]');
 		tmp.fileHandler = new FileUploaderJs(tmp.fileUploaderWrapperId).initFileUploader();
 		tmp.transRow.down('#' + tmp.fileUploaderWrapperId).store('fileHandler', tmp.fileHandler);
 		tmp.transRow.store('trans', trans);
@@ -329,7 +425,7 @@ ReportJs.prototype = {
 						$(this).up('.uploadedfile').hide().writeAttribute('delete', true);
 					})
 				})
-			})
+			});
 		});
 		return tmp.div;
 	}
@@ -346,10 +442,4 @@ ReportJs.prototype = {
 		}
 		return tmp.selectCloneFrom;
 	}
-	//getting the edit panel row
-	,_getEditPanelRow: function(title, content) {
-		return new Element('div', {'class': 'newRow'})
-			.insert({'bottom': new Element('span', {'class': 'label'}).update(title) })
-			.insert({'bottom': new Element('span', {'class': 'typein'}).update(content) });
-	}
-}
+};

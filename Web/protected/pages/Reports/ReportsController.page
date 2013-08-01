@@ -3,13 +3,15 @@
     <com:TCallback ID="editBtn" OnCallback="Page.editTrans"/>
     <com:TCallback ID="deleteBtn" OnCallback="Page.deleteTrans"/>
     <div id='transpage'>
-	    <com:TPanel ID="seachpage"></com:TPanel>
+	    <div ID="searchpanel"></div>
 	    <div id="transResults" class="content-box" style='display:none;'>
-	        <h3 class="box-title"><span class='noOfTrans'></span> Transactions Found!</h3>
+	        <h3 class="box-title"><span class='noOfTrans'>0</span> Transaction(s) Found!</h3>
 	        <div class="box-content resultlist">
 	        </div>
 	    </div>
 	</div>
-    <com:Application.controls.FileUploader.FileUploader>
-    </com:Application.controls.FileUploader.FileUploader>
+    <com:Application.controls.FileUploader.FileUploader />
+    <com:Application.controls.Chosen.Chosen>
+        var pageJs = new ReportJs('transResults', 'searchpanel', '<%= $this->searchBtn->getUniqueId() %>', '<%=  $this->editBtn->getUniqueId() %>', '<%=  $this->deleteBtn->getUniqueId() %>');
+    </com:Application.controls.Chosen.Chosen>
 </com:TContent>

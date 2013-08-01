@@ -1,0 +1,62 @@
+.inlineblock {
+	display: inline-block;
+}
+
+.fullwidth {
+	width: 90%;
+}
+
+.rndcnr {
+	padding: 4px;
+	border: 1px #cccccc solid;
+	border-radius: 4px;
+}
+
+.halfcut {
+	display: inline-block;
+	width: 49%;
+}
+
+.datePicker {
+	z-index: 1010;
+}
+
+.newAccError {
+	font-size: 10px;
+	font-style: italic;
+	color: red;
+}
+.hidesearchwrapper {
+	float: right;
+	font-size: 10px;
+}
+.row {
+	margin: 0 0 4px 0;
+}
+
+.row .label {
+	font-size: 10px;
+	display: block;
+}
+
+.row .input {
+	width: 100%;
+}
+
+.editDiv {
+	margin: 0 0 0 25px;
+	background: #cccccc;
+	padding: 5px;
+}
+
+.editDiv .date {
+	width: 130px;
+}
+
+.editDiv .amount {
+	width: 130px;
+}
+
+.editDiv .descr {
+	width: 500px;
+}
