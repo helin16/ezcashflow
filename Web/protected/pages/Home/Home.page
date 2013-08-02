@@ -27,7 +27,8 @@
     <com:TClientScript>
         var pageJs = new HomeJs();
         pageJs.getAccounts('bodyWrapper', '<%= $this->getAccountsBtn->getUniqueID()%>', function() {
-            pageJs.loadRecentTrans('recentTransList', '<%= $this->getRecentTransBtn->getUniqueID()%>')
+            pageJs.loadRecentTrans('recentTransList', '<%= $this->getRecentTransBtn->getUniqueID()%>');
+            transJs.buildFrom([1,2], [4]);
         });
     </com:TClientScript>
 </com:TContent>

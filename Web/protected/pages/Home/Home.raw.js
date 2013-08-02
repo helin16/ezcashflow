@@ -16,9 +16,9 @@ HomeJs.prototype = {
 		appJs.postAjax(getAccsBtn, {}, {
 			'onComplete': function(sender, param){
 				appJs.setPageData('accounts', appJs.getResp(param));
-				afterFunc();
 				$(pageWrapper).show();
 				$$('.loadingAccDiv').each(function(item) { item.remove(); });
+				afterFunc();
 	    	}
 		});
 	}

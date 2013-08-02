@@ -46,7 +46,6 @@
         '<%= $this->saveTrans->getUniqueID()%>', 
         '<%= $this->deleteFile->getUniqueID()%>',
         'fileUploaderWrapper');
-    transJs.buildFrom([1,2], [4]);
     $$('.inputtxt[transpane="transDate"]').each(function(item){
 	    new Prado.WebUI.TDatePicker({'ID': item,'InputMode':'TextBox','Format':'yyyy-MM-dd','FirstDayOfWeek':1,'ClassName':'datePicker','CalendarStyle':'default','FromYear':2007,'UpToYear':2030});
     });
