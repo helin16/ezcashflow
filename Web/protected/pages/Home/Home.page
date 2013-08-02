@@ -1,5 +1,5 @@
 <com:TContent ID="MainContent">
-    <div class="content-box listheader">
+    <div class="content-box listheader" >
         <h3 class="box-title">
             <ul>
                 <li><a href="#" selected onclick="return pageJs.selectSummary(this, function(){profitJs.loadInfo('30003', '40002')});" id="summaryBtn">Summary</a></li>
@@ -22,12 +22,11 @@
             <com:Application.controls.TransactionPanel.TransactionPanel Id="Expense" PostJs="pageJs.refreshTrans(transJs.recentTrans);"/>
         </div>
 	</div>
-	
-	<com:TCallback ID="getAccountsBtn" OnCallback="Page.getAccounts" />
 	<com:TCallback ID="getRecentTransBtn" OnCallback="Page.getRecentTrans" />
+	<com:TCallback ID="getAccountsBtn" OnCallback="Page.getAccounts" />
     <com:TClientScript>
         var pageJs = new HomeJs();
-        pageJs.getAccounts('<%= $this->getAccountsBtn->getUniqueID()%>', function() {
+        pageJs.getAccounts('bodyWrapper', '<%= $this->getAccountsBtn->getUniqueID()%>', function() {
             pageJs.loadRecentTrans('recentTransList', '<%= $this->getRecentTransBtn->getUniqueID()%>')
         });
     </com:TClientScript>

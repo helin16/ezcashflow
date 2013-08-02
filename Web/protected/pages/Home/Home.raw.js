@@ -8,11 +8,17 @@ HomeJs.prototype = {
 	},
 	//constructor
 	initialize: function () {}
-	,getAccounts: function(getAccsBtn, afterFunc) {
+	//getting the accounts
+	,getAccounts: function(pageWrapper, getAccsBtn, afterFunc) {
+		$(pageWrapper).hide();
+		$$('.loadingAccDiv').each(function(item) { item.remove(); });
+		$(pageWrapper).insert({'after': new Element('div', {'class': 'loadingAccDiv'}).update('<center><div>Loading Accounts Details ... </div><img src="/contents/images/loading.gif" /></center>') });
 		appJs.postAjax(getAccsBtn, {}, {
 			'onComplete': function(sender, param){
 				appJs.setPageData('accounts', appJs.getResp(param));
 				afterFunc();
+				$(pageWrapper).show();
+				$$('.loadingAccDiv').each(function(item) { item.remove(); });
 	    	}
 		});
 	}
