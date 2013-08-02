@@ -14,6 +14,9 @@ class StreamController extends TService
      */
   	public function run() 
   	{		
+        $response = $this->getResponse();
+        $response->setCharset('UTF-8');
+        ob_start();
   	    try
   	    {
   	        if(isset($this->Request['method']) && trim($this->Request['method']) === 'upload')
@@ -25,12 +28,15 @@ class StreamController extends TService
   	        }
   	        else 
         		echo BaseService::getInstance('AssetService')->streamFile($this->Request['id']);
-    		die;
   	    }
   	    catch(Exception $ex)
   	    {
-  	        die($ex->getMessage());
+  	        echo $ex->getMessage();
   	    }
+        $contents = ob_get_contents();
+        ob_end_clean();
+        $response->write($contents);
+        $response->flushContent();
   	}	
 }
 

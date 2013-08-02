@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<application id="EzCashFlow" mode="Debug">
+<application id="EzCashFlow" mode="Performance">
   <!-- alias definitions and namespace usings
   <paths>
     <alias id="myalias" path="./lib" />
@@ -34,8 +34,13 @@
 			<url ServiceParameter="Admin.AssetType.AssetTypeController" pattern="admin/assettype"/>
 			<url ServiceParameter="Admin.Eofy.EofyController" pattern="admin/eofy"/>
 			
+			
+			<!--  asset service -->
 			<url ServiceId="stream" ServiceParameter="" pattern="asset/{method}" parameters.method="upload" />
 			<url ServiceId="stream" ServiceParameter="" pattern="asset/{id}" parameters.id="\w+" />
+			
+			<!--  json service -->
+			<url ServiceId="json" ServiceParameter="" pattern="json" />
 			
 		</module>
 	
@@ -57,6 +62,14 @@
 		</service>
 		
 		<service id="stream" class="Application.pages.Stream.StreamController">
+            <modules>
+              <module id="auth" class="Application.classes.WebUser.AuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.LoginController" AuthExpire="3600"/>
+              <module id="users" class="Application.classes.WebUser.WebUserManager"/>
+            </modules>
+        </service>
+        
+		<!--  json service -->
+		<service id="json" class="Application.classes.JsonService">
             <modules>
               <module id="auth" class="Application.classes.WebUser.AuthManager" UserManager="users" ReturnUrl="/login.html" LoginPage="Login.LoginController" AuthExpire="3600"/>
               <module id="users" class="Application.classes.WebUser.WebUserManager"/>

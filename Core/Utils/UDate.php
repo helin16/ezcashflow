@@ -24,7 +24,7 @@ class UDate
 		if($timeZone === '')
 			$timeZone = Config::get("time", "defaultTimeZone");
 		if ($string == "0000-00-00 00:00:00")
-			$string = (string)UDate::zeroDate();
+			$string = trim(UDate::zeroDate());
 		// Is there a difference between UTC and GMT?
 		date_default_timezone_set('UTC');
 		if($timeZone === '')
@@ -91,6 +91,17 @@ class UDate
 	public function getDateTime()
 	{
 		return $this->_dateTime;
+	}
+	/**
+	 * Getting the difference between two dates
+	 * 
+	 * @param UDate $date The other datetime to compare with
+	 * 
+	 * @return DateInterval
+	 */
+	public function diff(UDate $date)
+	{
+	    return $this->getDateTime()->diff($date->getDateTime());
 	}
 	/**
 	 * Returns only the date part of the internal DateTime object
