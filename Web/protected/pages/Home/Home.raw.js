@@ -10,15 +10,29 @@ HomeJs.prototype = {
 	initialize: function () {}
 	//getting the accounts
 	,getAccounts: function(pageWrapper, getAccsBtn, afterFunc) {
+		var tmp = {};
+		tmp.accounts = appJs.getPageData('accounts');
+		tmp.lastUpdatedTime = appJs.getPageData('lastUpdatedTime');
 		$(pageWrapper).hide();
 		$$('.loadingAccDiv').each(function(item) { item.remove(); });
 		$(pageWrapper).insert({'after': new Element('div', {'class': 'loadingAccDiv'}).update('<center><div>Loading Accounts Details ... </div><img src="/contents/images/loading.gif" /></center>') });
-		appJs.postAjax(getAccsBtn, {}, {
+		appJs.postAjax(getAccsBtn, {'lastUpdatedTime': tmp.lastUpdatedTime}, {
 			'onComplete': function(sender, param){
-				appJs.setPageData('accounts', appJs.getResp(param));
-				$(pageWrapper).show();
-				$$('.loadingAccDiv').each(function(item) { item.remove(); });
-				afterFunc();
+				try {
+					tmp.result = appJs.getResp(param, false, true);
+					$H(tmp.result.accounts).each(function(account) {
+						$H(account.value).each(function(acc){
+							tmp.accounts[account.key][acc.value.id] = acc.value;
+						});
+					});
+					appJs.setPageData('accounts', tmp.accounts);
+					appJs.setPageData('lastUpdatedTime', tmp.result.lastUpdatedTime);
+					$(pageWrapper).show();
+					$$('.loadingAccDiv').each(function(item) { item.remove(); });
+					afterFunc();
+				} catch (e) {
+					console.error(e);
+				}
 	    	}
 		});
 	}

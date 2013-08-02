@@ -129,16 +129,37 @@ class Home extends PageAbstract
 	    $results = $errors = array();
 	    try
 	    {
-	        $accounts = BaseService::getInstance('AccountEntryService')->findAll();
-	        foreach($accounts as $account)
-	        {
-	            $results[$account->getRoot()->getId()][$account->getId()] = $account->getJsonArray();
-	        }
-	    }
-	    catch(Exception $e)
-	    {
-	        $errors[] = $e->getMessage();
-	    }
+    	    $params = json_decode(json_encode($param->CallbackParameter), true);
+      	    var_dump($params);
+    	    $lastUpdatedTime = (!isset($params['lastUpdatedTime']) || trim($params['lastUpdatedTime']) === '') ? '' : new UDate(trim($params['lastUpdatedTime']));
+      	    $accounts = array();
+      	    if(!$lastUpdatedTime instanceof UDate || $lastUpdatedTime->getDateTime() === false)
+      	        $accounts = BaseService::getInstance('AccountEntryService')->findAll();
+      	    else 
+      	    {
+      	        $trans = BaseService::getInstance('TransactionService')->findByCriteria('trans.updated > ?', array(trim($lastUpdatedTime)));
+          	    var_dump(count($trans));
+      	        foreach($trans as $tran)
+      	        {
+      	            $accounts[] =  $tran->getFrom();
+      	            $accounts[] =  $tran->getTo();
+      	        }
+      	        $accounts = array_merge($accounts, BaseService::getInstance('AccountEntryService')->findByCriteria('updated > ?', array(trim($lastUpdatedTime)), true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('etr.accountNumber' => 'asc')));
+      	    }
+      	    $accounts = array_filter(array_unique($accounts));
+      	    $accs = array();
+      	    foreach($accounts as $account)
+      	    {
+      	        $accs[$account->getRoot()->getId()][$account->getId()] = $account->getJsonArray();
+      	    }
+      	    $results['accounts'] = (count($accs) === 0 ? new stdClass() : $accs);
+      	    $res = Dao::getSingleResultNative('select NOW() `now`', array(), PDO::FETCH_ASSOC);
+      	    $results['lastUpdatedTime'] = $res['now'];
+  	    }
+  	    catch(Exception $e)
+  	    {
+  	        $errors[] = $e->getMessage();
+  	    }
 	    $param->ResponseData = Core::getJson($results, $errors);
 	    return $this;
 	}
