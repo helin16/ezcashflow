@@ -14,6 +14,11 @@ class AccountEntry extends BaseEntityAbstract
      */
     const ACC_NO_LENGTH = 4;
     /**
+     * The default separator for breadCrubms
+     * @var string
+     */
+    const BREADCRUMBS_SEPARATOR = ' / ';
+    /**
      * The account type for ASSET account
      * @var int
      */
@@ -348,7 +353,7 @@ class AccountEntry extends BaseEntityAbstract
 	 * 
 	 * @return string
 	 */
-	public function getBreadCrumbs($inclSelf = true, $forId = false, $separator = " / ")
+	public function getBreadCrumbs($inclSelf = true, $forId = false, $separator = self::BREADCRUMBS_SEPARATOR)
 	{
 	    $requestedNos = $this->_getParentsAccNo($inclSelf);
 	    $sql = "select " . ($forId === true ? 'id' : 'name') . ' `id` from accountentry where rootId = ? and accountNumber in (' . "'" . implode("', '", $requestedNos) . "'" . ') order by accountNumber asc';
