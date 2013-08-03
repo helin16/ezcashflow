@@ -23,7 +23,7 @@
     width: 100%;
 }
 .TransPanel .transDiv .row .inline.date {
-    width: 15%;
+    width: 18%;
 }
 .TransPanel .transDiv .row .inline.date [transpane]{
     cursor: pointer;
@@ -32,7 +32,7 @@
     width: 20%;
 }
 .TransPanel .transDiv .row .inline.description {
-    width: 62%;
+    width: 60%;
 }
 .TransPanel .transDiv .row .inline [transpane]{
     width: 90%;
