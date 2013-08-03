@@ -48,6 +48,7 @@ AccountsJs.prototype = {
 	    		try {
 	    			tmp.me.rootId = tmp.me._selectAccountType(btn);
 	    			tmp.accounts[tmp.me.rootId] = appJs.getResp(param, false, true);
+	    			appJs.setPageData('accounts', tmp.accounts);
 	    			tmp.me._showAccList(tmp.accounts[tmp.me.rootId], tmp.me.rootId);
 	    		} catch (e) {
 	    			alert(e);
