@@ -41,13 +41,10 @@ class AccountsController extends PageAbstract
 		{
 			if(!isset($param->CallbackParameter->rootId) || ($rootId = trim($param->CallbackParameter->rootId)) === '')
 				throw new Exception('rootId not found!');
-				
-			$accounts = $this->_accService->get($rootId)->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc'));
+			$accounts = BaseService::getInstance('AccountEntryService')->get($rootId)->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc'));
 			foreach($accounts as $account)
 			{
-				if(!$account instanceof AccountEntry)
-					continue;
-				$results[$account->getId()] = $acc->getJsonArray();
+				$results[$account->getId()] = $account->getJsonArray();
 			}
 		}
 		catch(Exception $e)
