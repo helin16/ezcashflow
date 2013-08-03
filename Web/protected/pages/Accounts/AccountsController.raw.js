@@ -12,8 +12,9 @@ AccountsJs.prototype = {
 	}
 	
 	//constructor
-	,initialize: function (accountListId, saveAccCallBackId, delAccCallBackId, moveAccCallBackId) {
+	,initialize: function (accountListId, getAccCallBackId, saveAccCallBackId, delAccCallBackId, moveAccCallBackId) {
 		this.divIds.list = accountListId;
+		this.callBackIds.getAccounts = getAccCallBackId;
 		this.callBackIds.saveAccount = saveAccCallBackId;
 		this.callBackIds.deleteAccounts = delAccCallBackId;
 		this.callBackIds.moveAccounts = moveAccCallBackId;
@@ -39,17 +40,19 @@ AccountsJs.prototype = {
     	var tmp = {};
     	tmp.me = this;
     	tmp.accounts = appJs.getPageData('accounts');
-		appJs.postAjax(this.callBackIds.getAccounts, {'rootId': tmp.me._selectAccountType(btn)}, {
+    	tmp.me.rootId = tmp.me._selectAccountType(btn);
+		appJs.postAjax(this.callBackIds.getAccounts, {'rootId': tmp.me.rootId}, {
     		'onLoading': function(sender, param){
     			$(tmp.me.divIds.list).update('<img src="/contents/images/loading.gif" />');
     		},
 	    	'onComplete': function(sender, param){
 	    		try {
-	    			tmp.me.rootId = tmp.me._selectAccountType(btn);
 	    			tmp.accounts[tmp.me.rootId] = appJs.getResp(param, false, true);
-	    			tmp.me._showAccList(tmp.accounts[tmp.me.rootId]);
+	    			appJs.setPageData('accounts', tmp.accounts);
+	    			$(tmp.me.divIds.list).update('');
+	    			tmp.me._showAccList(tmp.accounts[tmp.me.rootId], tmp.me.rootId, 0);
 	    		} catch (e) {
-	    			alert(e);
+	    			console.error(e);
 	    		}
 	    	}
     	});
@@ -57,20 +60,21 @@ AccountsJs.prototype = {
     }
     
     //showing the result
-    ,_showAccList: function (accounts) {
+    ,_showAccList: function (accounts, startAccId, rowNo) {
     	var tmp = {};
     	tmp.me = this;
-		$(tmp.me.divIds.list).update('');
-		tmp.i = 0;
-		tmp.orderedAccounts = Object.keys(accounts).map(function(k) { return accounts[k]; }).sortBy(function(account) {
-			return account.accountNumber + '';
+    	tmp.account = accounts[startAccId];
+		tmp.rowNo = rowNo;
+		$(tmp.me.divIds.list).insert({'bottom': tmp.me._formatAccountRow(tmp.account)
+			.addClassName(tmp.rowNo % 2 === 0 ? 'even' : 'odd')
+			.store('account', tmp.account)
 		});
-		tmp.orderedAccounts.each(function(account){
-			$(tmp.me.divIds.list).insert({'bottom': tmp.me._formatAccountRow(account)
-				.addClassName((tmp.i++) % 2 === 0 ? 'even' : 'odd')
-				.store('account', account)
-			});
-		});
+		tmp.account.children.map(function(k) { return accounts[k]; }).sortBy(function(acc) {
+    		return acc.name;
+    	}).each(function(acc){
+    		tmp.rowNo = tmp.me._showAccList(accounts, acc.id, tmp.rowNo + 1);
+    	});
+		return tmp.rowNo;
     }
     
     /**
@@ -80,8 +84,28 @@ AccountsJs.prototype = {
     	var tmp = {};
     	tmp.me = this;
     	tmp.leftMargin = account.level * 4 ;
-    	tmp.newRow = new Element('div', {'class': 'row', 'accountid': account.id, 'accountno': account.accountNumber, 'parentid': account.parent.id})
-	    	.insert({'bottom': new Element('div', {'class': 'space rowDivd', 'style': 'width: ' + tmp.leftMargin + '%'}).update('&nbsp;')})
+    	tmp.newRow = new Element('div', {'class': 'row accountrow', 'accountid': account.id, 'accountno': account.accountNumber, 'parentid': account.parent.id})
+	    	.insert({'bottom': new Element('div', {'class': 'space rowDivd', 'style': 'width: ' + tmp.leftMargin + '%'}).update(
+	    		account.children.size() === 0 ? '&nbsp;' :
+	    		new Element('span', {'class': 'expendBtn'}).update('-').observe('click', function() {
+	    			tmp.account = $(this).up('.accountrow').retrieve('account');
+	    			if($(this).innerHTML.strip() === '-') {
+	    				$(tmp.me.divIds.list).getElementsBySelector('.accountrow').filter(function(item) {
+		    				return item.readAttribute('accountno').startsWith(tmp.account.accountNumber) && item.readAttribute('accountid') !== tmp.account.id;
+		    			}).each(function(item) {
+		    				if($(item).retrieve('account').children.size() > 0)
+		    					$(item).down('.expendBtn').update('+');
+		    				item.hide();
+		    			});
+	    				$(this).update('+');
+	    			} else {
+	    				$(tmp.me.divIds.list).getElementsBySelector('.accountrow[parentid=' + tmp.account.id + ']').each(function(item) {
+		    				item.show();
+		    			});
+	    				$(this).update('-');
+	    			}
+	    		})
+	    	)})
 	    	.insert({'bottom': new Element('div', {'class': 'content rowDivd', 'style': 'width: ' + (100 - tmp.leftMargin - 5) + '%'})
 	    		.insert({'bottom': new Element('div', {'class': 'accountname'}).update( account.name ) })
 	    		.insert({'bottom': new Element('div', {'class': 'value'}).update( account.sum === 0 ? '' : '$' + account.sum ) })
