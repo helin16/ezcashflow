@@ -22,6 +22,7 @@ HomeJs.prototype = {
 					tmp.result = appJs.getResp(param, false, true);
 					$H(tmp.result.accounts).each(function(account) {
 						$H(account.value).each(function(acc){
+							tmp.accounts[account.key] = (tmp.accounts[account.key] || {});
 							tmp.accounts[account.key][acc.value.id] = acc.value;
 						});
 					});
