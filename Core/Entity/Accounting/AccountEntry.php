@@ -434,7 +434,7 @@ class AccountEntry extends BaseEntityAbstract
 	    	'name' => $this->getBreadCrumbs(true, false)
 	    );
 	    $acc['sum'] = $this->getSum();
-	    $acc['noOfChildren'] = Dao::countByCriteria(new DaoQuery('AccountEntry'), 'parentId = ?', array($this->getId()));
+	    $acc['children'] = array_map(create_function('$a', 'return $a->getId();'), $this->getChildren(false, true));
 	    $acc['parent'] = array();
 	    if(($parent = $this->getParent()) instanceof AccountEntry)
     	    $acc['parent'] = array('id' => $parent->getId(), 'name' => $parent->getName());
