@@ -90,8 +90,8 @@ HomeJs.prototype = {
 		tmp.lis = tmp.ul.getElementsBySelector('li');
 		data.each(function(trans){
 			tmp.lastLi = tmp.lis.last();
-			if(tmp.lis.size() >= pageJs.recentTrans.noOfTrans && tmp.lastLi !== undefined)
-				tmp.lastLi.remove();
+//			if(tmp.lis.size() >= pageJs.recentTrans.noOfTrans && tmp.lastLi !== undefined)
+//				tmp.lastLi.remove();
 			tmp.ul.insert({'top': pageJs.getRecentTranRow(trans)});
 		});
 	}
