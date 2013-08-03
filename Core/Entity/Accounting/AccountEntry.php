@@ -434,7 +434,7 @@ class AccountEntry extends BaseEntityAbstract
 	    	'name' => $this->getBreadCrumbs(true, false)
 	    );
 	    $acc['sum'] = $this->getSum();
-	    $acc['children'] = array_map(create_function('$a', 'return $a->getId();'), $this->getChildren(false, true));
+	    $acc['children'] = array_map(create_function('$a', 'return $a->getId();'), $this->getChildren(false, true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc')));
 	    $acc['parent'] = array();
 	    if(($parent = $this->getParent()) instanceof AccountEntry)
     	    $acc['parent'] = array('id' => $parent->getId(), 'name' => $parent->getName());
