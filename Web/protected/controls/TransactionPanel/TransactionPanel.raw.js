@@ -103,7 +103,7 @@ TransPaneJs.prototype = {
 	    			if(typeof(postJsFunc) === 'function')
 	    				postJsFunc();
 	    		} catch(e) {
-	    			console.error(e);
+	    			alert(e);
 	    			tmp.saveBtn.value = tmp.saveBtnValue;
 		    		tmp.saveBtn.disabled = false;
 	    		}

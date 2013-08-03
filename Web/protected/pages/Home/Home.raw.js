@@ -33,7 +33,7 @@ HomeJs.prototype = {
 					$$('.loadingAccDiv').each(function(item) { item.remove(); });
 					afterFunc();
 				} catch (e) {
-					console.error(e);
+					alert(e);
 				}
 	    	}
 		});

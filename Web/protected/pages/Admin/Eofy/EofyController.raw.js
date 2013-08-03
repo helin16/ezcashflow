@@ -30,7 +30,6 @@ EofyControllerJS.prototype = {
 		tmp.eofyId = tmp.eofyStart = tmp.eofyEnd = tmp.eofyComments = '';
 		tmp.assets = [];
 		if(eofy) {
-			console.debug(eofy);
 			tmp.eofyId = (eofy.id || '');
 			tmp.eofyStart = (eofy.start || '');
 			tmp.eofyEnd = (eofy.end || '');

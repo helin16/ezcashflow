@@ -297,7 +297,7 @@ PropertiesJs.prototype = {
 	    		} catch(e) {
 	    			tmp.savingInfo.remove();
 	    			tmp.row.down('.btns').show();
-	    			console.error(e);
+	    			alert(e);
 	    		}
 	    	}
     	});

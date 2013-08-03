@@ -52,7 +52,7 @@ AccountsJs.prototype = {
 	    			$(tmp.me.divIds.list).update('');
 	    			tmp.me._showAccList(tmp.accounts[tmp.me.rootId], tmp.me.rootId, 0);
 	    		} catch (e) {
-	    			console.error(e);
+	    			alert(e);
 	    		}
 	    	}
     	});
