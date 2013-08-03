@@ -12,7 +12,8 @@ HomeJs.prototype = {
 	,getAccounts: function(pageWrapper, getAccsBtn, afterFunc) {
 		var tmp = {};
 		tmp.accounts = appJs.getPageData('accounts');
-		tmp.lastUpdatedTime = appJs.getPageData('lastUpdatedTime');
+		tmp.lastUpdatedTime = (appJs.getPageData('lastUpdatedTime') || '');
+		tmp.lastUpdatedTime = (Object.toJSON(tmp.lastUpdatedTime) === "{}" ? '' : tmp.lastUpdatedTime);
 		$(pageWrapper).hide();
 		$$('.loadingAccDiv').each(function(item) { item.remove(); });
 		$(pageWrapper).insert({'after': new Element('div', {'class': 'loadingAccDiv'}).update('<center><div>Loading Accounts Details ... </div><img src="/contents/images/loading.gif" /></center>') });

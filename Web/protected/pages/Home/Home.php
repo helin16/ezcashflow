@@ -130,7 +130,6 @@ class Home extends PageAbstract
 	    try
 	    {
     	    $params = json_decode(json_encode($param->CallbackParameter), true);
-      	    var_dump($params);
     	    $lastUpdatedTime = (!isset($params['lastUpdatedTime']) || trim($params['lastUpdatedTime']) === '') ? '' : new UDate(trim($params['lastUpdatedTime']));
       	    $accounts = array();
       	    if(!$lastUpdatedTime instanceof UDate || $lastUpdatedTime->getDateTime() === false)
