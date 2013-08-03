@@ -165,14 +165,14 @@ class PropertiesController extends PageAbstract
 	        try {Dao::beginTransaction(); } catch(Exception $e) {$transStarted = true;}
 	        $params = json_decode(json_encode($param->CallbackParameter), true);
 	        if(!isset($params['id']) || !($property = BaseService::getInstance('PropertyService')->get($params['id'])) instanceof Property)
-	            throw new Exception('Invalid property ID: ' . $params['id']);
+	            $property = new Property();
             $property->setBoughtValue(trim($params['boughtValue']));
             $property->setComments(trim($params['comments']));
             $property->setSetupAcc(BaseService::getInstance('AccountEntryService')->get(trim($params['setupAcc'])));
             $property->setIncomeAcc(BaseService::getInstance('AccountEntryService')->get(trim($params['incomeAcc'])));
             $property->setOutgoingAcc(BaseService::getInstance('AccountEntryService')->get(trim($params['outgoingAcc'])));
             
-            $address = (($address = $property->getAddress()) instanceof Address) ? $address : new Address();
+            $address = (trim($property->getId()) !== '') ? $property->getAddress() : new Address();
             $address->setLine1(trim($params['address']['line1']));
             $address->setSuburb(trim($params['address']['suburb']));
             $address->setPostCode(trim($params['address']['postcode']));

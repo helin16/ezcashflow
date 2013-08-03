@@ -19,7 +19,7 @@ class Address extends BaseEntityAbstract
      * 
      * @var string
      */
-	private $line2;
+	private $line2 = '';
 	/**
 	 * The suburb of the address
 	 * 

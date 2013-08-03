@@ -2,6 +2,7 @@
 var PropertiesJs = new Class.create();
 PropertiesJs.prototype = {
 	states: null, //the states
+	chosens: [], //the array of chosen objects
 	pagination:
 	{
 		pageSize: 30,
@@ -138,22 +139,7 @@ PropertiesJs.prototype = {
 				.insert({'bottom': new Element('span', {'class': "address"}).update(property.address.full) })
 				.observe('click', function() {
 					tmp.row = $(this).up('.property');
-					//we have the account entries already
-					if (tmp.me.states !== null) {
-						tmp.me._showPropertyPanel(property, tmp.row);
-						return;
-					}
-					//else we have to fetch them from the backend
-					appJs.postAjax(tmp.me.callBackIds.getAcc, {}, {
-			    		'onLoading': function(sender, param) {
-			    			tmp.row.insert({'bottom': new Element('div', {'class': 'editDiv newAccDiv'}).update('Getting states...<img src="/contents/images/loading.gif" />') });
-			    		},
-				    	'onComplete': function(sender, param) {
-				    		tmp.result = appJs.getResp(param);
-				    		tmp.me.states = tmp.result.states;
-				    		tmp.me._showPropertyPanel(property, tmp.row);
-				    	}
-			    	});
+					tmp.me._getSavePropertyPanel(property, tmp.row);
 				})
 			})
 			//current FY
@@ -166,28 +152,67 @@ PropertiesJs.prototype = {
 			.insert({'bottom': new Element('div', {'class': 'assets smlTxt alignLeft fullwidth'}).update(tmp.assetsUl) })
 			;
 	}
+	,createProperty: function(btn) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.newDiv = new Element('div', {'class': 'newProperty'});
+		$(tmp.me.divIds.list).insert({'top': tmp.newDiv });
+		tmp.me._getSavePropertyPanel({}, tmp.newDiv);
+	}
+	//getting the property saving panel
+	,_getSavePropertyPanel: function(property, rowDiv) {
+		try {
+			var tmp = {};
+			tmp.me = this;
+			//we have the account entries already
+			if (tmp.me.states !== null) {
+				tmp.me._showPropertyPanel(property, rowDiv);
+				return;
+			}
+			//else we have to fetch them from the backend
+			appJs.postAjax(tmp.me.callBackIds.getAcc, {}, {
+	    		'onLoading': function(sender, param) {
+	    			tmp.row.insert({'bottom': new Element('div', {'class': 'editDiv newAccDiv'}).update('Getting states...<img src="/contents/images/loading.gif" />') });
+	    		},
+		    	'onComplete': function(sender, param) {
+		    		tmp.result = appJs.getResp(param);
+		    		tmp.me.states = tmp.result.states;
+		    		tmp.me._showPropertyPanel(property, rowDiv);
+		    	}
+	    	});
+		} catch(e) {
+			console.error(e);
+		}
+	}
 	//show add/edit property panel
 	,_showPropertyPanel: function(property, rowDiv) {
 		var tmp = {};
 		tmp.me = this;
 		//clearout all editpane
 		$$('.editDiv').each(function(item) { item.remove(); });
+		//destory all the chosen objects
+		tmp.me.chosens.each(function(item) { item.destroy(); });
+		tmp.me.chosens = [];
 		
-		tmp.pId = (property.id || '');
-		tmp.boughtValue = (property.boughtValue || '');
-		tmp.comments = (property.comments || '');
-		tmp.setupAcc = (property.setupAcc || null);
-		tmp.incomeAcc = (property.incomeAcc || null);
-		tmp.outgoingAcc = (property.outgoingAcc || null);
-		tmp.addrLine1 = (property.address.line1 || '');
-		tmp.addrSuburb = (property.address.suburb || '');
-		tmp.addrState = (property.address.state || '');
-		tmp.addrPostCode = (property.address.postCode || '');
-		
-		tmp.stateSelectBox = new Element('select', {'class': 'fullwidth', 'editaddr': 'stateId'});
+		tmp.pId = tmp.boughtValue = tmp.comments = tmp.addrLine1 = tmp.addrSuburb = tmp.addrPostCode = '';
+		tmp.setupAcc = tmp.incomeAcc = tmp.outgoingAcc = tmp.addrState = tmp.assets = null;
+		if(property !== undefined && property.id !== undefined) {
+			tmp.pId = (property.id || '');
+			tmp.boughtValue = (property.boughtValue || '');
+			tmp.comments = (property.comments || '');
+			tmp.setupAcc = (property.setupAcc || null);
+			tmp.incomeAcc = (property.incomeAcc || null);
+			tmp.outgoingAcc = (property.outgoingAcc || null);
+			tmp.addrLine1 = (property.address.line1 || '');
+			tmp.addrSuburb = (property.address.suburb || '');
+			tmp.addrState = (property.address.state || '');
+			tmp.addrPostCode = (property.address.postCode || '');
+			tmp.assets = (property.assets || null);
+		}
+		tmp.stateSelectBox = new Element('select', {'class': 'fullwidth chose-select', 'editaddr': 'stateId'});
 		$H(tmp.me.states).each(function(st) {
 			tmp.option = new Element('option', {'value': st.key}).update(st.value.name + ' (' + st.value.country.name + ')');
-			if(st.value.id === tmp.addrState.id) {
+			if(property.id !== undefined && st.value.id === tmp.addrState.id) {
 				tmp.option.writeAttribute('selected', true);
 			}
 			tmp.stateSelectBox.insert({'bottom': tmp.option});
@@ -238,12 +263,17 @@ PropertiesJs.prototype = {
 		rowDiv.insert({'bottom': tmp.newDiv });
 		tmp.fileHandler = new FileUploaderJs(tmp.fileUploaderWrapperId).initFileUploader();
 		tmp.newDiv.store('fileHandler', tmp.fileHandler);
+		tmp.newDiv.getElementsBySelector('.chose-select').each(function(item){
+			tmp.me.chosens.push(new Chosen(item));
+		});
 		return this;
 	}
 	//getting the asset list
 	,_getAssetListDiv: function(assets) {
 		var tmp = {};
 		tmp.div = new Element('div', {'class': 'assets uploadedFileList', 'assets': 'assets'});
+		if(assets === undefined || assets === null)
+			return tmp.div;
 		assets.each(function(item) {
 			tmp.div.insert({'bottom': new Element('div', {'class': 'uploadedfile', 'assetkey': item.assetKey})
 				.update(item.filename)
@@ -288,16 +318,20 @@ PropertiesJs.prototype = {
 	    			tmp.property = appJs.getResp(param, false, true);
 	    			if(tmp.property.id === undefined || tmp.property.id.blank())
 	    				throw 'System Error:Invalid property id!';
-	    			
-	    			tmp.propRow = tmp.row.up('.property');
-	    			tmp.oddRow = tmp.propRow.hasClassName('odd') ? 'odd' : 'even';
-	    			tmp.propRow.replace( tmp.me._getPropertyRow(tmp.property).addClassName(tmp.oddRow)).scrollTo();
+	    			if(tmp.requestData.id !== undefined && tmp.requestData.id !== null && !tmp.requestData.id.blank()) {
+	    				tmp.propRow = tmp.row.up('.property');
+		    			tmp.oddRow = tmp.propRow.hasClassName('odd') ? 'odd' : 'even';
+		    			tmp.propRow.replace( tmp.me._getPropertyRow(tmp.property).addClassName(tmp.oddRow)).scrollTo();
+	    			} else {
+	    				tmp.oddRow = $(tmp.me.divIds.list).down('.property').hasClassName('odd') ? 'even' : 'odd';
+	    				$(tmp.me.divIds.list).down('.property.header').insert({'after': tmp.me._getPropertyRow(tmp.property).addClassName(tmp.oddRow)});
+	    			}
     				//remove the saving panel
 	    			tmp.row.remove();
 	    		} catch(e) {
 	    			tmp.savingInfo.remove();
 	    			tmp.row.down('.btns').show();
-	    			alert(e);
+	    			console.error(e);
 	    		}
 	    	}
     	});
@@ -307,14 +341,14 @@ PropertiesJs.prototype = {
 	,_getAccListBox: function(rootIds, selectedAcc) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.selectBox = new Element('select', {'class': 'inputbox fullwidth'});
+		tmp.selectBox = new Element('select', {'class': 'inputbox fullwidth chose-select'});
 		tmp.shownSelectedAccount = (selectedAcc === undefined || selectedAcc === null ? true : false);
 		tmp.accounts = appJs.getPageData('accounts');
 		rootIds.each(function(rootId) {
 			tmp.selectBox.insert({'bottom': new Element('optgroup', {'label': tmp.accounts[rootId][rootId].name}) });
 			$H(tmp.accounts[rootId]).each(function(acc){
 				tmp.option =new Element('option', {'value': acc.key}).update(acc.value.breadCrumbs.name + ' - ' + appJs.getCurrency(acc.value.sum));
-				if(acc.key === selectedAcc.id) {
+				if(tmp.shownSelectedAccount === false && acc.key === selectedAcc.id) {
 					tmp.option.writeAttribute('selected', true);
 					tmp.shownSelectedAccount = true;
 				}
