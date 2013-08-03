@@ -40,13 +40,13 @@ AccountsJs.prototype = {
     	var tmp = {};
     	tmp.me = this;
     	tmp.accounts = appJs.getPageData('accounts');
-		appJs.postAjax(this.callBackIds.getAccounts, {'rootId': tmp.me._selectAccountType(btn)}, {
+    	tmp.me.rootId = tmp.me._selectAccountType(btn);
+		appJs.postAjax(this.callBackIds.getAccounts, {'rootId': tmp.me.rootId}, {
     		'onLoading': function(sender, param){
     			$(tmp.me.divIds.list).update('<img src="/contents/images/loading.gif" />');
     		},
 	    	'onComplete': function(sender, param){
 	    		try {
-	    			tmp.me.rootId = tmp.me._selectAccountType(btn);
 	    			tmp.accounts[tmp.me.rootId] = appJs.getResp(param, false, true);
 	    			appJs.setPageData('accounts', tmp.accounts);
 	    			tmp.me._showAccList(tmp.accounts[tmp.me.rootId], tmp.me.rootId);
