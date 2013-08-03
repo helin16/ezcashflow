@@ -27,6 +27,37 @@ class AccountsController extends PageAbstract
 		}
 	}
 	/**
+	 * Event: ajax call to get all the accounts
+	 *
+	 * @param TCallback          $sender The event sender
+	 * @param TCallbackParameter $param  The event params
+	 *
+	 * @throws Exception
+	 */
+	public function getAccounts($sender, $param)
+	{
+		$results = $errors = array();
+		try
+		{
+			if(!isset($param->CallbackParameter->rootId) || ($rootId = trim($param->CallbackParameter->rootId)) === '')
+				throw new Exception('rootId not found!');
+				
+			$accounts = $this->_accService->get($rootId)->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc'));
+			foreach($accounts as $account)
+			{
+				if(!$account instanceof AccountEntry)
+					continue;
+				$results[$account->getId()] = $acc->getJsonArray();
+			}
+		}
+		catch(Exception $e)
+		{
+			$errors[] = $e->getMessage();
+		}
+		$param->ResponseData = $this->_getJson($results, $errors);
+		return $this;
+	}
+	/**
 	 * Event: ajax call to save Account
 	 * 
 	 * @param TCallback          $sender The event sender

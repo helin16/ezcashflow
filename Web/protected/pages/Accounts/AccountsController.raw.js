@@ -39,8 +39,20 @@ AccountsJs.prototype = {
     	var tmp = {};
     	tmp.me = this;
     	tmp.accounts = appJs.getPageData('accounts');
-    	tmp.me.rootId = tmp.me._selectAccountType(btn);
-		tmp.me._showAccList(tmp.accounts[tmp.me.rootId]);
+		appJs.postAjax(this.callBackIds.getAccounts, {'rootId': tmp.me._selectAccountType(btn)}, {
+    		'onLoading': function(sender, param){
+    			$(tmp.me.divIds.list).update('<img src="/contents/images/loading.gif" />');
+    		},
+	    	'onComplete': function(sender, param){
+	    		try {
+	    			tmp.me.rootId = tmp.me._selectAccountType(btn);
+	    			tmp.accounts[tmp.me.rootId] = appJs.getResp(param, false, true);
+	    			tmp.me._showAccList(tmp.accounts[tmp.me.rootId]);
+	    		} catch (e) {
+	    			alert(e);
+	    		}
+	    	}
+    	});
     	return false;
     }
     
