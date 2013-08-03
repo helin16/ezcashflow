@@ -89,14 +89,20 @@ class TransactionPanel extends TTemplateControl
 	        else
 	            $transArray = array(BaseService::getInstance('TransactionService')->transferMoney($fromAccount, $toAccount, $value, $comments, $transDate));
 	        
+	        $contents = array();
+	        foreach($assets as $key => $asset)
+	        {
+	        	$filePath = trim($asset['tmpDir']) . DIRECTORY_SEPARATOR . trim($asset['filepath']);
+	        	if(is_file($filePath))
+	        		$contents[] = BaseService::getInstance('AssetService')->registerFile(AssetType::ID_DOC, $filePath, trim($asset['name']));
+	        }
+	        
 	        $results['trans'] = array();
 	        foreach($transArray as $trans)
 	        {
-	            foreach($assets as $key => $asset)
+	            foreach($contents as $asset)
 	            {
-	                $filePath = trim($asset['tmpDir']) . DIRECTORY_SEPARATOR . trim($asset['filepath']);
-	                if(is_file($filePath))
-	                    $trans = BaseService::getInstance('TransactionService')->addAsset($trans, BaseService::getInstance('AssetService')->registerFile(AssetType::ID_DOC, $filePath, trim($asset['name'])));
+                    $trans = BaseService::getInstance('TransactionService')->addAsset($trans, $asset);
 	            }
 	            $transArray = $trans->getJsonArray();
 	            $transArray['link'] = '/trans/' . $trans->getId();
