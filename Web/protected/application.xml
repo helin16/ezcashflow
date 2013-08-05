@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<application id="EzCashFlow" mode="Performance">
+<application id="EzCashFlow" mode="Debug">
   <!-- alias definitions and namespace usings
   <paths>
     <alias id="myalias" path="./lib" />
@@ -36,6 +36,7 @@
 			
 			
 			<!--  asset service -->
+			<url ServiceId="stream" ServiceParameter="" pattern="asset/{method}/{ids}" parameters.method="zipped" parameters.ids=".+" />
 			<url ServiceId="stream" ServiceParameter="" pattern="asset/{method}" parameters.method="upload" />
 			<url ServiceId="stream" ServiceParameter="" pattern="asset/{id}" parameters.id="\w+" />
 			

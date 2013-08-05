@@ -17,7 +17,6 @@ class StreamController extends TService
 //         $response = $this->getResponse();
 //         $response->clear();
 //         $response->setCharset('UTF-8');
-        ob_start();
   	    try
   	    {
   	        if(isset($this->Request['method']) && trim($this->Request['method']) === 'upload')
@@ -28,6 +27,24 @@ class StreamController extends TService
   	            $upload_handler = new UploadHandler();
   	            error_reporting($reporting);
   	        }
+  	        else if((isset($this->Request['method']) && trim($this->Request['method']) === 'zipped') && isset($this->Request['ids']) && ($ids = trim($this->Request['ids'])) !== '')
+  	        {
+  	            $assetIds = json_decode($ids);
+  	            if(count($assetIds) === 0)
+  	                throw new Exception('Nothing to zip!');
+                $zip = new ZipArchive();
+                $file = tempnam("/tmp", "zip");
+                if ($zip->open($file, ZipArchive::OVERWRITE) !== TRUE)
+                    throw new Exception("cannot open temp file!");
+                
+                foreach(BaseService::getInstance('AssetService')->findByCriteria("`assetKey` in ('" . implode("', '", $assetIds) . "')") as $asset)
+                    $zip->addFile($asset->getFilePath(), $asset->getFileName());
+                $zip->close();
+                header('Content-Type: application/zip');
+                header('Content-Disposition: attachment; filename="attachments.zip"');
+                echo readfile($file);
+                unlink($file);
+  	        }
   	        else 
         		BaseService::getInstance('AssetService')->streamFile($this->Request['id']);
   	    }
@@ -35,9 +52,6 @@ class StreamController extends TService
   	    {
   	        echo $ex->getMessage();
   	    }
-        $contents = ob_get_contents();
-        ob_end_clean();
-        echo $contents;
         die;
 //         $response->write($contents);
 //         $response->flushContent();
