@@ -34,7 +34,7 @@ EofyControllerJS.prototype = {
 			tmp.eofyStart = (eofy.start || '');
 			tmp.eofyEnd = (eofy.end || '');
 			tmp.eofyComments = (eofy.comments || '');
-			tmp.assets = (eofy.assets || [])
+			tmp.assets = (eofy.assets || []);
 		}
 		tmp.attachmentDivID = tmp.me.preFixAttachmentID + tmp.eofyId;
 		tmp.div = new Element('div', {'class': 'editDiv row roundcorner', 'eofyid': tmp.eofyId, 'id': 'editDiv_' + tmp.eofyId})
@@ -83,7 +83,7 @@ EofyControllerJS.prototype = {
 						$(this).up('.uploadedfile').hide().writeAttribute('delete', true);
 					})
 				})
-			})
+			});
 		});
 		return tmp.div;
 	}
@@ -220,7 +220,9 @@ EofyControllerJS.prototype = {
 		//getting all assets
 		tmp.assetsDiv = new Element('div', {'class': 'assetsrow uploadedFileList'});
 		if(eofy.assets) {
+			tmp.assetKeys = [];
 			eofy.assets.each(function(asset) {
+				tmp.assetKeys.push(asset.assetKey);
 				tmp.assetsDiv.insert({'bottom': new Element('span', {'class': 'assetlink uploadedfile', 'assetkey': asset.assetKey})
 					.update(asset.filename)
 					.observe('click', function() {
@@ -228,6 +230,13 @@ EofyControllerJS.prototype = {
 					})
 				});
 			});
+			if(tmp.assetKeys.size() > 0) {
+				tmp.assetsDiv.insert({'top': new Element('div', {'class': 'downloadAll inlineblock'}).update('&nbsp;')
+					.observe('click', function() {
+						window.open('/asset/zipped/' + Object.toJSON(tmp.assetKeys));
+					})
+				});
+			}
 		}
 		
 		//getting btns
@@ -274,7 +283,7 @@ EofyControllerJS.prototype = {
 		});
 		tmp.eofyRow = $(btn).up('.eofyrow');
 		tmp.eofy = tmp.eofyRow.retrieve('eofy');
-		tmp.newDiv = tmp.me._getEOFYDiv(tmp.eofy).addClassName('editInLine')
+		tmp.newDiv = tmp.me._getEOFYDiv(tmp.eofy).addClassName('editInLine');
 		tmp.eofyRow.insert({'bottom': tmp.newDiv });
 		tmp.me.initialDatePicker('#' + tmp.newDiv.id + ' .datepicker');
 		tmp.newDiv.store('fileUploader', new FileUploaderJs(tmp.me.preFixAttachmentID + tmp.eofy.id).initFileUploader());
