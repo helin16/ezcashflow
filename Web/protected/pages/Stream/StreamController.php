@@ -29,7 +29,7 @@ class StreamController extends TService
   	            error_reporting($reporting);
   	        }
   	        else 
-        		echo BaseService::getInstance('AssetService')->streamFile($this->Request['id']);
+        		BaseService::getInstance('AssetService')->streamFile($this->Request['id']);
   	    }
   	    catch(Exception $ex)
   	    {
