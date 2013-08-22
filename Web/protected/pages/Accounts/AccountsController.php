@@ -41,11 +41,7 @@ class AccountsController extends PageAbstract
 		{
 			if(!isset($param->CallbackParameter->rootId) || ($rootId = trim($param->CallbackParameter->rootId)) === '')
 				throw new Exception('rootId not found!');
-			$accounts = BaseService::getInstance('AccountEntryService')->get($rootId)->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc'));
-			foreach($accounts as $account)
-			{
-				$results[$account->getId()] = $account->getJsonArray();
-			}
+			$results = $this->_getAccountFromRoot($rootId);
 		}
 		catch(Exception $e)
 		{
@@ -77,11 +73,12 @@ class AccountsController extends PageAbstract
     	        throw new Exception('System Error: it is not numeric for the budget!');
     	    $comments = trim($param->CallbackParameter->comments);
     	    
+    	    var_dump($account);
     	    if ($account instanceof AccountEntry)
     	        $account = BaseService::getInstance('AccountEntryService')->updateAccount($account, $account->getParent(), $accountName, $accountValue, $comments, $accountBudget);
     	    else
     	        $account = BaseService::getInstance('AccountEntryService')->createAccount($parent, $accountName, $accountValue, $comments, $accountBudget);
-    	    $results = $account->getJsonArray();
+    	    $results = $this->_getAccountFromRoot($account->getRoot()->getId());
 	    }
 	    catch(Exception $e)
 	    {
@@ -106,10 +103,7 @@ class AccountsController extends PageAbstract
     	    if(!($account = BaseService::getInstance('AccountEntryService')->get($param->CallbackParameter->accountId)) instanceof AccountEntry || !($parent = BaseService::getInstance('AccountEntryService')->get($param->CallbackParameter->parentId)) instanceof AccountEntry)
     	        throw new Exception('System Error: we need both them: accountId and parentId!');
     	    $account = BaseService::getInstance('AccountEntryService')->moveAccount($parent, $account);
-    	    foreach($account->getRoot()->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc')) as $acc)
-    	    {
-    	        $results[$acc->getId()] = $acc->getJsonArray();
-    	    }
+    	    $results = $this->_getAccountFromRoot($account->getRoot()->getId());
 	    }
 	    catch(Exception $e)
 	    {
@@ -135,8 +129,8 @@ class AccountsController extends PageAbstract
     	    if(($accountId = trim($param->CallbackParameter->accountId)) === '' || !( $account = BaseService::getInstance('AccountEntryService')->get($accountId)) instanceof AccountEntry)
     	        throw new Exception('System Error: Invalid account id provided!');
     	    $account->setActive(false);
-    	    $results = $account->getJsonArray();
     	    BaseService::getInstance('AccountEntryService')->save($account);
+    	    $results = $this->_getAccountFromRoot($account->getRoot()->getId());
 	        Dao::commitTransaction();
 	    }
 	    catch(Exception $e)
@@ -146,6 +140,23 @@ class AccountsController extends PageAbstract
 	    }
 	    $param->ResponseData = $this->_getJson($results, $errors);
 	    return $this;
+	}
+	/**
+	 * Getting the account entries from the root id
+	 * 
+	 * @param int $rootId The ID of the root account entry
+	 * 
+	 * @return array
+	 */
+	private function _getAccountFromRoot($rootId)
+	{
+	    $results = array();
+	    $accounts = BaseService::getInstance('AccountEntryService')->get($rootId)->getChildren(true, false, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('accountNumber' => 'asc'));
+	    foreach($accounts as $account)
+	    {
+	        $results[$account->getId()] = $account->getJsonArray();
+	    }
+	    return $results;
 	}
 }
 ?>
