@@ -379,6 +379,8 @@ abstract class BaseEntityAbstract
 	    $errorMsgs = array();
 	    return $errorMsgs;
 	}
+	public function preSave() {}
+	public function postSave() {}
 }
 
 ?>

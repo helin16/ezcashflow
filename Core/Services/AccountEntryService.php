@@ -73,15 +73,13 @@ class AccountEntryService extends BaseService
 	    {
     	    $newAccountNumber = trim($this->getNextAccountNo($parent));
     	    $oldAccountNumber = trim($childAccount->getAccountNumber());
+    	    $oldParent = $childAccount->getParent();
     	    Dao::$debug = true;
-    	    $this->updateByCriteria('accountNumber = CONCAT("' . $newAccountNumber . '", substring(accountNumber, length("' . $oldAccountNumber . '") + 1  ))', 'accountNumber like ?', array($oldAccountNumber . '%'));
+    	    $this->updateByCriteria('accountNumber = CONCAT(?, substring(accountNumber, ?))', 'accountNumber like ?', array($newAccountNumber, strlen($oldAccountNumber) + 1, $oldAccountNumber . '%'));
     	    Dao::$debug = false;
-    	    
     	    $childAccount = $this->get($childAccount->getId());
-    	    $childAccount->setParent($parent);
-    	    $childAccount->setRoot($parent->getRoot());
-    	    $this->save($childAccount);
-    	    
+    	    $childAccount = $this->_saveAccount($childAccount, $parent, $childAccount->getName(), $childAccount->getValue(), $childAccount->getComments(), $childAccount->getBudget());
+    	    $this->save($oldParent);
     	    if($transStarted === false)
     	        Dao::commitTransaction();
     	    return $childAccount;

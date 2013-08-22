@@ -445,6 +445,19 @@ class AccountEntry extends BaseEntityAbstract
 	}
 	/**
 	 * (non-PHPdoc)
+	 * @see BaseEntityAbstract::postSave()
+	 */
+	public function postSave()
+	{
+	    $shouldAllTrans = (count($this->getChildren()) === 0);
+	    if($this->getAllowTrans() !== $shouldAllTrans)
+	        Dao::save($this->setAllowTrans($shouldAllTrans));
+	    
+	    if(($parent =$this->getParent()) instanceof AccountEntry && $parent->getAllowTrans() !== false)
+	        Dao::save($parent->setAllowTrans(false));
+	}
+	/**
+	 * (non-PHPdoc)
 	 * @see BaseEntity::__toString()
 	 */
 	public function __toString()

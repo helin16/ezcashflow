@@ -241,6 +241,7 @@ abstract class Dao
         $qry = new DaoQuery(get_class($entity));
         $params = self::_getParams($entity);
         $id = $entity->getId();
+        $entity->preSave();
         if(trim($id) === '')
         {
             $now = new UDate();
@@ -267,6 +268,7 @@ abstract class Dao
             $params['updated'] = new UDate();
             self::_execSql($qry->generateForUpdate(), $params);
         }
+        $entity->postSave();
         return $entity;
     }
     /**
