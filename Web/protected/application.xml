@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<application id="EzCashFlow" mode="Debug">
+<application id="EzCashFlow" mode="Performance">
   <!-- alias definitions and namespace usings
   <paths>
     <alias id="myalias" path="./lib" />
@@ -15,6 +15,7 @@
 
 	<!-- configurations for modules -->
 	<modules>
+		<module id="cache" class="System.Caching.TAPCCache" />
 	    <module id="Session" class="Application.classes.Session.SessionDb" UseCustomStorage="true"/>
 		<module id="security" class="TSecurityManager" EncryptionKey="EasyCashFlowCool" ValidationKey="EasyCashFlowCool" />
 		<module id="request" class="THttpRequest" UrlManager="friendly-url" />
