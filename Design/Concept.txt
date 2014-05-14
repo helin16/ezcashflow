@@ -1,8 +1,0 @@
-I would have the following structural classes:
-
-Account - Represents a financial account. eg. Cash, Sale, Expense;
-Category - The category where the Account belongs to. eg. Asset, Expenses, Revenues;
-Mutation - Represents a financial entry of an account.
-Transaction - Contains a collection of mutations.
-Money - A composite class using Currency object and storing amount as long integer;
-When I approached the design initially I kept thinking about Decorator and Builder Patterns. Tax calculation can use the Strategy Pattern. Observer Pattern can be used to veto Transaction.
