@@ -1,21 +1,13 @@
 {
 	"type": "UserCollection",
 	"properties": {
-		"firstName": {
-			"name": "firstName",
+		"name": {
+			"name": "name",
 			"type": "string",
 			"typeLabel": "string",
 			"required": false,
-			"id": "firstName",
+			"id": "name",
 			"order": 0
-		},
-		"lastName": {
-			"name": "lastName",
-			"type": "string",
-			"typeLabel": "string",
-			"required": false,
-			"id": "lastName",
-			"order": 1
 		},
 		"address": {
 			"name": "address",
@@ -23,7 +15,7 @@
 			"typeLabel": "object",
 			"required": false,
 			"id": "address",
-			"order": 2
+			"order": 1
 		},
 		"domainId": {
 			"name": "domainId",
@@ -31,7 +23,23 @@
 			"typeLabel": "string",
 			"required": false,
 			"id": "domainId",
+			"order": 2
+		},
+		"roleIds": {
+			"name": "roleIds",
+			"type": "array",
+			"typeLabel": "array",
+			"required": false,
+			"id": "roleIds",
 			"order": 3
+		},
+		"lastLogin": {
+			"name": "lastLogin",
+			"type": "object",
+			"typeLabel": "object",
+			"required": false,
+			"id": "lastLogin",
+			"order": 4
 		}
 	}
 }

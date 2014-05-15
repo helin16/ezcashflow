@@ -1,3 +1,45 @@
 {
-	"type": "Collection"
+	"type": "Collection",
+	"properties": {
+		"mimeType": {
+			"name": "mimeType",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "mimeType",
+			"order": 0
+		},
+		"path": {
+			"name": "path",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "path",
+			"order": 1
+		},
+		"filename": {
+			"name": "filename",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "filename",
+			"order": 2
+		},
+		"tagIds": {
+			"name": "tagIds",
+			"type": "array",
+			"typeLabel": "array",
+			"required": false,
+			"id": "tagIds",
+			"order": 3
+		},
+		"domainId": {
+			"name": "domainId",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "domainId",
+			"order": 4
+		}
+	}
 }

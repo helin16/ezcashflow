@@ -1,3 +1,37 @@
 {
-	"type": "Collection"
+	"type": "Collection",
+	"properties": {
+		"domainId": {
+			"name": "domainId",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "domainId",
+			"order": 4
+		},
+		"incomeAccountIds": {
+			"name": "incomeAccountIds",
+			"type": "array",
+			"typeLabel": "array",
+			"required": false,
+			"id": "incomeAccountIds",
+			"order": 1
+		},
+		"expenseAccountIds": {
+			"name": "expenseAccountIds",
+			"type": "array",
+			"typeLabel": "array",
+			"required": false,
+			"id": "expenseAccountIds",
+			"order": 2
+		},
+		"setupAccountIds": {
+			"name": "setupAccountIds",
+			"type": "array",
+			"typeLabel": "array",
+			"required": false,
+			"id": "setupAccountIds",
+			"order": 3
+		}
+	}
 }

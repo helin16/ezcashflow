@@ -1,3 +1,93 @@
 {
-	"type": "Collection"
+	"type": "Collection",
+	"properties": {
+		"name": {
+			"name": "name",
+			"type": "string",
+			"typeLabel": "string",
+			"required": true,
+			"id": "name",
+			"order": 0
+		},
+		"accountNo": {
+			"name": "accountNo",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "accountNo",
+			"order": 1
+		},
+		"initValue": {
+			"name": "initValue",
+			"type": "number",
+			"typeLabel": "number",
+			"required": false,
+			"id": "initValue",
+			"order": 2
+		},
+		"sumValue": {
+			"name": "sumValue",
+			"type": "number",
+			"typeLabel": "number",
+			"required": false,
+			"id": "sumValue",
+			"order": 3
+		},
+		"budgetValue": {
+			"name": "budgetValue",
+			"type": "number",
+			"typeLabel": "number",
+			"required": false,
+			"id": "budgetValue",
+			"order": 4
+		},
+		"coments": {
+			"name": "coments",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "coments",
+			"order": 5
+		},
+		"allowTrans": {
+			"name": "allowTrans",
+			"type": "boolean",
+			"typeLabel": "boolean",
+			"required": false,
+			"id": "allowTrans",
+			"order": 6
+		},
+		"path": {
+			"name": "path",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "path",
+			"order": 7
+		},
+		"parentId": {
+			"name": "parentId",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "parentId",
+			"order": 8
+		},
+		"rootId": {
+			"name": "rootId",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "rootId",
+			"order": 9
+		},
+		"domainId": {
+			"name": "domainId",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "domainId",
+			"order": 10
+		}
+	}
 }

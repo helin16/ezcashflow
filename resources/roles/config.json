@@ -8,14 +8,6 @@
 			"required": false,
 			"id": "name",
 			"order": 0
-		},
-		"domainId": {
-			"name": "domainId",
-			"type": "string",
-			"typeLabel": "string",
-			"required": false,
-			"id": "domainId",
-			"order": 1
 		}
 	}
 }
