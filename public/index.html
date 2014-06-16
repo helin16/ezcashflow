@@ -1,13 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-	<script type="text/javascript" src="dpd.js"></script>
-	<script type="text/javascript" src="lib/app.js"></script>
+<title>Deployd login form</title>
+<link rel="stylesheet" type="text/css" href="/css/login.css" />
+<script type="text/javascript"
+	src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript" src="/dpd.js"></script>
 </head>
 <body>
-	<h1>Welcome to Deployd!</h1>
-	<p>You've just created a Deployd app. You can add front-end files in the <code>public</code> folder.</p>
-	<p>If you're new to Deployd, have a look at the <a href="http://deployd.com/docs">Getting Started Guide</a> or <a href="http://deployd.com/docs/tutorials/hello-world.html">Hello World Tutorial<a>.</p>
+	<div class="pagewrapper login container LoginPanel">
+		<section id="content">
+			<form class="form">
+				<h1>Login</h1>
+				<div ID='errorDiv' class="errorMsgDiv msgDiv">
+					<span id="errorMsg" class="msg"></span>
+				</div>
+				<div>
+					<input type="text" id="username" class="username" placeholder="Username" required="Username required!" />
+				</div>
+				<div>
+					<input id="password" class="password" type="password" placeholder="Password" required="Password required!" />
+				</div>
+				<div>
+					<input type="submit" value="Log in"/>
+					<!--  <a href="#">Lost your password?</a> <a href="#">Register</a> -->
+				</div>
+			</form>
+			<!-- form -->
+			<div class="button">Some thing here!</div>
+			<!-- button -->
+		</section>
+		<!-- content -->
+	</div>
+
+	<script type="text/javascript">
+		dpd.users.me(function(user) {
+			if (user) {
+				location.href = "/welcome.html";
+			}
+		});
+
+		$('form').submit(function() {
+			var username = $('#username').val();
+			var password = $('#password').val();
+
+			dpd.users.login({
+				username : username,
+				password : password
+			}, function(session, error) {
+				if (error) {
+					alert(error.message);
+				} else {
+					location.href = "/welcome.html";
+				}
+			});
+
+			return false;
+		});
+	</script>
 </body>
 </html>
