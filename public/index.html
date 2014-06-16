@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Deployd login form</title>
-<link rel="stylesheet" type="text/css" href="/css/login.css" />
-<script type="text/javascript"
-	src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script type="text/javascript" src="/dpd.js"></script>
+	<title>Ezcash Flow</title>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="css/login.css" />
+	<script type="text/javascript" src="/dpd.js"></script>
 </head>
 <body>
 	<div class="pagewrapper login container LoginPanel">
@@ -36,7 +35,7 @@
 	<script type="text/javascript">
 		dpd.users.me(function(user) {
 			if (user) {
-				location.href = "/welcome.html";
+				location.href = "/home.html";
 			}
 		});
 
@@ -51,7 +50,7 @@
 				if (error) {
 					alert(error.message);
 				} else {
-					location.href = "/welcome.html";
+					location.href = "/home.html";
 				}
 			});
 
