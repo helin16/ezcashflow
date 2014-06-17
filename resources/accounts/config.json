@@ -1,13 +1,21 @@
 {
 	"type": "Collection",
 	"properties": {
+		"typeId": {
+			"name": "typeId",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "typeId",
+			"order": 0
+		},
 		"name": {
 			"name": "name",
 			"type": "string",
 			"typeLabel": "string",
 			"required": true,
 			"id": "name",
-			"order": 0
+			"order": 1
 		},
 		"accountNo": {
 			"name": "accountNo",
@@ -15,31 +23,7 @@
 			"typeLabel": "string",
 			"required": false,
 			"id": "accountNo",
-			"order": 1
-		},
-		"initValue": {
-			"name": "initValue",
-			"type": "number",
-			"typeLabel": "number",
-			"required": false,
-			"id": "initValue",
 			"order": 2
-		},
-		"sumValue": {
-			"name": "sumValue",
-			"type": "number",
-			"typeLabel": "number",
-			"required": false,
-			"id": "sumValue",
-			"order": 3
-		},
-		"budgetValue": {
-			"name": "budgetValue",
-			"type": "number",
-			"typeLabel": "number",
-			"required": false,
-			"id": "budgetValue",
-			"order": 4
 		},
 		"coments": {
 			"name": "coments",
@@ -47,39 +31,7 @@
 			"typeLabel": "string",
 			"required": false,
 			"id": "coments",
-			"order": 5
-		},
-		"allowTrans": {
-			"name": "allowTrans",
-			"type": "boolean",
-			"typeLabel": "boolean",
-			"required": false,
-			"id": "allowTrans",
-			"order": 6
-		},
-		"path": {
-			"name": "path",
-			"type": "string",
-			"typeLabel": "string",
-			"required": false,
-			"id": "path",
-			"order": 7
-		},
-		"parentId": {
-			"name": "parentId",
-			"type": "string",
-			"typeLabel": "string",
-			"required": false,
-			"id": "parentId",
-			"order": 8
-		},
-		"rootId": {
-			"name": "rootId",
-			"type": "string",
-			"typeLabel": "string",
-			"required": false,
-			"id": "rootId",
-			"order": 9
+			"order": 3
 		},
 		"domainId": {
 			"name": "domainId",
@@ -87,7 +39,23 @@
 			"typeLabel": "string",
 			"required": false,
 			"id": "domainId",
-			"order": 10
+			"order": 4
+		},
+		"relationships": {
+			"name": "relationships",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "relationships",
+			"order": 5
+		},
+		"values": {
+			"name": "values",
+			"type": "string",
+			"typeLabel": "string",
+			"required": false,
+			"id": "values",
+			"order": 6
 		}
 	}
 }

@@ -2,34 +2,35 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-	<link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
-	<link rel="stylesheet" href="lib/bootstrap/css/bootstrap-theme.min.css">
-	<link rel="stylesheet" href="/css/page.css">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="/css/page.css">
+<title>EzCashFlow - Home</title>
 </head>
 <body>
 	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container">
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-					<span class="sr-only">Toggle navigation</span> 
-					<span class="icon-bar"></span> 
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
 				</button>
 				<a class="navbar-brand" href="/">EzCashFlow</a>
 			</div>
 			<div class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
 					<li class="active"><a href="/">Home</a></li>
-					<li><a href="#about">About</a></li>
-					<li><a href="#contact">Contact</a></li>
+					<li><a href="/accounts.html">Accounts</a></li>
+					<li><a href="/transactions.html">Transactions</a></li>
+					<li><a href="/properties.html">Properties</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li><a href="/me.html" id="me">Static top</a></li>
+					<li><a href="/me.html" id="me">User Msg</a></li>
 					<li><a href="#" id="logout-btn">Logout</a></li>
 				</ul>
 			</div>
@@ -37,27 +38,61 @@
 		</div>
 	</div>
 
-	<div class="container">
-		<!-- Main component for a primary marketing message or call to action -->
-		<div class="jumbotron">
-			<h1>Navbar example</h1>
-			<p>This example is a quick exercise to illustrate how the
-				default, static and fixed to top navbar work. It includes the
-				responsive CSS and HTML, so it also adapts to your viewport and
-				device.</p>
-			<p>To see the difference between static and fixed top navbars,
-				just scroll.</p>
-			<p>
-				<a class="btn btn-lg btn-primary" href="../../components/#navbar"
-					role="button">View navbar docs &raquo;</a>
-			</p>
+	<div class="container content-wrapper">
+		<div class="row">
+			<div class="col-md-8">
+				<div class="panel panel-default nodefault">
+					<!-- Default panel contents -->
+					<div class="panel-heading">
+						<ul class="nav nav-tabs">
+							<li class="active"><a href="#" data-toggle="tab">Summary</a></li>
+							<li><a href="#" data-toggle="tab">Summary with Invest</a></li>
+						</ul>
+					</div>
+					<!-- Table -->
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th></th>
+								<th><abbr title="2014-06-17 00:00:00 ~ 2014-06-18 00:00:00"
+									class="initialism">Day</abbr></th>
+								<th><abbr title="2014-06-12 00:00:00 ~ 2014-06-19 00:00:00"
+									class="initialism">Week</abbr></th>
+								<th><abbr title="2013-07-01 00:00:00 ~ 2014-06-30 23:59:59"
+									class="initialism">Month</abbr></th>
+								<th><abbr title="2013-07-01 00:00:00 ~ 2014-06-30 23:59:59"
+									class="initialism">Year</abbr></th>
+								<th><abbr title="1791-01-01 00:00:00 ~ 9999-01-01 00:00:00"
+									class="initialism">All</abbr></th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="panel panel-primary">
+					<div class="panel-heading">Recent Trans</div>
+					<div class="list-group">
+						<a href="#" class="list-group-item">
+							<span class="badge">14</span>
+							<h4 class="list-group-item-heading">List group item heading</h4>
+							<p class="list-group-item-text">...</p>
+							<p class="list-group-item-text">...</p>
+						</a>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
-	
+
 	<!-- Bootstrap core JavaScript
     ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript"src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="/dpd.js"></script>
 	<script type="text/javascript">
 		dpd.users.me(function(user) {

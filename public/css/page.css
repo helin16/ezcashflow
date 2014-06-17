@@ -1,4 +1,10 @@
 body {
-  min-height: 800px;
-  padding-top: 70px;
+	padding-top: 70px;
+}
+
+.nodefault .panel-heading {
+	padding: 10px 15px 0px 15px;
+}
+.nodefault .panel-heading .nav-tabs{
+	border-bottom: none;
 }

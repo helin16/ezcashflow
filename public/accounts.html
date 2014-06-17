@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="lib/treeGrid/css/jquery.treegrid.css">
+<link rel="stylesheet" href="/css/page.css">
+<title>EzCashFlow - Accounts</title>
+</head>
+<body>
+	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">EzCashFlow</a>
+			</div>
+			<div class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li><a href="/">Home</a></li>
+					<li class="active"><a href="/accounts.html">Accounts</a></li>
+					<li><a href="/transactions.html">Transactions</a></li>
+					<li><a href="/properties.html">Properties</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="/me.html" id="me">User Msg</a></li>
+					<li><a href="#" id="logout-btn">Logout</a></li>
+				</ul>
+			</div>
+			<!--/.nav-collapse -->
+		</div>
+	</div>
+
+	<div class="container content-wrapper">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-default nodefault">
+					<!-- Default panel contents -->
+					<div class="panel-heading">
+						<ul class="nav nav-tabs" id="accountTypes"></ul>
+					</div>
+					<div class="panel-body table-responsive">
+						<!-- Table -->
+						<table class="table table-striped tree">
+							<thead>
+								<tr>
+									<th>Account Name</th>
+									<th>Account No.</th>
+									<th>Trans.</th>
+									<th>Value</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="treegrid-1">
+									<td>Root node</td>
+									<td>Additional info</td>
+									<td></td>
+									<td></td>
+									<td>
+										<div class="btn-group">
+											<button type="button"
+												class="btn btn-success btn-xs dropdown-toggle"
+												data-toggle="dropdown">
+												<span class="glyphicon glyphicon-cog"></span> <span
+													class="caret"></span>
+											</button>
+											<ul class="dropdown-menu">
+												<li><a href="#">Dropdown link</a></li>
+												<li><a href="#">Dropdown link</a></li>
+											</ul>
+										</div>
+									</td>
+								</tr>
+								<tr class="treegrid-2 treegrid-parent-1">
+									<td>Node 1-1</td>
+									<td>Additional info</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr class="treegrid-3 treegrid-parent-1">
+									<td>Node 1-2</td>
+									<td>Additional info</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr class="treegrid-4 treegrid-parent-3">
+									<td>Node 1-2-1</td>
+									<td>Additional info</td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bootstrap core JavaScript
+    ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript"
+		src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="lib/treeGrid/js/jquery.treegrid.js"></script>
+	<script type="text/javascript"
+		src="lib/treeGrid/js/treegrid.bootstrap3.js"></script>
+	<script type="text/javascript" src="/dpd.js"></script>
+	<script type="text/javascript">
+		dpd.users.me(function(user) {
+			if (user) {
+				$('#me').text("Welcome, " + user.username + "!");
+			} else {
+				location.href = "/";
+			}
+		});
+
+		$('#logout-btn').click(function() {
+			dpd.users.logout(function(res, err) {
+				location.href = "/";
+			});
+		});
+
+		dpd.accounttype.get({}, function(result) {
+			$.each(result, function(index, value) {
+				$('<a href="#" data-toggle="tab">' + value.name + '</a>')
+					.appendTo(
+						$('<li' + (index == 0 ? ' class="active"' : '') + '></li>').appendTo($('#accountTypes'))
+					)
+					.data('data', value)
+					.click(function(){
+						if($(this).parent().hasClass('active'))
+							return false;
+						
+						dpd.accounts.get({'typeId': $(this).data('data').id}, function (res) {
+							console.debug(res);
+						});
+					})
+				;
+			});
+			
+			$('.tree').treegrid({
+				expanderExpandedClass : 'glyphicon glyphicon-minus-sign',
+				expanderCollapsedClass : 'glyphicon glyphicon-plus-sign'
+			});
+		});
+	</script>
+</body>
+</html>
