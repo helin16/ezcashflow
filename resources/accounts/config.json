@@ -5,7 +5,7 @@
 			"name": "typeId",
 			"type": "string",
 			"typeLabel": "string",
-			"required": false,
+			"required": true,
 			"id": "typeId",
 			"order": 0
 		},
@@ -19,41 +19,41 @@
 		},
 		"accountNo": {
 			"name": "accountNo",
-			"type": "string",
-			"typeLabel": "string",
+			"type": "number",
+			"typeLabel": "number",
 			"required": false,
 			"id": "accountNo",
 			"order": 2
 		},
-		"coments": {
-			"name": "coments",
+		"comments": {
+			"name": "comments",
 			"type": "string",
 			"typeLabel": "string",
 			"required": false,
-			"id": "coments",
+			"id": "comments",
 			"order": 3
 		},
 		"domainId": {
 			"name": "domainId",
 			"type": "string",
 			"typeLabel": "string",
-			"required": false,
+			"required": true,
 			"id": "domainId",
 			"order": 4
 		},
 		"relationships": {
 			"name": "relationships",
-			"type": "string",
-			"typeLabel": "string",
-			"required": false,
+			"type": "object",
+			"typeLabel": "object",
+			"required": true,
 			"id": "relationships",
 			"order": 5
 		},
 		"values": {
 			"name": "values",
-			"type": "string",
-			"typeLabel": "string",
-			"required": false,
+			"type": "object",
+			"typeLabel": "object",
+			"required": true,
 			"id": "values",
 			"order": 6
 		}
