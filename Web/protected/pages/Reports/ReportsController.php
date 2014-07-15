@@ -131,6 +131,58 @@ class ReportsController extends PageAbstract
 	    return $this;
 	}
 	/**
+	 * Event: ajax call to get all the outputToExcel
+	 * 
+	 * @param TCallback          $sender The event sender
+	 * @param TCallbackParameter $param  The event params
+	 * 
+	 * @throws Exception
+	 */
+	public function outputToExcel($sender, $param)
+	{
+	    $results = $errors = array();
+	    try 
+	    {
+	        $transId = trim($param->CallbackParameter->search->transId);
+	        if($transId !== '') 
+	        {
+	            if(!($trans = BaseService::getInstance('TransactionService')->get($transId)) instanceof Transaction)
+	                throw new Exception('Invalid transaction ID:' . $transId);
+	            $trans = array($trans);
+	        }
+	        else
+	        {
+    	        $date_start = trim($param->CallbackParameter->search->date_start);
+        	    $date_end = trim($param->CallbackParameter->search->date_end);
+        	    $fromaccIds = $param->CallbackParameter->search->fromacc;
+        	    $toaccIds = $param->CallbackParameter->search->toacc;
+        	    
+        	    if($date_start === '' && $date_end === '' && count($fromaccIds) === 0 && count($toaccIds) === 0)
+        	        throw new Exception('We need at least one search criteria to search!');
+        	    
+        	    $where = 'active = 1';
+        	    if($date_start !== '')
+        	        $where .= " AND created >= '$date_start'";
+        	    if($date_end !== '')
+        	        $where .= " AND created <= '$date_end'";
+        	    if(count($fromaccIds) !== 0)
+        	        $where .= " AND fromId in(" . implode(', ', $fromaccIds) . ")";
+        	    if(count($toaccIds) !== 0)
+        	        $where .= " AND toId in(" . implode(', ', $toaccIds) . ")";
+        	    $trans = BaseService::getInstance('TransactionService')->findByCriteria($where, array(), true);
+	        }
+	        $results['trans'] = array();
+	        foreach($trans as $tran)
+	        	$results['trans'][] = $tran->getJsonArray();
+	    }
+	    catch(Exception $e)
+	    {
+	        $errors[] = $e->getMessage();
+	    }
+	    $param->ResponseData = $this->_getJson($results, $errors);
+	    return $this;
+	}
+	/**
 	 * Event: ajax call to delete a transaction
 	 * 
 	 * @param TCallback          $sender The event sender

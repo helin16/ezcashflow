@@ -12,15 +12,17 @@ ReportJs.prototype = {
 	callbackIds: {
 		search: '',
 		edit: '',
-		del: ''
+		del: '',
+		output: ''
 	},
 	//constructor
-	initialize: function(resultPanelId, searchPanelId, searchCallbackId, editCallbackId, delCallbackId){
+	initialize: function(resultPanelId, searchPanelId, searchCallbackId, editCallbackId, delCallbackId, outputCallbackId){
 		this.resultPanelId = resultPanelId;
 		this.searchPanelId = searchPanelId;
 		this.callbackIds.search = searchCallbackId;
 		this.callbackIds.edit = editCallbackId;
 		this.callbackIds.del = delCallbackId;
+		this.callbackIds.output = outputCallbackId;
 	}
 	//getting the edit panel row
 	,_getRowDiv: function(title, content) {
@@ -64,6 +66,11 @@ ReportJs.prototype = {
 					.insert({'bottom': new Element('input', {'type': 'button', 'value': 'Search', 'class': 'submitBtn'})
 						.observe('click', function() {
 							tmp.me.search();
+						})
+					})
+					.insert({'bottom': new Element('input', {'type': 'button', 'value': 'Output to Excel', 'class': 'submitBtn'})
+						.observe('click', function() {
+							tmp.me.outputToExcel();
 						})
 					})
 				})
@@ -164,6 +171,44 @@ ReportJs.prototype = {
 	    		}
 	    	}
     	});
+	},
+	//click to output to excel
+	outputToExcel: function() {
+		var tmp = {};
+		tmp.me = this;
+		tmp.searchPane = $(this.searchPanelId);
+		
+		//collects information
+		tmp.searchCriterias = {};
+		tmp.searchPane.getElementsBySelector('[searchpane]').each(function(item){
+			tmp.field = item.readAttribute('searchpane').strip();
+			tmp.value = $F(item);
+			tmp.searchCriterias[tmp.field] = tmp.value;
+		});
+		
+		tmp.me.searchCriteria.search = tmp.searchCriterias;
+		appJs.postAjax(this.callbackIds.output, this.searchCriteria, {
+			'onLoading': function(sender, param){},
+			'onComplete': function(sender, param){
+				tmp.result = appJs.getResp(param);
+				if(!tmp.result || !tmp.result.trans) {
+					alert('ERROR: NOthing come back');
+					return;
+				}
+				
+				tmp.data = [];
+				tmp.data.push(['created time', 'from Account', 'to Account', 'amount', 'Comments'].join(', ') + '\n');
+				tmp.result.trans.each(function(item) {
+					tmp.row = item.created + ', ' + (!item.fromAcc.id ? '' : item.fromAcc.breadCrumbs.name) + ', ' + item.toAcc.breadCrumbs.name + ', ' + item.value + ', ' + item.comments + '\n';
+					tmp.data.push(tmp.row);
+				})
+				
+				tmp.now = new Date();
+				tmp.fileName = 'transactions_' + tmp.now.getFullYear() + '_' + tmp.now.getMonth() + '_' + tmp.now.getDate() + '_' + tmp.now.getHours() + '_' + tmp.now.getMinutes() + '_' + tmp.now.getSeconds() + '.csv';
+				tmp.blob = new Blob(tmp.data, {type: "text/csv;charset=utf-8"});
+				saveAs(tmp.blob, tmp.fileName);
+			}
+		});
 	},
 	getMoreBtn: function(rowNo, total) {
 		var tmp = {};

@@ -2,6 +2,7 @@
     <com:TCallback ID="searchBtn" OnCallback="Page.searchTrans"/>
     <com:TCallback ID="editBtn" OnCallback="Page.editTrans"/>
     <com:TCallback ID="deleteBtn" OnCallback="Page.deleteTrans"/>
+    <com:TCallback ID="outputToExcelBtn" OnCallback="Page.outputToExcel"/>
     <div id='transpage'>
 	    <div ID="searchpanel"></div>
 	    <div id="transResults" class="content-box" style='display:none;'>
@@ -11,7 +12,8 @@
 	    </div>
 	</div>
     <com:Application.controls.FileUploader.FileUploader />
+    <com:Application.controls.jsSaveAs.jsSaveAs />
     <com:Application.controls.Chosen.Chosen>
-        var pageJs = new ReportJs('transResults', 'searchpanel', '<%= $this->searchBtn->getUniqueId() %>', '<%=  $this->editBtn->getUniqueId() %>', '<%=  $this->deleteBtn->getUniqueId() %>');
+        var pageJs = new ReportJs('transResults', 'searchpanel', '<%= $this->searchBtn->getUniqueId() %>', '<%=  $this->editBtn->getUniqueId() %>', '<%=  $this->deleteBtn->getUniqueId() %>', '<%= $this->outputToExcelBtn->getUniqueId() %>');
     </com:Application.controls.Chosen.Chosen>
 </com:TContent>
