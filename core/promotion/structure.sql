@@ -1,11 +1,61 @@
 -- Setting Up Database
+DROP TABLE IF EXISTS `accountentry`;
+CREATE TABLE `accountentry` (
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	`name` varchar(100) NOT NULL DEFAULT '',
+	`organizationId` int(10) unsigned NOT NULL DEFAULT 0,
+	`initValue` double(10,4) unsigned NOT NULL DEFAULT 0,
+	`rootId` int(10) unsigned NULL DEFAULT NULL,
+	`parentId` int(10) unsigned NULL DEFAULT NULL,
+	`path` varchar(255) NOT NULL DEFAULT '',
+	`description` varchar(255) NOT NULL DEFAULT '',
+	`active` bool NOT NULL DEFAULT 1,
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
+	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`)
+	,INDEX (`organizationId`)
+	,INDEX (`rootId`)
+	,INDEX (`parentId`)
+	,INDEX (`createdById`)
+	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
+	,INDEX (`name`)
+	,INDEX (`initValue`)
+	,INDEX (`path`)
+) ENGINE=innodb DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `transaction`;
+CREATE TABLE `transaction` (
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	`accountEntryId` int(10) unsigned NOT NULL DEFAULT 0,
+	`credit` double(10,4) unsigned NOT NULL DEFAULT 0,
+	`debit` double(10,4) unsigned NOT NULL DEFAULT 0,
+	`description` varchar(255) NOT NULL DEFAULT '',
+	`active` bool NOT NULL DEFAULT 1,
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
+	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`)
+	,INDEX (`accountEntryId`)
+	,INDEX (`createdById`)
+	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
+	,INDEX (`credit`)
+	,INDEX (`debit`)
+) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `asset`;
 CREATE TABLE `asset` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-	`assetId` varchar(32) NOT NULL DEFAULT '',
 	`filename` varchar(100) NOT NULL DEFAULT '',
 	`mimeType` varchar(50) NOT NULL DEFAULT '',
 	`content` varchar(50) NOT NULL DEFAULT '',
+	`skey` varchar(32) NOT NULL DEFAULT '',
 	`active` bool NOT NULL DEFAULT 1,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
@@ -14,7 +64,10 @@ CREATE TABLE `asset` (
 	PRIMARY KEY (`id`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
-	,UNIQUE INDEX (`assetId`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
+	,UNIQUE INDEX (`skey`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `attachment`;
 CREATE TABLE `attachment` (
@@ -31,6 +84,9 @@ CREATE TABLE `attachment` (
 	,INDEX (`assetId`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,INDEX (`entityId`)
 	,INDEX (`EntityName`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
@@ -46,72 +102,9 @@ CREATE TABLE `content` (
 	PRIMARY KEY (`id`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
-) ENGINE=innodb DEFAULT CHARSET=utf8;
-DROP TABLE IF EXISTS `address`;
-CREATE TABLE `address` (
-	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-	`sKey` varchar(32) NOT NULL DEFAULT '',
-	`street` varchar(100) NOT NULL DEFAULT '',
-	`city` varchar(20) NOT NULL DEFAULT '',
-	`region` varchar(20) NOT NULL DEFAULT '',
-	`country` varchar(20) NOT NULL DEFAULT '',
-	`postCode` varchar(10) NOT NULL DEFAULT '',
-	`active` bool NOT NULL DEFAULT 1,
-	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
-	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
-	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
-	PRIMARY KEY (`id`)
-	,INDEX (`createdById`)
-	,INDEX (`updatedById`)
-	,INDEX (`skey`)
-	,INDEX (`city`)
-	,INDEX (`region`)
-	,INDEX (`country`)
-	,INDEX (`postCode`)
-) ENGINE=innodb DEFAULT CHARSET=utf8;
-DROP TABLE IF EXISTS `property`;
-CREATE TABLE `property` (
-	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-	`sKey` varchar(32) NOT NULL DEFAULT '',
-	`description` text NOT NULL ,
-	`addressId` int(10) unsigned NULL DEFAULT NULL,
-	`noOfRooms` int(10) unsigned NOT NULL DEFAULT 0,
-	`noOfCars` int(10) unsigned NOT NULL DEFAULT 0,
-	`noOfBaths` int(10) unsigned NOT NULL DEFAULT 0,
-	`active` bool NOT NULL DEFAULT 1,
-	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
-	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
-	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
-	PRIMARY KEY (`id`)
-	,INDEX (`addressId`)
-	,INDEX (`createdById`)
-	,INDEX (`updatedById`)
-	,INDEX (`sKey`)
-	,INDEX (`noOfRooms`)
-	,INDEX (`noOfCars`)
-	,INDEX (`noOfBaths`)
-) ENGINE=innodb DEFAULT CHARSET=utf8;
-DROP TABLE IF EXISTS `propertyrel`;
-CREATE TABLE `propertyrel` (
-	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-	`propertyId` int(10) unsigned NOT NULL DEFAULT 0,
-	`roleId` int(10) unsigned NOT NULL DEFAULT 0,
-	`personId` int(10) unsigned NOT NULL DEFAULT 0,
-	`confirmationId` int(10) unsigned NULL DEFAULT NULL,
-	`active` bool NOT NULL DEFAULT 1,
-	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
-	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
-	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
-	PRIMARY KEY (`id`)
-	,INDEX (`propertyId`)
-	,INDEX (`roleId`)
-	,INDEX (`personId`)
-	,INDEX (`confirmationId`)
-	,INDEX (`createdById`)
-	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `confirmation`;
 CREATE TABLE `confirmation` (
@@ -130,6 +123,9 @@ CREATE TABLE `confirmation` (
 	PRIMARY KEY (`id`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,INDEX (`sKey`)
 	,INDEX (`entityId`)
 	,INDEX (`entityName`)
@@ -152,6 +148,9 @@ CREATE TABLE `log` (
 	PRIMARY KEY (`id`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,INDEX (`transId`)
 	,INDEX (`entityId`)
 	,INDEX (`entityName`)
@@ -179,11 +178,55 @@ CREATE TABLE `message` (
 	,INDEX (`fromId`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,INDEX (`isRead`)
 	,INDEX (`sendType`)
 	,INDEX (`transId`)
 	,INDEX (`type`)
 	,INDEX (`subject`)
+) ENGINE=innodb DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `organization`;
+CREATE TABLE `organization` (
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	`name` varchar(100) NOT NULL DEFAULT '',
+	`skey` varchar(32) NOT NULL DEFAULT '',
+	`active` bool NOT NULL DEFAULT 1,
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
+	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`)
+	,INDEX (`createdById`)
+	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
+	,INDEX (`name`)
+	,INDEX (`skey`)
+	,UNIQUE INDEX (`skey`)
+) ENGINE=innodb DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `orgpersonrole`;
+CREATE TABLE `orgpersonrole` (
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	`personId` int(10) unsigned NOT NULL DEFAULT 0,
+	`roleId` int(10) unsigned NOT NULL DEFAULT 0,
+	`organizationId` int(10) unsigned NOT NULL DEFAULT 0,
+	`active` bool NOT NULL DEFAULT 1,
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
+	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`)
+	,INDEX (`personId`)
+	,INDEX (`roleId`)
+	,INDEX (`organizationId`)
+	,INDEX (`createdById`)
+	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `person`;
 CREATE TABLE `person` (
@@ -200,6 +243,9 @@ CREATE TABLE `person` (
 	PRIMARY KEY (`id`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,INDEX (`email`)
 	,INDEX (`firstName`)
 	,INDEX (`lastName`)
@@ -217,6 +263,9 @@ CREATE TABLE `role` (
 	PRIMARY KEY (`id`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,UNIQUE INDEX (`name`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `session`;
@@ -232,6 +281,9 @@ CREATE TABLE `session` (
 	PRIMARY KEY (`id`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,UNIQUE INDEX (`key`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `systemsettings`;
@@ -248,6 +300,9 @@ CREATE TABLE `systemsettings` (
 	PRIMARY KEY (`id`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,UNIQUE INDEX (`type`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `useraccount`;
@@ -267,6 +322,9 @@ CREATE TABLE `useraccount` (
 	,INDEX (`confirmationId`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,INDEX (`username`)
 	,INDEX (`password`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
@@ -286,6 +344,9 @@ CREATE TABLE `entitytag` (
 	,INDEX (`tagId`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,INDEX (`entityId`)
 	,INDEX (`EntityName`)
 	,INDEX (`type`)
@@ -302,6 +363,9 @@ CREATE TABLE `tag` (
 	PRIMARY KEY (`id`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
 	,UNIQUE INDEX (`name`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 
