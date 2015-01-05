@@ -8,24 +8,8 @@
  */
 class Role extends BaseEntityAbstract
 {
-    /**
-     * ID the TENANT role
-     * 
-     * @var int
-     */
-    const ID_TENANT = 40;
-    /**
-     * ID the Agent role
-     * 
-     * @var int
-     */
-    const ID_AGENT = 41;
-    /**
-     * ID the OWNER role
-     * 
-     * @var int
-     */
-    const ID_OWNER = 42;
+	const ID_ADMIN = 10;
+	const ID_BOOKKEEPER = 11;
     /**
      * The name of the role
      * @var string
@@ -86,19 +70,6 @@ class Role extends BaseEntityAbstract
     	if(!self::cacheExsits($id))
     		self::addCache($id, parent::get($id));
     	return self::getCache($id);
-    }
-    /**
-     * Get Roles for a property
-     * 
-     * @param Property $property
-     * @param Person   $person
-     * 
-     * @return multitype:Role
-     */
-    public static function getPropertyRoles(Property $property, Person $person)
-    {
-    	$rels = PropertyRel::getRelationships($property, $person);
-    	return array_unique(array_map(create_function('$a', 'return $a->getRole();'), $rels));
     }
 }
 ?>

@@ -27,53 +27,6 @@ class SystemSettings extends BaseEntityAbstract
 	 */
 	private $description;
 	/**
-	 * Getting Settings Object
-	 * 
-	 * @param string $type The type string
-	 * 
-	 * @return String
-	 */
-	public static function getSettings($type)
-	{
-		if(!self::cacheExsits($type))
-		{
-			$settings = self::getAllByCriteria('type = ?', array($type), true, 1, 1);
-			self::addCache($type, (trim(count($settings) === 0 ? '' : $settings[0]->getValue())));
-		}
-		return self::getCache($type);
-	}
-	/**
-	 * adding a new Settings Object
-	 * 
-	 * @param string $type The type string
-	 * 
-	 * @return SystemSettings
-	 */
-	public static function addSettings($type, $value)
-	{
-		$class = __CLASS__;
-		$settings = self::getAllByCriteria('type=?', array($type), true, 1, 1);
-		$setting = ((count($settings) === 0 ? new $class() : $settings[0]));
-		$setting->setType($type)
-			->setValue($value)
-			->setActive(true)
-			->save();
-		self::addSettings($type, $value);
-		return $setting;
-	}
-	/**
-	 * Removing Settings Object
-	 * 
-	 * @param string $type The type string
-	 */
-	public static function removeSettings($type)
-	{
-		self::updateByCriteria('set active = 0', 'type = ?', array($type));
-		if(self::cacheExsits($type))
-			self::removeCache($type);
-		return true;
-	}
-	/**
 	 * Getter for value
 	 *
 	 * @return int
@@ -152,5 +105,52 @@ class SystemSettings extends BaseEntityAbstract
 	
 		DaoMap::createUniqueIndex('type');
 		DaoMap::commit();
+	}
+	/**
+	 * Getting Settings Object
+	 *
+	 * @param string $type The type string
+	 *
+	 * @return String
+	 */
+	public static function getSettings($type)
+	{
+		if(!self::cacheExsits($type))
+		{
+			$settings = self::getAllByCriteria('type = ?', array($type), true, 1, 1);
+			self::addCache($type, (trim(count($settings) === 0 ? '' : $settings[0]->getValue())));
+		}
+		return self::getCache($type);
+	}
+	/**
+	 * adding a new Settings Object
+	 *
+	 * @param string $type The type string
+	 *
+	 * @return SystemSettings
+	 */
+	public static function addSettings($type, $value)
+	{
+		$class = __CLASS__;
+		$settings = self::getAllByCriteria('type=?', array($type), true, 1, 1);
+		$setting = ((count($settings) === 0 ? new $class() : $settings[0]));
+		$setting->setType($type)
+		->setValue($value)
+		->setActive(true)
+		->save();
+		self::addSettings($type, $value);
+		return $setting;
+	}
+	/**
+	 * Removing Settings Object
+	 *
+	 * @param string $type The type string
+	 */
+	public static function removeSettings($type)
+	{
+		self::updateByCriteria('set active = 0', 'type = ?', array($type));
+		if(self::cacheExsits($type))
+			self::removeCache($type);
+		return true;
 	}
 }

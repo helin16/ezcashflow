@@ -6,12 +6,8 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class Asset extends BaseEntityAbstract
+class Asset extends EncryptedEntityAbstract
 {
-	/**
-	 * @var string
-	 */
-	private $assetId = '';
 	/**
 	 * @var string
 	 */
@@ -26,27 +22,6 @@ class Asset extends BaseEntityAbstract
 	 * @var string
 	 */
 	protected $content;
-	/**
-	 * getter assetId
-	 *
-	 * @return string
-	 */
-	public function getAssetId()
-	{
-		return $this->assetId;
-	}
-	/**
-	 * setter assetId
-	 * 
-	 * @param string $assetId The asset Id
-	 * 
-	 * @return Asset
-	 */
-	public function setAssetId($assetId)
-	{
-		$this->assetId = $assetId;
-		return $this;
-	}
 	/**
 	 * getter filename
 	 *
@@ -113,15 +88,6 @@ class Asset extends BaseEntityAbstract
 	}
 	/**
 	 * (non-PHPdoc)
-	 * @see BaseEntityAbstract::preSave()
-	 */
-	public function preSave()
-	{
-		if(trim($this->getAssetId()) === '')
-			$this->setAssetId(md5($filename . '::' . microtime()));
-	}
-	/**
-	 * (non-PHPdoc)
 	 * @see BaseEntityAbstract::__toString()
 	 */
 	public function __toString()
@@ -136,40 +102,32 @@ class Asset extends BaseEntityAbstract
 	{
 		DaoMap::begin($this, 'asset');
 		
-		DaoMap::setStringType('assetId', 'varchar', 32);
 		DaoMap::setStringType('filename', 'varchar', 100);
 		DaoMap::setStringType('mimeType', 'varchar', 50);
 		DaoMap::setStringType('content');
 		parent::__loadDaoMap();
 		
-		DaoMap::createUniqueIndex('assetId');
 		DaoMap::commit();
-	}
-	/**
-	 * Getting the Asset object
-	 *
-	 * @param string $assetId The assetid of the content
-	 *
-	 * @return Ambigous <unknown, array(HydraEntity), Ambigous, multitype:, string, multitype:Ambigous <multitype:, multitype:NULL boolean number string mixed > >
-	 */
-	public static function getAsset($assetId)
-	{
-		$content = self::getAllByCriteria('assetId = ?', array($assetId), false, 1, 1);
-		return count($content) === 0 ? null : $content[0];
 	}
 	/**
 	 * Remove an asset from the content server
 	 *
-	 * @param array $assetIds The assetids of the content
+	 * @param array $skeys The assetids of the content
 	 *
 	 * @return bool
 	 */
-	public static function removeAssets(array $assetIds)
+	public static function removeAssets(array $skeys)
 	{
-		if(count($assetIds) === 0)
+		if(count($skeys) === 0)
 			return true;
+		
+		$where = 'skey in (' . implode(', ', array_fill(0, count($skeys), '?')) . ')';
+		$params = $skeys;
+		//delete the contents
+		if(count($contentIds = array_map(create_function('$a', 'return $a->getContent()->getId();'), self::getAllByCriteria($where, $params))) > 0 )
+			Content::deleteByCriteria('id in (' . implode(', ', array_fill(0, count($contentIds), '?')) . ')', $contentIds);
 		// Delete the item from the database
-		self::deleteByCriteria('assetId in (' . implode(', ', array_fill(0, count($assetIds), '?')) . ')', $assetIds);
+		self::deleteByCriteria($where, $params);
 		return true;
 	}
 	/**
