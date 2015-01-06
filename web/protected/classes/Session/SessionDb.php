@@ -9,17 +9,10 @@
 class SessionDb extends THttpSession
 {
     /**
-     * The session service
-     * 
-     * @var SessionService
-     */
-    private $_sessService;
-    /**
      * constructor
      */
     public function __construct()
     {
-        $this->_sessService = new SessionService();
     }
     /**
     * Session open handler.
@@ -51,7 +44,7 @@ class SessionDb extends THttpSession
      */
     public function _read($id)
     {
-        return $this->_sessService->read($id);
+        return Session::read($id);
     }
     /**
      * Session write handler.
@@ -62,7 +55,7 @@ class SessionDb extends THttpSession
      */
     public function _write($id,$data)
     {
-        $session = $this->_sessService->write($id, $data);
+        $session = Session::write($id, $data);
         return ($session instanceof Session);
     }
     
@@ -74,7 +67,7 @@ class SessionDb extends THttpSession
      */
     public function _destroy($id)
     {
-        $this->_sessService->delete($id);
+        Session::delete($id);
         return true;
     }
     
@@ -86,7 +79,7 @@ class SessionDb extends THttpSession
      */
     public function _gc($maxLifetime)
     {
-        $this->_sessService->cleanUp($maxLifetime);
+        Session::cleanUp($maxLifetime);
         return true;
     }
 }

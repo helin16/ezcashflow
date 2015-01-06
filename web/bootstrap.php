@@ -35,6 +35,6 @@ class Web
 spl_autoload_register(array('Web','autoload'));
 
 // Bootstrap the core for its autoloader settings
-require(dirname(__FILE__) . '/../Core/bootstrap.php');
+require(dirname(__FILE__) . '/../core/main/bootstrap.php');
 
 ?>

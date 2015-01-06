@@ -7,6 +7,7 @@ Prado::using('Application.classes.WebUser.WebUser');
  */
 class WebUserManager extends TModule implements IUserManager
 {
+	public static $fromLocalDB = false;
 	/**
 	 * get the Guest Name
 	 *
@@ -27,17 +28,14 @@ class WebUserManager extends TModule implements IUserManager
 	{
 		if($username === null)
 			return new WebUser($this);
-			
-		$userAccountService = new UserAccountService();
-		$userAccount = $userAccountService->getUserByUsername($username);
-		if(!$userAccount instanceof UserAccount)
+		
+		if(!($userAccount = Core::getUser()) instanceof UserAccount)
 			return null;
+		
 		$user = new WebUser($this);
 		$user->setUserAccount($userAccount);
-		
 		$user->setName($userAccount->getUsername());
 		$user->setIsGuest(false);
-		$user->setRoles($userAccount->getRoles());
 		return $user;
 	}
 	
@@ -50,15 +48,12 @@ class WebUserManager extends TModule implements IUserManager
 	 */
 	public function validateUser($username, $password)
 	{
-		$userAccountService = new UserAccountService();
-		$userAccount = $userAccountService->getUserByUsernameAndPassword($username,$password,false);
-		if(!$userAccount instanceof UserAccount)
-			return false;
-		else
+		if(!Core::getUser() instanceof UserAccount)
 		{
-			Core::setUser($userAccount);
-			return true;
+			if(!($userAccount = self::login($username, $password)) instanceof UserAccount)
+				return false;
 		}
+		return true;
 	}
 	
 	/**
@@ -83,6 +78,22 @@ class WebUserManager extends TModule implements IUserManager
 		// TODO: do nothing at this moment,
 		//since we don't support cookie-based auth
 		return null;
+	}
+	/**
+	 * login
+	 *
+	 * @param unknown $username
+	 * @param unknown $password
+	 */
+	public static function login($username, $password)
+	{
+		$userAccount = UserAccount::getUserByUsernameAndPassword($username, $password);
+		// check whether the library has the user or not
+		if (!$userAccount instanceof UserAccount)
+			return null;
+	
+		Core::setUser($userAccount);
+		return $userAccount;
 	}
 }
 ?>
