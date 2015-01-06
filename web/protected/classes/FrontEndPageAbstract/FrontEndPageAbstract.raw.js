@@ -193,6 +193,6 @@ FrontPageJs.prototype = {
 	 * Getting a loading image div
 	 */
 	,_getLoadingDiv: function() {
-		return new Element('div', {'class': 'text-center', 'style': 'padding: 100px 0;'}).insert({'bottom': new Element('span', {'class': 'fa fa-refresh fa-5x fa-spin'}) });
+		return new Element('div', {'class': 'text-center'}).insert({'bottom': new Element('span', {'class': 'fa fa-refresh fa-5x fa-spin'}) });
 	}
 };

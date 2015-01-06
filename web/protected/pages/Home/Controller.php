@@ -8,5 +8,16 @@
  */
 class Controller extends BackEndPageAbstract 
 {
+	/**
+	 * Getting The end javascript
+	 *
+	 * @return string
+	 */
+	protected function _getEndJs()
+	{
+		$js = parent::_getEndJs();
+		$js .= 'pageJs.init("page-wrapper");';
+		return $js;
+	}
 }
 ?>

@@ -42,15 +42,6 @@ abstract class FrontEndPageAbstract extends TPage
 	 */
 	protected function _getEndJs() 
 	{
-		$js ='jQuery("#header > .top-head").affix({';
-		$js .= 'offset: {';
-			$js .= 'top: 10,';
-			$js .= 'bottom: function () {';
-		    	$js .= 'return (this.bottom = jQuery(".footer").outerHeight(true))';
-				    $js .= '}';
-				$js .= '}';
-			$js .= '}).on("affix.bs.affix", function(){ jQuery( this ).data("originalPadding", jQuery( this ).css("padding")).css("padding", 0); })';
-			$js .= '.on("affixed-top.bs.affix", function() {jQuery( this ).css("padding", jQuery( this ).data("originalPadding"));});';
 	    $js .= 'if(typeof(PageJs) !== "undefined"){var pageJs = new PageJs(); }';
 	    return $js;
 	}
