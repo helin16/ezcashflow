@@ -52,6 +52,12 @@ class AccountEntry extends BaseEntityAbstract
      */
     private $description = '';
     /**
+     * Whether this is a summary account. if it is, it can't be have any transactions against them
+     * 
+     * @var bool
+     */
+    private $isSumAcc = false;
+    /**
      * Getter for name
      *
      * @return string
@@ -209,6 +215,42 @@ class AccountEntry extends BaseEntityAbstract
     public function getPaths()
     {
     	return explode(self::PATH_SEPARATOR, $this->getPath);
+    }
+    /**
+     * Getter for isSumAcc
+     *
+     * @return bool
+     */
+    public function getIsSumAcc() 
+    {
+        return $this->isSumAcc;
+    }
+    /**
+     * Setter for isSumAcc
+     *
+     * @param bool $value The isSumAcc
+     *
+     * @return AccountEntry
+     */
+    public function setIsSumAcc($value) 
+    {
+        $this->isSumAcc = $value;
+        return $this;
+    }
+    /**
+     * (non-PHPdoc)
+     * @see BaseEntityAbstract::preSave()
+     */
+    public function preSave()
+    {
+    	if(trim($this->getId()) !== '') {
+    		if(count(self::countByCriteria('parentId = ?', array($this->getId()))) > 0) {
+    			$this->setIsSumAcc(true);
+    		}
+    	} else {
+    		if($this->getParent() instanceof AccountEntry && !$this->getParent()->getIsSumAcc())
+    			throw new EntityException('You can ONLY create an account under a summary account.');
+    	}
     }
     /**
      * (non-PHPdoc)

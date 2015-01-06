@@ -16,7 +16,7 @@ class Controller extends BackEndPageAbstract
 	protected function _getEndJs()
 	{
 		$js = parent::_getEndJs();
-		$js .= 'pageJs.init("page-wrapper");';
+		$js .= 'pageJs.init("page-wrapper", "#' . $this->getForm()->getClientID() . '");';
 		return $js;
 	}
 }
