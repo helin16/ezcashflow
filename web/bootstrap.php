@@ -12,8 +12,8 @@ class Web
 		$autoloadPaths = array(
 			dirname(__FILE__) . '/protected/',
 			dirname(__FILE__) . '/protected/classes/',
-			dirname(__FILE__) . '/protected/classes/PageAbstract/',
-			dirname(__FILE__) . '/protected/pages/ContentLoader/'
+			dirname(__FILE__) . '/protected/classes/BackEndPageAbstract/',
+			dirname(__FILE__) . '/protected/classes/FrontEndPageAbstract/',
 				);
 		
 		$found = false;

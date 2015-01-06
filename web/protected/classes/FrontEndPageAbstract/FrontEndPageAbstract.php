@@ -31,6 +31,7 @@ abstract class FrontEndPageAbstract extends TPage
 	{
 	    if(!$this->IsPostBack || !$this->IsCallback)
 	    {
+	    	$this->getHead()->setTitle($this->getAppName());
 	        $this->getClientScript()->registerEndScript('pageJs', $this->_getEndJs());
 	    }
 	}
@@ -86,8 +87,8 @@ abstract class FrontEndPageAbstract extends TPage
 	private function _Load3rdPartyJs(TClientScriptManager $clientScript)
 	{
 		//google fonts
-		$clientScript->registerStyleSheetFile('google.fonts.1', '//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic');
-		$clientScript->registerStyleSheetFile('google.fonts.2', '//fonts.googleapis.com/css?family=Lato:400,300,400italic,300italic,700,700italic,900');
+// 		$clientScript->registerStyleSheetFile('google.fonts.1', '//fonts.googleapis.com/css?family=PT+Sans:400,400italic,700,700italic');
+// 		$clientScript->registerStyleSheetFile('google.fonts.2', '//fonts.googleapis.com/css?family=Lato:400,300,400italic,300italic,700,700italic,900');
 		//font awesome
 		$folder = $this->publishFilePath(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'FontAwesome' . DIRECTORY_SEPARATOR);
 		$clientScript->registerStyleSheetFile('Awesome.font.css', $folder .  '/css/font-awesome.min.css');

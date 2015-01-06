@@ -1,6 +1,6 @@
 <?php
 /**
- * class BlankLayout
+ * BlankLayout PageLayout
  *
  * @package    Web
  * @subpackage Layout
@@ -8,12 +8,11 @@
  */
 class BlankLayout extends TTemplateControl
 {
-    /**
-     * (non-PHPdoc)
-     * @see TControl::onLoad()
-     */
+	/**
+	 * (non-PHPdoc)
+	 * @see TControl::onLoad()
+	 */
 	public function onLoad($param)
 	{
 	}
 }
-?>
