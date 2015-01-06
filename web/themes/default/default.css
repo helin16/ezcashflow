@@ -9,12 +9,8 @@ html,body,.main-form {
 	line-height: 175%;
 }
 
-.main-form>#mainbody,.main-form>#footer {
-	display: block;
-}
-
 .main-form>#mainbody {
-	min-height: 70%;
+	min-height: 86%;
 }
 
 .main-form>#mainbody .page-header {
@@ -22,5 +18,6 @@ html,body,.main-form {
 }
 
 #footer {
+	padding: 20px 0;
 	background: #eee;
 }

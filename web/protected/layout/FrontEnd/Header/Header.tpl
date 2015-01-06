@@ -1,6 +1,6 @@
 <com:TPanel id="topmenu" CssClass="top-head">
-	<div class="container">
-		<nav class="navbar navbar-default" role="navigation">
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-menu-div">
 					<span class="sr-only">Toggle navigation</span>
@@ -18,6 +18,6 @@
 					<li><a href="/#contactus">Contact</a></li>
 				</ul>
 			</div>
-		</nav>
-	</div>
+		</div>
+	</nav>
 </com:TPanel>

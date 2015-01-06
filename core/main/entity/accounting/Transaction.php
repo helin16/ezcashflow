@@ -112,8 +112,8 @@ class Transaction extends BaseEntityAbstract
     {
     	DaoMap::begin($this, 'trans');
     	DaoMap::setManyToOne('accountEntry', 'AccountEntry', 'trans_acc');
-    	DaoMap::setIntType('credit', 'double', '10,4');
-    	DaoMap::setIntType('debit', 'double', '10,4');
+    	DaoMap::setIntType('credit', 'double', '10,4', false);
+    	DaoMap::setIntType('debit', 'double', '10,4', false);
     	DaoMap::setStringType('description', 'varchar', 255);
     	parent::__loadDaoMap();
     

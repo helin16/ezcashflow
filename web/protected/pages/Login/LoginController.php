@@ -24,7 +24,7 @@ class LoginController extends FrontEndPageAbstract
             $authManager=$this->getApplication()->getModule('auth');
             if(!$authManager->login($email, $password))
             	throw new Exception('No user found!');
-            $results['url'] = '/backend.html';
+            $results['url'] = '/';
         }
         catch(Exception $ex)
         {

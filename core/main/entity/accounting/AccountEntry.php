@@ -238,7 +238,7 @@ class AccountEntry extends BaseEntityAbstract
     	DaoMap::begin($this, 'acc_entry');
     	DaoMap::setStringType('name', 'varchar', 100);
     	DaoMap::setManyToOne('organization', "Organization", 'acc_entry_org');
-    	DaoMap::setIntType('initValue', 'double', '10,4');
+    	DaoMap::setIntType('initValue', 'double', '10,4', false);
     	DaoMap::setManyToOne('root', "AccountEntry", 'acc_entry_root', true);
     	DaoMap::setManyToOne('parent', "AccountEntry", 'acc_entry_parent', true);
     	DaoMap::setStringType('path', 'varchar', 255);

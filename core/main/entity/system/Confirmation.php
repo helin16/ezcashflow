@@ -5,7 +5,7 @@
  * @subpackage Entity
  * @author     lhe<helin16@gmail.com>
  */
-class Confirmation extends BaseEntityAbstract
+class Confirmation extends EncryptedEntityAbstract
 {
 	const TYPE_SYS = 'SYSTEM';
 	/**
@@ -38,12 +38,6 @@ class Confirmation extends BaseEntityAbstract
 	 * @var string
 	 */
 	private $type;
-	/**
-	 * The identifier of that confirmation
-	 * 
-	 * @var string
-	 */
-	private $sKey;
 	/**
 	 * The expiry time
 	 * 
@@ -133,27 +127,6 @@ class Confirmation extends BaseEntityAbstract
 	    return $this;
 	}
 	/**
-	 * Getter for the sKey
-	 * 
-	 * @return string
-	 */
-	public function getSKey() 
-	{
-	    return $this->sKey;
-	}
-	/**
-	 * Setter for the SKey
-	 * 
-	 * @param string $value The skey
-	 * 
-	 * @return Confirmation
-	 */
-	public function setSKey($value) 
-	{
-	    $this->sKey = $value;
-	    return $this;
-	}
-	/**
 	 * Getter for expiryTime
 	 *
 	 * @return UDate
@@ -221,7 +194,6 @@ class Confirmation extends BaseEntityAbstract
 	{
 		DaoMap::begin($this, 'log');
 	
-		DaoMap::setStringType('sKey','varchar', 32);
 		DaoMap::setStringType('type','varchar', 20);
 		DaoMap::setIntType('entityId');
 		DaoMap::setStringType('entityName','varchar', 100);
@@ -230,7 +202,6 @@ class Confirmation extends BaseEntityAbstract
 	
 		parent::__loadDaoMap();
 	
-		DaoMap::createIndex('sKey');
 		DaoMap::createIndex('entityId');
 		DaoMap::createIndex('entityName');
 		DaoMap::createIndex('type');

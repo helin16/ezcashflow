@@ -14,9 +14,9 @@
 		<header id="header">
 			<com:Application.layout.FrontEnd.Header.Header />
 		</header>
-		<div id="mainbody">
+		<section id="mainbody">
 			<com:TContentPlaceHolder ID="MainContent" />
-		</div>
+		</section>
 		<footer id="footer">
 			<com:Application.layout.FrontEnd.Footer.Footer />
 		</footer>

@@ -3,7 +3,7 @@ return array(
 	'Database' => array(
 			'Driver' => 'mysql',
 			'DBHost' => 'localhost',
-			'DB' => 'properta',
+			'DB' => 'ezcashflow',
 			'Username' => 'root',
 			'Password' => ''
 		)
