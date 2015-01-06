@@ -180,6 +180,16 @@ abstract class FrontEndPageAbstract extends TPage
 		return isset($array['name']) ? trim($array['name']) : '';
 	}
 	/**
+	 * Getting the application log
+	 *
+	 * @return string
+	 */
+	public function getAppLogo()
+	{
+		$array = Core::getAppMetaInfo();
+		return isset($array['logo']) ? trim($array['logo']) : '';
+	}
+	/**
 	 * Getting the 404 page
 	 * 
 	 * @param string $title   The title of the page

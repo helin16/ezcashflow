@@ -10,6 +10,7 @@ return array(
 	,'Application' => array(
 		'name' => 'EzBookKeeping'
 		,'version' => '1.0.0'
+		,'logo' => ''
 	)
 // 	,'MailServer' =>  array (
 // 		'host' => 'mail.budgetpc.com.au',

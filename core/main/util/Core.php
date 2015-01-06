@@ -100,7 +100,7 @@ abstract class Core
 	 */
 	public static function getAppMetaInfo()
 	{
-		return array('name' => Config::get('Application', 'name'), 'version' => Config::get('Application', 'version'));
+		return array('name' => Config::get('Application', 'name'), 'version' => Config::get('Application', 'version'), 'Logo' => Config::get('Application', 'logo'));
 	}
 }
 
