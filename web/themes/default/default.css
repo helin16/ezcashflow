@@ -21,3 +21,13 @@ html,body,.main-form {
 	padding: 20px 0;
 	background: #eee;
 }
+
+.file-drop-zone {
+	border: 1px #ccc dotted;
+	border-radius: 4px;
+	padding: 8px;
+}
+
+.file-drop-zone:hover {
+	border-color: #000;
+}

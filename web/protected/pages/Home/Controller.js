@@ -56,22 +56,22 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 			.insert({'bottom': new Element('div', {'class': 'panel'})
 				.insert({'bottom': new Element('div', {'class': 'panel-body form-horizontal'}) 
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
-							.insert({'bottom': new Element('select', {'class': 'form-control', 'input-panel': 'from-acc-id', 'placeholder': 'From:', 'name': 'from_acc_id'}) })
-						, new Element('label', {'class': 'control-label col-sm-2'}).update('From:')
+							.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'from-acc-id', 'placeholder': 'From:', 'name': 'from_acc_id'}) })
+						, new Element('label', {'class': 'control-label col-sm-2 hidden-xs'}).update('From:')
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
-							.insert({'bottom': new Element('select', {'class': 'form-control', 'input-panel': 'to-acc-id', 'placeholder': 'To:', 'name': 'to_acc_id'}) })
-						, new Element('label', {'class': 'control-label col-sm-2'}).update('To:')
+							.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'to-acc-id', 'placeholder': 'To:', 'name': 'to_acc_id'}) })
+						, new Element('label', {'class': 'control-label col-sm-2 hidden-xs'}).update('To:')
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
-							.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'comments', 'placeholder': 'Comments:'}) })
-						, new Element('label', {'class': 'control-label col-sm-2'}).update('Comments:')
+							.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'comments', 'placeholder': 'Some comments for this transaction'}) })
+						, new Element('label', {'class': 'control-label col-sm-2 hidden-xs'}).update('Comments:')
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10 col-sm-offset-2'})
-							.insert({'bottom': '' })
+						.insert({'bottom': tmp.me._fileUploader.getFileUploader() })
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10 col-sm-offset-2'})
-							.insert({'bottom': new Element('button', {'class': 'btn btn-primary', 'type': 'submit'}).update('Save') })
+							.insert({'bottom': new Element('button', {'class': 'btn btn-primary col-sm-6', 'type': 'submit'}).update('Save') })
 					) })
 				})
 			});
@@ -136,9 +136,11 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 	,init: function(ressultPanelId, jQueryFormSelector) {
 		var tmp = {};
 		tmp.me = this;
+		tmp.me._fileUploader = new FileUploaderJs(tmp.me);
 		tmp.me._jQueryFormSelector = jQueryFormSelector;
 		tmp.me._ressultPanelId = ressultPanelId;
 		$(tmp.me._ressultPanelId).update(tmp.me._getLayout());
+		tmp.me._initValidator(jQueryFormSelector);
 		return tmp.me;
 	}
 });

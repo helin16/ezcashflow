@@ -1,4 +1,4 @@
 <com:TContent ID="MainContent">
-	<div class="container" id="page-wrapper">
-	</div>
+	<com:Application.controls.fileUploader.fileUploader />
+	<div class="container" id="page-wrapper"></div>
 </com:TContent>
