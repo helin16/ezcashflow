@@ -60,7 +60,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 						, new Element('label', {'class': 'control-label col-sm-2'}).update('From:')
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
-							.insert({'bottom': new Element('select', {'class': 'form-control', 'input-panel': 'to-acc-id', 'placeholder': 'To:', 'name': 'to_acc_id''}) })
+							.insert({'bottom': new Element('select', {'class': 'form-control', 'input-panel': 'to-acc-id', 'placeholder': 'To:', 'name': 'to_acc_id'}) })
 						, new Element('label', {'class': 'control-label col-sm-2'}).update('To:')
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
@@ -126,36 +126,6 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
         })
         .on('success.field.bv', function(e, data) {
         	data.bv.disableSubmitButtons(false);
-        })
-        .on('keydown', '.login-page-form[submit-btn]', function(e){
-        	tmp.element = jQuery(e.target);
-        	tmp.me.keydown(e, function(){
-        		jQuery(tmp.element.attr('submit-btn')).click();
-        	});
-        })
-        .on('click', '#loginbtn', function(e){
-        	jQuery('.panel .msg-div').html('');
-            jQuery.each(jQuery('.form-control'), function(index, element){
-            	jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('enableFieldValidators', jQuery(element).attr('name'), jQuery(element).hasClass('login-form'));
-            });
-            if(jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('validate').data('bootstrapValidator').isValid())
-            	tmp.me.login($('loginbtn'));
-        })
-        .on('click', '#signupbtn', function(e){
-        	jQuery('.panel .msg-div').html('');
-        	jQuery.each(jQuery('.form-control'), function(index, element){
-        		jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('enableFieldValidators', jQuery(element).attr('name'), jQuery(element).hasClass('signup-form'));
-        	});
-        	if(jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('validate').data('bootstrapValidator').isValid())
-        		tmp.me._signUp($('signupbtn'));
-        })
-        .on('click', '#retrievebtn', function(e){
-        	jQuery('.panel .msg-div').html('');
-        	jQuery.each(jQuery('.form-control'), function(index, element){
-        		jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('enableFieldValidators', jQuery(element).attr('name'), jQuery(element).hasClass('retrieve-pass-form'));
-        	});
-        	if(jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('validate').data('bootstrapValidator').isValid())
-        		tmp.me._submtRetrievePass($('retrievebtn'));
         })
         ;
 		return tmp.me;

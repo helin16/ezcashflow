@@ -4,7 +4,7 @@ CREATE TABLE `accountentry` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 	`name` varchar(100) NOT NULL DEFAULT '',
 	`organizationId` int(10) unsigned NOT NULL DEFAULT 0,
-	`initValue` double(10,4) unsigned NOT NULL DEFAULT 0,
+	`initValue` double(10,4) NOT NULL DEFAULT 0,
 	`rootId` int(10) unsigned NULL DEFAULT NULL,
 	`parentId` int(10) unsigned NULL DEFAULT NULL,
 	`path` varchar(255) NOT NULL DEFAULT '',
@@ -31,8 +31,8 @@ DROP TABLE IF EXISTS `transaction`;
 CREATE TABLE `transaction` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 	`accountEntryId` int(10) unsigned NOT NULL DEFAULT 0,
-	`credit` double(10,4) unsigned NOT NULL DEFAULT 0,
-	`debit` double(10,4) unsigned NOT NULL DEFAULT 0,
+	`credit` double(10,4) NOT NULL DEFAULT 0,
+	`debit` double(10,4) NOT NULL DEFAULT 0,
 	`description` varchar(255) NOT NULL DEFAULT '',
 	`active` bool NOT NULL DEFAULT 1,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
@@ -109,12 +109,12 @@ CREATE TABLE `content` (
 DROP TABLE IF EXISTS `confirmation`;
 CREATE TABLE `confirmation` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-	`sKey` varchar(32) NOT NULL DEFAULT '',
 	`type` varchar(20) NOT NULL DEFAULT '',
 	`entityId` int(10) unsigned NOT NULL DEFAULT 0,
 	`entityName` varchar(100) NOT NULL DEFAULT '',
 	`comments` varchar(255) NOT NULL DEFAULT '',
 	`expiryTime` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`skey` varchar(32) NOT NULL DEFAULT '',
 	`active` bool NOT NULL DEFAULT 1,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
@@ -126,10 +126,10 @@ CREATE TABLE `confirmation` (
 	,INDEX (`active`)
 	,INDEX (`created`)
 	,INDEX (`updated`)
-	,INDEX (`sKey`)
 	,INDEX (`entityId`)
 	,INDEX (`entityName`)
 	,INDEX (`type`)
+	,UNIQUE INDEX (`skey`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `log`;
 CREATE TABLE `log` (
