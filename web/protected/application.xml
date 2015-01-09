@@ -20,6 +20,9 @@
 		<module id="request" class="THttpRequest" UrlManager="friendly-url" />
 		<module id="friendly-url" class="System.Web.TUrlMapping" EnableCustomUrl="true" UrlPrefix="/">	
 			<url ServiceParameter="Login.LoginController" pattern="login.html" />
+			
+			<!-- asset service -->
+			<url ServiceId="ajax" ServiceParameter="" pattern="ajax/{method}" parameters.method="\w+"  />
 		</module>
 	
 		<module id="globalization" class="TGlobalization">
@@ -36,5 +39,7 @@
 			  <module id="users" class="Application.classes.WebUser.WebUserManager"/>
 			</modules>
 		</service>
+		
+		<service id="ajax" class="Application.pages.Ajax.Controller"></service>
 	</services>
 </application>
