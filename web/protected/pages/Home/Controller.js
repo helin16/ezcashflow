@@ -142,17 +142,33 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		tmp.fileInput = layout.down('.file-uploader');
+		tmp.resultPanel = layout.down('.file-uploader-results');
 		tmp.me._signRandID(tmp.fileInput);
 		jQuery('#' + tmp.fileInput.id).fileupload({
 	        url: '/asset/upload',
 	        dataType: 'json',
+	        add: function (e, data) {
+	        	data.submit();
+//	        	console.debug(data.index);
+	        	if(data.files && data.files.size() > 0 && tmp.resultPanel) {
+	        		tmp.resultPanel.insert({'bottom': new Element('div', {'class': 'file-list-item row'})
+		        		.insert({'bottom': new Element('div', {'class': 'col-xs-3'}).update(data.files[0].name) })
+		        		.insert({'bottom': new Element('div', {'class': 'col-xs-9'})
+		        			.insert({'bottom': new Element('div', {'class': 'progress'})
+			        			.insert({'bottom': new Element('div', {'class': 'progress-bar progress-bar-success'}) })
+		        			})
+		        		})
+	        		});
+	        	}
+	        },
 	        done: function (e, data) {
-	        	console.debug(data);
+//	        	console.debug(data);
 //	            j.each(data.result.files, function (index, file) {
 //	                $('<p/>').text(file.name).appendTo('#files');
 //	            });
 	        },
 	        progressall: function (e, data) {
+//	        	console.debug(e);
 //	            var progress = parseInt(data.loaded / data.total * 100, 10);
 //	            $('#progress .progress-bar').css(
 //	                'width',
