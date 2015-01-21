@@ -1,5 +1,5 @@
 <?php
-class fileUploader extends TTemplateControl
+class fileUploader extends TClientScript
 {
 	/**
 	 * (non-PHPdoc)
@@ -9,9 +9,11 @@ class fileUploader extends TTemplateControl
 	{
 		if(!$this->getPage()->IsPostBack || !$this->getPage()->IsCallback)
 		{
-			$cScripts = FrontEndPageAbstract::getLastestJS(__CLASS__);
-			if (isset($cScripts['js']) && ($lastestJs = trim($cScripts['js'])) !== '')
-				$this->getPage()->getClientScript()->registerScriptFile('fileUploaderJS', $this->publishAsset($cScripts['js']));
+			$clientScript = $this->getPage()->getClientScript();
+			$folder = $this->publishFilePath(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'jQuery-File-Upload' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR);
+			$clientScript->registerHeadScriptFile('jquery.fileupload.widget', $folder . '/vendor/jquery.ui.widget.js');
+			$clientScript->registerHeadScriptFile('jquery.fileupload.iframe', $folder . '/jquery.iframe-transport.js');
+			$clientScript->registerHeadScriptFile('jquery.fileupload', $folder . '/jquery.fileupload.js');
 			return $this;
 		}
 	}

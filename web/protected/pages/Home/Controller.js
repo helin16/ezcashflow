@@ -54,7 +54,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 				})
 			})
 			.insert({'bottom': new Element('div', {'class': 'panel'})
-				.insert({'bottom': new Element('div', {'class': 'panel-body form-horizontal'}) 
+				.insert({'bottom': new Element('div', {'class': 'panel-body form-horizontal'})
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
 							.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'from-acc-id', 'placeholder': 'From:', 'name': 'from_acc_id'}) })
 						, new Element('label', {'class': 'control-label col-sm-2 hidden-xs'}).update('From:')
@@ -68,7 +68,14 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 						, new Element('label', {'class': 'control-label col-sm-2 hidden-xs'}).update('Comments:')
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10 col-sm-offset-2'})
-						.insert({'bottom': tmp.me._fileUploader.getFileUploader() })
+						.insert({'bottom': new Element('span', {'class': 'btn btn-success'})
+							.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-plus'}) })
+							.insert({'bottom': new Element('span').update('Add files...') })
+							.insert({'bottom': new Element('input', {'type': 'file', 'input-panel': 'files', 'name': 'files[]', 'multiple': true}).setStyle({'display': 'none'}) })
+							.observe('click', function() {
+								$(this).down('[input-panel="files"]').click();
+							})
+						})
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10 col-sm-offset-2'})
 							.insert({'bottom': new Element('button', {'class': 'btn btn-primary col-sm-6', 'type': 'submit'}).update('Save') })
@@ -85,7 +92,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 				.insert({'bottom': tmp.me._getOverviewPanel().addClassName('hidden-sm hidden-xs') })
 				.insert({'bottom': tmp.me._getInputPanel() })
 			})
-			.insert({'bottom': new Element('div', {'class': 'col-md-4'}) 
+			.insert({'bottom': new Element('div', {'class': 'col-md-4'})
 				.insert({'bottom': tmp.me._getLastTrans().addClassName('hidden-sm hidden-xs') })
 			});
 		return tmp.newDiv;
@@ -136,10 +143,15 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 	,init: function(ressultPanelId, jQueryFormSelector) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.me._fileUploader = new FileUploaderJs(tmp.me);
 		tmp.me._jQueryFormSelector = jQueryFormSelector;
 		tmp.me._ressultPanelId = ressultPanelId;
-		$(tmp.me._ressultPanelId).update(tmp.me._getLayout());
+		$(tmp.me._ressultPanelId).update(tmp.layout = tmp.me._getLayout());
+		tmp.fileInput = tmp.layout.down('[input-panel="files"]');
+		tmp.me._signRandID(tmp.fileInput);
+		jQuery('#' + tmp.fileInput.id).fileupload({
+	        url: '/asset/upload',
+	        dataType: 'json'
+	    });
 		tmp.me._initValidator(jQueryFormSelector);
 		return tmp.me;
 	}
