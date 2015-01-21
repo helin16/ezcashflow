@@ -71,11 +71,12 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 						.insert({'bottom': new Element('span', {'class': 'btn btn-success'})
 							.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-plus'}) })
 							.insert({'bottom': new Element('span').update('Add files...') })
-							.insert({'bottom': new Element('input', {'type': 'file', 'input-panel': 'files', 'name': 'files[]', 'multiple': true}).setStyle({'display': 'none'}) })
+							.insert({'bottom': new Element('input', {'type': 'file', 'class': 'file-uploader', 'name': 'files[]', 'multiple': true}).setStyle({'display': 'none'}) })
 							.observe('click', function() {
-								$(this).down('[input-panel="files"]').click();
+								$(this).down('.file-uploader').click();
 							})
 						})
+						.insert({'bottom': new Element('div', {'class': 'file-uploader-results'}) })
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10 col-sm-offset-2'})
 							.insert({'bottom': new Element('button', {'class': 'btn btn-primary col-sm-6', 'type': 'submit'}).update('Save') })
@@ -137,6 +138,31 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
         ;
 		return tmp.me;
 	}
+	,_initFileUploader: function (layout) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.fileInput = layout.down('.file-uploader');
+		tmp.me._signRandID(tmp.fileInput);
+		jQuery('#' + tmp.fileInput.id).fileupload({
+	        url: '/asset/upload',
+	        dataType: 'json',
+	        done: function (e, data) {
+	        	console.debug(data);
+//	            j.each(data.result.files, function (index, file) {
+//	                $('<p/>').text(file.name).appendTo('#files');
+//	            });
+	        },
+	        progressall: function (e, data) {
+//	            var progress = parseInt(data.loaded / data.total * 100, 10);
+//	            $('#progress .progress-bar').css(
+//	                'width',
+//	                progress + '%'
+//	            );
+	        }
+	    }).prop('disabled', !jQuery.support.fileInput)
+        	.parent().addClass(jQuery.support.fileInput ? undefined : 'disabled');
+		return tmp.me;
+	}
 	/**
 	 * initialising
 	 */
@@ -146,13 +172,8 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.me._jQueryFormSelector = jQueryFormSelector;
 		tmp.me._ressultPanelId = ressultPanelId;
 		$(tmp.me._ressultPanelId).update(tmp.layout = tmp.me._getLayout());
-		tmp.fileInput = tmp.layout.down('[input-panel="files"]');
-		tmp.me._signRandID(tmp.fileInput);
-		jQuery('#' + tmp.fileInput.id).fileupload({
-	        url: '/asset/upload',
-	        dataType: 'json'
-	    });
-		tmp.me._initValidator(jQueryFormSelector);
+		tmp.me._initFileUploader(tmp.layout)
+			._initValidator(jQueryFormSelector);
 		return tmp.me;
 	}
 });
