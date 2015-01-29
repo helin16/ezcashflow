@@ -67,16 +67,18 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 							.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'comments', 'placeholder': 'Some comments for this transaction'}) })
 						, new Element('label', {'class': 'control-label col-sm-2 hidden-xs'}).update('Comments:')
 					) })
-					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10 col-sm-offset-2'})
-						.insert({'bottom': new Element('span', {'class': 'btn btn-success'})
-							.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-plus'}) })
-							.insert({'bottom': new Element('span').update('Add files...') })
-							.insert({'bottom': new Element('input', {'type': 'file', 'class': 'file-uploader', 'name': 'files[]', 'multiple': true}).setStyle({'display': 'none'}) })
-							.observe('click', function() {
-								$(this).down('.file-uploader').click();
+					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
+							.insert({'bottom': new Element('div', {'class': 'file-uploader-results'}) })
+							.insert({'bottom': new Element('div', {'class': 'file-uploading-results'}) })
+						, new Element('div', {'class': 'control-lable col-sm-2'})
+							.insert({'bottom': new Element('span', {'class': 'btn btn-success btn-sm'})
+								.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-plus'}) })
+								.insert({'bottom': new Element('span', {'class': 'hidden-xs'}).update(' Add files') })
+								.insert({'bottom': new Element('input', {'type': 'file', 'class': 'file-uploader', 'name': 'files[]', 'multiple': true}).setStyle({'display': 'none'}) })
+								.observe('click', function() {
+									$(this).down('.file-uploader').click();
+								})
 							})
-						})
-						.insert({'bottom': new Element('div', {'class': 'file-uploader-results'}) })
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10 col-sm-offset-2'})
 							.insert({'bottom': new Element('button', {'class': 'btn btn-primary col-sm-6', 'type': 'submit'}).update('Save') })
@@ -142,16 +144,15 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		tmp.fileInput = layout.down('.file-uploader');
+		tmp.uploadingPanel = layout.down('.file-uploading-results');
 		tmp.resultPanel = layout.down('.file-uploader-results');
 		tmp.me._signRandID(tmp.fileInput);
 		jQuery('#' + tmp.fileInput.id).fileupload({
 	        url: '/asset/upload',
 	        dataType: 'json',
 	        add: function (e, data) {
-	        	data.submit();
-//	        	console.debug(data.index);
-	        	if(data.files && data.files.size() > 0 && tmp.resultPanel) {
-	        		tmp.resultPanel.insert({'bottom': new Element('div', {'class': 'file-list-item row'})
+	        	if(data.files && data.files.size() > 0 && tmp.uploadingPanel) {
+	        		tmp.uploadingPanel.insert({'bottom': tmp.resultRow = new Element('div', {'class': 'file-list-item row'})
 		        		.insert({'bottom': new Element('div', {'class': 'col-xs-3'}).update(data.files[0].name) })
 		        		.insert({'bottom': new Element('div', {'class': 'col-xs-9'})
 		        			.insert({'bottom': new Element('div', {'class': 'progress'})
@@ -160,20 +161,30 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		        		})
 	        		});
 	        	}
+	        	tmp.me._signRandID(tmp.resultRow);
+	        	data.resultRowId = tmp.resultRow.id;
+	        	data.submit();
 	        },
 	        done: function (e, data) {
-//	        	console.debug(data);
-//	            j.each(data.result.files, function (index, file) {
-//	                $('<p/>').text(file.name).appendTo('#files');
-//	            });
+	        	jQuery('#' + data.resultRowId).remove();
+	        	tmp.result = data.result.resultData;
+	        	if(!tmp.result || !tmp.result.file.name)
+	        		return;
+	        	tmp.resultPanel.insert({'bottom': new Element('div', {'class': 'btn-group', 'input-panel': 'files'}).setStyle('margin-right: 4px; margin-bottom: 4px;').store('file', tmp.result)
+		        	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'}).update(tmp.result.file.name) })
+		        	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'})
+			        	.insert({'bottom': new Element('span', {'class': 'text-danger'})
+			        		.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-remove'}) })
+			        	})
+		        	})
+	        	});
 	        },
-	        progressall: function (e, data) {
-//	        	console.debug(e);
-//	            var progress = parseInt(data.loaded / data.total * 100, 10);
-//	            $('#progress .progress-bar').css(
-//	                'width',
-//	                progress + '%'
-//	            );
+	        progress: function (e, data) {
+	        	tmp.percentage = parseInt(data.loaded / data.total * 100, 10) + '%';
+	            jQuery('#' + data.resultRowId + ' .progress .progress-bar').css(
+	                'width',
+	                tmp.percentage
+	            ).html(tmp.percentage);
 	        }
 	    }).prop('disabled', !jQuery.support.fileInput)
         	.parent().addClass(jQuery.support.fileInput ? undefined : 'disabled');
