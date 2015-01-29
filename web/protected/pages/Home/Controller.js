@@ -60,7 +60,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 						, new Element('label', {'class': 'control-label col-sm-2 hidden-xs'}).update('From:')
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
-							.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'to-acc-id', 'placeholder': 'To:', 'name': 'to_acc_id'}) })
+							.insert({'bottom': new Element('select', {'class': 'form-control', 'input-panel': 'to-acc-id', 'placeholder': 'To:', 'name': 'to_acc_id'}) })
 						, new Element('label', {'class': 'control-label col-sm-2 hidden-xs'}).update('To:')
 					) })
 					.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
@@ -190,6 +190,26 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
         	.parent().addClass(jQuery.support.fileInput ? undefined : 'disabled');
 		return tmp.me;
 	}
+	,_initSelect2: function (layout) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.fromAccBox = layout.down('[input-panel="from-acc-id"]');
+		tmp.me._signRandID(tmp.fromAccBox);
+		jQuery('#' + tmp.fromAccBox.id).select2({
+			 minimumInputLength: 1,
+			 multiple: false,
+			 ajax: {
+				 delay: 250,
+				 url: '/'
+			 }
+		});
+
+		tmp.toAccBox = layout.down('[input-panel="to-acc-id"]');
+		tmp.me._signRandID(tmp.toAccBox);
+		jQuery('#' + tmp.toAccBox.id).select2({
+		})
+		return tmp.me;
+	}
 	/**
 	 * initialising
 	 */
@@ -200,6 +220,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.me._ressultPanelId = ressultPanelId;
 		$(tmp.me._ressultPanelId).update(tmp.layout = tmp.me._getLayout());
 		tmp.me._initFileUploader(tmp.layout)
+			._initSelect2(tmp.layout)
 			._initValidator(jQueryFormSelector);
 		return tmp.me;
 	}
