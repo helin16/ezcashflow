@@ -146,11 +146,12 @@ transFormJs.prototype = {
 		        		})
 	        		});
 	        	}
-	        	tmp.me._pageJs_signRandID(tmp.resultRow);
+	        	tmp.me._pageJs._signRandID(tmp.resultRow);
 	        	data.resultRowId = tmp.resultRow.id;
 	        	data.submit();
 	        },
 	        done: function (e, data) {
+	        	jQuery('#' + data.resultRowId).remove();
 	        	tmp.result = data.result.resultData;
 	        	if(!tmp.result || !tmp.result.file.name)
 	        		return;
