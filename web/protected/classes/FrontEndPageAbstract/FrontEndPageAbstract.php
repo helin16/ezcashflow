@@ -32,6 +32,12 @@ abstract class FrontEndPageAbstract extends TPage
 	    if(!$this->IsPostBack || !$this->IsCallback)
 	    {
 	    	$this->getHead()->setTitle($this->getAppName());
+	    	$cScripts = self::getLastestJS(get_class($this));
+	    	$clientScript = $this->getPage()->getCLientScript();
+	    	if (isset($cScripts['js']) && ($lastestJs = trim($cScripts['js'])) !== '')
+	    		$clientScript->registerScriptFile('pageJsClass', $this->publishAsset($lastestJs));
+	    	if (isset($cScripts['css']) && ($lastestCss = trim($cScripts['css'])) !== '')
+	    		$clientScript->registerStyleSheetFile('pageCss', $this->publishAsset($lastestCss));
 	        $this->getClientScript()->registerEndScript('pageJs', $this->_getEndJs());
 	    }
 	}
@@ -56,11 +62,6 @@ abstract class FrontEndPageAbstract extends TPage
 	    $this->_Load3rdPartyJs($clientScript);
 	    $clientScript->registerPradoScript('ajax');
 	    $this->_loadPageJsClass();
-        $cScripts = self::getLastestJS(get_class($this));
-	    if (isset($cScripts['js']) && ($lastestJs = trim($cScripts['js'])) !== '')
-	        $clientScript->registerScriptFile('pageJs', $this->publishAsset($lastestJs));
-	    if (isset($cScripts['css']) && ($lastestCss = trim($cScripts['css'])) !== '')
-	        $clientScript->registerStyleSheetFile('pageCss', $this->publishAsset($lastestCss));
 	}
 	/**
 	 * loading the page js class files
