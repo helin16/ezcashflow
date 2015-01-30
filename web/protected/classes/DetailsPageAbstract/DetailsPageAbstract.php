@@ -45,7 +45,16 @@ abstract class DetailsPageAbstract extends BackEndPageAbstract
 		$this->_saveItemBtn->OnCallback = 'Page.saveItem';
 		$this->getControls()->add($this->_saveItemBtn);
 	}
-
+	/**
+	 * (non-PHPdoc)
+	 * @see TPage::onPreInit()
+	 */
+	public function onPreInit($param)
+	{
+		parent::onPreInit($param);
+		if(isset($_REQUEST['blanklayout']) && intval($_REQUEST['blanklayout']) === 1)
+			$this->getPage()->setMasterClass("Application.layout.BlankLayout");
+	}
 	/**
 	 * Getting The end javascript
 	 *
@@ -55,7 +64,7 @@ abstract class DetailsPageAbstract extends BackEndPageAbstract
 	{
 		$js = parent::_getEndJs();
 		$js .= "pageJs.setHTMLID('result-div', 'details-page-wrapper')";
-		if(($entity = $this->_getEntity()) instanceof BaseEntityAbstract)
+		if(!($entity = $this->_getEntity()) instanceof BaseEntityAbstract)
 			$js .= ".errWhenFirstLoad();";
 		else {
 			$js .= ".setCallbackId('saveItem', '" . $this->_saveItemBtn->getUniqueID() . "')";

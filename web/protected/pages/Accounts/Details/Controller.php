@@ -8,6 +8,7 @@
  */
 class Controller extends DetailsPageAbstract
 {
+	private $_entity;
 	/**
 	 * Getting The end javascript
 	 *
@@ -16,7 +17,8 @@ class Controller extends DetailsPageAbstract
 	protected function _getEndJs()
 	{
 		$js = parent::_getEndJs();
-		$js .= 'pageJs.init();';
+		if($this->_entity instanceof BaseEntityAbstract)
+			$js .= 'pageJs.init();';
 		return $js;
 	}
 	/**
@@ -41,6 +43,7 @@ class Controller extends DetailsPageAbstract
 		}
 		else
 			$entity = AccountEntry::get($id);
+		$this->_entity = $entity;
 		return $entity;
 	}
 	/**

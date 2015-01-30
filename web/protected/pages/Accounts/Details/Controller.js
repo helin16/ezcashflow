@@ -8,6 +8,7 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 		tmp.me = this;
 		tmp.newDiv = new Element('div')
 			.insert({'bottom': new Element('h4').update(!tmp.me._entity.id || tmp.me._entity.id.blank() ? 'Creating an AccountEntry:' : 'Editing an AccountEntry: ' + tmp.me._entity.breadCrumbs.join('/')) });
+			.insert({'bottom': new Element('div').update(!tmp.me._entity.id || tmp.me._entity.id.blank() ? 'Creating an AccountEntry:' : 'Editing an AccountEntry: ' + tmp.me._entity.breadCrumbs.join('/')) });
 		$(tmp.me.getHTMLID('result-div')).update(tmp.newDiv);
 		return tmp.me;
 	}
