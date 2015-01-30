@@ -1,0 +1,6 @@
+<com:TContent ID="MainContent">
+	<com:Application.controls.bootstrapTreeGrid.bootstrapTreeGrid />
+	<com:TCallback ID="getAccountsBtn" onCallback="Page.getAccounts" />
+	<div class="container" id="page-wrapper"></div>
+</table>
+</com:TContent>

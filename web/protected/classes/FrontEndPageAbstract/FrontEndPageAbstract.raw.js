@@ -4,24 +4,38 @@
 var FrontPageJs = new Class.create();
 FrontPageJs.prototype = {
 	modalId: 'page_modal_box_id'
-		
+	,_htmlIDs: {}
+
 	//the callback ids
 	,callbackIds: {}
 
 	//constructor
 	,initialize: function () {}
-	
+
 	,setCallbackId: function(key, callbackid) {
 		this.callbackIds[key] = callbackid;
 		return this;
 	}
-	
+
 	,getCallbackId: function(key) {
 		if(this.callbackIds[key] === undefined || this.callbackIds[key] === null)
 			throw 'Callback ID is not set for:' + key;
 		return this.callbackIds[key];
 	}
-	
+
+	,setHTMLID: function($key, $value) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.me._htmlIDs[$key]  = $value;
+		return tmp.me;
+	}
+
+	,getHTMLID: function($key) {
+		var tmp = {};
+		tmp.me = this;
+		return tmp.me._htmlIDs[$key];
+	}
+
 	//posting an ajax request
 	,postAjax: function(callbackId, data, requestProperty, timeout) {
 		var tmp = {};
@@ -46,7 +60,7 @@ FrontPageJs.prototype = {
 			tmp.error = 'Invalid JSON string: ' + tmp.result;
 			if (noAlert === true)
 				throw tmp.error;
-			else 
+			else
 				return alert(tmp.error);
 		}
 		tmp.result = tmp.result.evalJSON();
@@ -54,7 +68,7 @@ FrontPageJs.prototype = {
 			tmp.error = 'Error: \n\n' + tmp.result.errors.join('\n');
 			if (noAlert === true)
 				throw tmp.error;
-			else 
+			else
 				return alert(tmp.error);
 		}
 		return tmp.result.resultData;
@@ -88,7 +102,7 @@ FrontPageJs.prototype = {
 			}
 			return true;
 		}
-		
+
 		if(typeof(enterFunc) === 'function') {
 			enterFunc();
 		}
@@ -163,7 +177,7 @@ FrontPageJs.prototype = {
 					.insert({'bottom': tmp.footer === null ? '' : new Element('div', {'class': 'modal-footer' }).update(tmp.footer) })
 				})
 			});
-		
+
 		if($(tmp.me.modalId)) {
 			$(tmp.me.modalId).remove();
 		}
@@ -193,10 +207,10 @@ FrontPageJs.prototype = {
 	/**
 	 * validate email via Regex
 	 */
-	,validateEmail: function (email) { 
+	,validateEmail: function (email) {
 	    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	    return re.test(email);
-	} 
+	}
 	/**
 	 * Getting a loading image div
 	 */

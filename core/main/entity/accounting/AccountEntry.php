@@ -17,46 +17,52 @@ class AccountEntry extends BaseEntityAbstract
     private $name;
     /**
      * Organization
-     * 
+     *
      * @var Organization
      */
     protected $organization;
     /**
      * The initValue of the account
-     * 
+     *
      * @var double
      */
     private $initValue = 0;
     /**
      * The Root accountEntry of this account
-     * 
+     *
      * @var AccountEntry
      */
     protected $root = null;
     /**
      * The parent accountEntry of this account
-     * 
+     *
      * @var AccountEntry
      */
     protected $parent = null;
     /**
      * The path of this account
-     * 
+     *
      * @var string
      */
     private $path = '';
     /**
      * The description of this account
-     * 
+     *
      * @var string
      */
     private $description = '';
     /**
      * Whether this is a summary account. if it is, it can't be have any transactions against them
-     * 
+     *
      * @var bool
      */
     private $isSumAcc = false;
+    /**
+     * The type of the account
+     *
+     * @var AccountType
+     */
+    protected $type;
     /**
      * Getter for name
      *
@@ -73,7 +79,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function setName($value) 
+    public function setName($value)
     {
         $this->name = $value;
         return $this;
@@ -105,7 +111,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return double
      */
-    public function getInitValue() 
+    public function getInitValue()
     {
         return $this->initValue;
     }
@@ -116,7 +122,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function setInitValue($value) 
+    public function setInitValue($value)
     {
         $this->initValue = $value;
         return $this;
@@ -126,7 +132,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function getRoot() 
+    public function getRoot()
     {
     	$this->loadManyToOne('root');
         return $this->root;
@@ -138,7 +144,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function setRoot(AccountEntry $value = null) 
+    public function setRoot(AccountEntry $value = null)
     {
         $this->root = $value;
         return $this;
@@ -148,7 +154,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function getParent() 
+    public function getParent()
     {
     	$this->loadManyToOne('parent');
         return $this->parent;
@@ -160,7 +166,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function setParent(AccountEntry $value = null) 
+    public function setParent(AccountEntry $value = null)
     {
         $this->parent = $value;
         return $this;
@@ -170,7 +176,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function getPath() 
+    public function getPath()
     {
         return $this->path;
     }
@@ -181,7 +187,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function setPath($value) 
+    public function setPath($value)
     {
         $this->path = $value;
         return $this;
@@ -191,7 +197,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function getDescription() 
+    public function getDescription()
     {
         return $this->description;
     }
@@ -202,26 +208,44 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function setDescription($value) 
+    public function setDescription($value)
     {
         $this->description = $value;
         return $this;
     }
     /**
      * getting the path in an array
-     * 
+     *
      * @return multitype:int
      */
     public function getPaths()
     {
-    	return explode(self::PATH_SEPARATOR, $this->getPath);
+    	return explode(self::PATH_SEPARATOR, $this->getPath());
+    }
+    /**
+     * Getting the BreadCrumbs of the AccountEntry from the path
+     *
+     * @return array
+     */
+    public function getBreadCrumbs()
+    {
+    	$parentIds = $this->getPaths();
+    	if(count($parentIds) === 0 || count($accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($parentIds), '?')) . ')', $parentIds, false)) === 0)
+    		return array();
+		$map = array();
+		foreach($accounts as $account)
+			$map[$account->getId()] = $account;
+		$names = array();
+		foreach($parentIds as $id)
+			$names[] = $map[$id];
+		return $names;
     }
     /**
      * Getter for isSumAcc
      *
      * @return bool
      */
-    public function getIsSumAcc() 
+    public function getIsSumAcc()
     {
         return $this->isSumAcc;
     }
@@ -232,9 +256,31 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return AccountEntry
      */
-    public function setIsSumAcc($value) 
+    public function setIsSumAcc($value)
     {
         $this->isSumAcc = $value;
+        return $this;
+    }
+    /**
+     * Getter for type
+     *
+     * @return AccountType
+     */
+    public function getType()
+    {
+    	$this->loadManyToOne('type');
+        return $this->type;
+    }
+    /**
+     * Setter for type
+     *
+     * @param AccountEntry $value The type
+     *
+     * @return AccountEntry
+     */
+    public function setType($value)
+    {
+        $this->type = $value;
         return $this;
     }
     /**
@@ -251,6 +297,19 @@ class AccountEntry extends BaseEntityAbstract
     		if($this->getParent() instanceof AccountEntry && !$this->getParent()->getIsSumAcc())
     			throw new EntityException('You can ONLY create an account under a summary account.');
     	}
+    }
+	/**
+     * (non-PHPdoc)
+     * @see BaseEntityAbstract::getJson()
+     */
+    public function getJson($extra = '', $reset = false)
+    {
+    	$array = array();
+    	if(!$this->isJsonLoaded($reset))
+    	{
+    		$array['breadCrumbs'] = $this->getBreadCrumbs();
+    	}
+    	return parent::getJson($array, $reset);
     }
     /**
      * (non-PHPdoc)
@@ -279,6 +338,7 @@ class AccountEntry extends BaseEntityAbstract
     {
     	DaoMap::begin($this, 'acc_entry');
     	DaoMap::setStringType('name', 'varchar', 100);
+    	DaoMap::setManyToOne('type', 'AccountType', 'acc_entry_type');
     	DaoMap::setManyToOne('organization', "Organization", 'acc_entry_org');
     	DaoMap::setIntType('initValue', 'double', '10,4', false);
     	DaoMap::setManyToOne('root', "AccountEntry", 'acc_entry_root', true);
@@ -286,7 +346,7 @@ class AccountEntry extends BaseEntityAbstract
     	DaoMap::setStringType('path', 'varchar', 255);
     	DaoMap::setStringType('description', 'varchar', 255);
     	parent::__loadDaoMap();
-    
+
     	DaoMap::createIndex('name');
     	DaoMap::createIndex('initValue');
     	DaoMap::createIndex('path');
@@ -294,34 +354,36 @@ class AccountEntry extends BaseEntityAbstract
     }
     /**
      * Creating a RootAccount
-     * 
+     *
      * @param string $name
-     * 
+     *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public function createRootAccount($name)
+    public static function createRootAccount($name, AccountType $type)
     {
     	$item = new AccountEntry();
     	return $item->setName(trim($name))
+    		->setType($type)
     		->save();
     }
     /**
      * Creating a AccountEntry
-     * 
+     *
      * @param AccountEntry $parent
      * @param string       $name
      * @param double       $initValue
      * @param string       $description
-     * 
+     *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public function create(AccountEntry $parent, $name, $initValue = 0, $description = '')
+    public static function create(AccountEntry $parent, $name, $initValue = 0, $description = '')
     {
     	$item = new AccountEntry();
     	return $item->setName(trim($name))
     		->setParent($parent)
     		->setInitValue($initValue)
     		->setDescription(trim($description))
+    		->setType($parent->getType())
     		->save();
     }
 }

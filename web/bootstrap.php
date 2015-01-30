@@ -13,11 +13,12 @@ class Web
 			dirname(__FILE__) . '/protected/',
 			dirname(__FILE__) . '/protected/classes/',
 			dirname(__FILE__) . '/protected/classes/BackEndPageAbstract/',
+			dirname(__FILE__) . '/protected/classes//DetailsPageAbstract/',
 			dirname(__FILE__) . '/protected/classes/FrontEndPageAbstract/',
 				);
-		
+
 		$found = false;
-		
+
 		foreach ($autoloadPaths as $path)
 		{
 			if (file_exists($path . $className . '.php'))
@@ -27,7 +28,7 @@ class Web
 				break;
 			}
 		}
-		
+
 		return $found;
 	}
 }

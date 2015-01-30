@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS `accountentry`;
 CREATE TABLE `accountentry` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 	`name` varchar(100) NOT NULL DEFAULT '',
+	`typeId` int(10) unsigned NOT NULL DEFAULT 0,
 	`organizationId` int(10) unsigned NOT NULL DEFAULT 0,
 	`initValue` double(10,4) NOT NULL DEFAULT 0,
 	`rootId` int(10) unsigned NULL DEFAULT NULL,
@@ -15,6 +16,7 @@ CREATE TABLE `accountentry` (
 	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`)
+	,INDEX (`typeId`)
 	,INDEX (`organizationId`)
 	,INDEX (`rootId`)
 	,INDEX (`parentId`)
@@ -26,6 +28,23 @@ CREATE TABLE `accountentry` (
 	,INDEX (`name`)
 	,INDEX (`initValue`)
 	,INDEX (`path`)
+) ENGINE=innodb DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `accounttype`;
+CREATE TABLE `accounttype` (
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	`name` varchar(10) NOT NULL DEFAULT '',
+	`active` bool NOT NULL DEFAULT 1,
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
+	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`)
+	,INDEX (`createdById`)
+	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
+	,INDEX (`name`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `transaction`;
 CREATE TABLE `transaction` (
