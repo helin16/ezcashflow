@@ -28,17 +28,17 @@ class WebUserManager extends TModule implements IUserManager
 	{
 		if($username === null)
 			return new WebUser($this);
-		
+
 		if(!($userAccount = Core::getUser()) instanceof UserAccount)
 			return null;
-		
+
 		$user = new WebUser($this);
 		$user->setUserAccount($userAccount);
 		$user->setName($userAccount->getUsername());
 		$user->setIsGuest(false);
 		return $user;
 	}
-	
+
 	/**
 	 * validate a user providing $username and $password
 	 *
@@ -55,7 +55,7 @@ class WebUserManager extends TModule implements IUserManager
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Save a TUser to cookie
 	 *
@@ -91,8 +91,10 @@ class WebUserManager extends TModule implements IUserManager
 		// check whether the library has the user or not
 		if (!$userAccount instanceof UserAccount)
 			return null;
-	
-		Core::setUser($userAccount);
+		$rel = OrgPersonRole::getAllByCriteria('personId = ?', array($userAccount->getPerson()->getId()), true, 1, 1);
+		if (count($rel) === 0)
+			return null;
+		Core::setUser($userAccount, $rel[0]->getRole(), $rel[0]->getOrganization());
 		return $userAccount;
 	}
 }

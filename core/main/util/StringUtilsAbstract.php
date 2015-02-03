@@ -24,11 +24,11 @@ abstract class StringUtilsAbstract
 	}
 	/**
 	 * Getting the CDKey for the supplier
-	 * 
+	 *
 	 * @param string $key
 	 * @param string $username
 	 * @param string $libCode
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getCDKey($key, $username, $libCode)
@@ -37,9 +37,9 @@ abstract class StringUtilsAbstract
 	}
 	/**
 	 * Getting a random key
-	 * 
+	 *
 	 * @param string $salt The salt of making one string
-	 * 
+	 *
 	 * @return strng
 	 */
 	public static function getRandKey($salt = '')
@@ -93,36 +93,36 @@ abstract class StringUtilsAbstract
 	public static function getMimeType($filename)
 	{
 		preg_match("|\.([a-z0-9]{2,4})$|i", $filename, $fileSuffix);
-	
+
 		switch(strtolower($fileSuffix[1]))
 		{
 			case "js" :
 				return "application/x-javascript";
-	
+
 			case "json" :
 				return "application/json";
-	
+
 			case "jpg" :
 			case "jpeg" :
 			case "jpe" :
 				return "image/jpg";
-	
+
 			case "png" :
 			case "gif" :
 			case "bmp" :
 			case "tiff" :
 				return "image/".strtolower($fileSuffix[1]);
-	
+
 			case "css" :
 				return "text/css";
-	
+
 			case "xml" :
 				return "application/xml";
-	
+
 			case "doc" :
 			case "docx" :
 				return "application/msword";
-	
+
 			case "xls" :
 			case "xlt" :
 			case "xlm" :
@@ -132,75 +132,64 @@ abstract class StringUtilsAbstract
 			case "xlw" :
 			case "xll" :
 				return "application/vnd.ms-excel";
-	
+
 			case "ppt" :
 			case "pps" :
 				return "application/vnd.ms-powerpoint";
-	
+
 			case "rtf" :
 				return "application/rtf";
-	
+
 			case "pdf" :
 				return "application/pdf";
-	
+
 			case "html" :
 			case "htm" :
 			case "php" :
 				return "text/html";
-	
+
 			case "txt" :
 				return "text/plain";
-	
+
 			case "mpeg" :
 			case "mpg" :
 			case "mpe" :
 				return "video/mpeg";
-	
+
 			case "mp3" :
 				return "audio/mpeg3";
-	
+
 			case "wav" :
 				return "audio/wav";
-	
+
 			case "aiff" :
 			case "aif" :
 				return "audio/aiff";
-	
+
 			case "avi" :
 				return "video/msvideo";
-	
+
 			case "wmv" :
 				return "video/x-ms-wmv";
-	
+
 			case "mov" :
 				return "video/quicktime";
-	
+
 			case "zip" :
 				return "application/zip";
-	
+
 			case "tar" :
 				return "application/x-tar";
-	
+
 			case "swf" :
 				return "application/x-shockwave-flash";
-	
+
 			default :
 		}
-	
+
 		if(function_exists("mime_content_type"))
 			$fileSuffix = mime_content_type($filename);
-	
+
 		return "unknown/" . trim($fileSuffix[0], ".");
-	}
-	/**
-	 * return a encripted name for displaying
-	 * 
-	 * @param string $string The fullname string
-	 * 
-	 * @return string
-	 */
-	public static function encriptedName($string)
-	{
-		return substr($string, 0, 1) . str_repeat('*', strlen($string) >= 2 ? (strlen($string) - 2) : 2) . substr($string, -1, 1);
 	}
 }

@@ -64,6 +64,7 @@ abstract class DetailsPageAbstract extends BackEndPageAbstract
 	{
 		$js = parent::_getEndJs();
 		$js .= "pageJs.setHTMLID('result-div', 'details-page-wrapper')";
+		$js .= ".setHTMLID('page-form', '" . $this->getForm()->getClientID() . "')";
 		if(!($entity = $this->_getEntity()) instanceof BaseEntityAbstract)
 			$js .= ".errWhenFirstLoad();";
 		else {

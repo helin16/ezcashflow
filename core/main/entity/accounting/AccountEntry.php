@@ -308,6 +308,8 @@ class AccountEntry extends BaseEntityAbstract
     	if(!$this->isJsonLoaded($reset))
     	{
     		$array['breadCrumbs'] = $this->getBreadCrumbs();
+    		$array['parent'] = $this->getParent() instanceof AccountEntry ? $this->getParent()->getJson() : null;
+    		$array['type'] = $this->getType() instanceof AccountType ? $this->getType()->getJson() : null;
     	}
     	return parent::getJson($array, $reset);
     }
@@ -355,31 +357,40 @@ class AccountEntry extends BaseEntityAbstract
     /**
      * Creating a RootAccount
      *
-     * @param string $name
+     * @param Organization $org
+     * @param string       $name
+     * @param AccountType  $type
+     * @param number       $initValue
+     * @param string       $description
      *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public static function createRootAccount($name, AccountType $type)
+    public static function createRootAccount(Organization $org, $name, AccountType $type, $initValue = 0, $description = '')
     {
     	$item = new AccountEntry();
     	return $item->setName(trim($name))
+    		->setOrganization($org)
     		->setType($type)
+    		->setInitValue($initValue)
+    		->setDescription($description)
     		->save();
     }
     /**
      * Creating a AccountEntry
      *
+     * @param Organization $org
      * @param AccountEntry $parent
      * @param string       $name
-     * @param double       $initValue
+     * @param number       $initValue
      * @param string       $description
      *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public static function create(AccountEntry $parent, $name, $initValue = 0, $description = '')
+    public static function create(Organization $org, AccountEntry $parent, $name, $initValue = 0, $description = '')
     {
     	$item = new AccountEntry();
     	return $item->setName(trim($name))
+    		->setOrganization($org)
     		->setParent($parent)
     		->setInitValue($initValue)
     		->setDescription(trim($description))

@@ -54,14 +54,35 @@ class Controller extends DetailsPageAbstract
 	 * @throws Exception
 	 *
 	 */
-	public function saveItem($sender, $param)
+	public function saveItem($sender, $params)
 	{
 		$results = $errors = array();
 		try {
-			if(!isset($params->CallbackParameter->typeId))
+			Dao::beginTransaction();
+			if(!isset($params->CallbackParameter->typeId) || !($type = AccountType::get(trim($params->CallbackParameter->typeId))) instanceof AccountType)
 				throw new Exception('No typeId provided.');
+			if(!isset($params->CallbackParameter->name) || ($name = trim($params->CallbackParameter->name)) === '')
+				throw new Exception('No name provided.');
+
+			$parent = null;
+			if(isset($params->CallbackParameter->parentId) && ($parent = AccountEntry::get(trim($params->CallbackParameter->parentId))) instanceof AccountEntry)
+				throw new Exception('Invalid parent account provided.');
+			$initValue = 0;
+			if(isset($params->CallbackParameter->initValue) && !is_numeric($initValue = trim($params->CallbackParameter->initValue)))
+				throw new Exception('Invalid initial value provided.');
+			$description = '';
+			if(isset($params->CallbackParameter->description))
+				$description = trim($params->CallbackParameter->description);
+
+			if($parent instanceof AccountEntry)
+				$account = AccountEntry::create(Core::getOrganization(), $parent, $name, $initValue, $description);
+			else
+				$account = AccountEntry::createRootAccount(Core::getOrganization(), $name, $type, $initValue, $description);
+			$results['item'] = $account->getJson();
+			Dao::rollbackTransaction();
 
 		} catch(Exception $ex) {
+			Dao::rollbackTransaction();
 			$errors[] = $ex->getMessage();
 		}
 		$params->ResponseData = StringUtilsAbstract::getJson($results, $errors);
