@@ -229,12 +229,12 @@ class AccountEntry extends BaseEntityAbstract
      */
     public function getBreadCrumbs()
     {
-    	$parentIds = $this->getPaths();
+    	$parentIds = array_filter($this->getPaths());
     	if(count($parentIds) === 0 || count($accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($parentIds), '?')) . ')', $parentIds, false)) === 0)
     		return array();
 		$map = array();
 		foreach($accounts as $account)
-			$map[$account->getId()] = $account;
+			$map[$account->getId()] = $account->getName();
 		$names = array();
 		foreach($parentIds as $id)
 			$names[] = $map[$id];
@@ -294,8 +294,31 @@ class AccountEntry extends BaseEntityAbstract
     			$this->setIsSumAcc(true);
     		}
     	} else {
-    		if($this->getParent() instanceof AccountEntry && !$this->getParent()->getIsSumAcc())
-    			throw new EntityException('You can ONLY create an account under a summary account.');
+	    	if($this->getParent() instanceof AccountEntry) {
+	    		if($this->getParent()->getIsSumAcc())
+	    			throw new EntityException('You can ONLY create an account under a summary account.');
+	    		$this->setRoot($this->getParent()->getRoot())
+	    			->setType($this->getParent()->getType());
+	    	}
+    	}
+    }
+    /**
+     * (non-PHPdoc)
+     * @see BaseEntityAbstract::postSave()
+     */
+    public function postSave()
+    {
+    	if(!$this->getRoot() instanceof AccountEntry) {
+    		$fakeEntry = new AccountEntry();
+    		$fakeEntry->setProxyMode(true)
+    			->setId($this->getId());
+    		$this->setRoot($fakeEntry)
+    			->setPath(trim($this->getId()))
+    			->save();
+    	}
+    	if(trim($this->getPath()) === '') {
+    		$path = (trim($this->getParent()->getPath()) . self::PATH_SEPARATOR . trim($this->getId()));
+    		self::updateByCriteria('path = ?', 'id = ?', array($path, $this->getId()));
     	}
     }
 	/**
@@ -312,25 +335,6 @@ class AccountEntry extends BaseEntityAbstract
     		$array['type'] = $this->getType() instanceof AccountType ? $this->getType()->getJson() : null;
     	}
     	return parent::getJson($array, $reset);
-    }
-    /**
-     * (non-PHPdoc)
-     * @see BaseEntityAbstract::postSave()
-     */
-    public function postSave()
-    {
-    	if($this->getParent() instanceof AccountEntry) {
-    		$this->setRoot($this->getParent()->getRoot())
-    			->setPath(trim($this->getParent()->getPath()) . self::PATH_SEPARATOR , trim($this->getId()))
-    			->save();
-    	} else {
-    		$fakeEntry = new AccountEntry();
-    		$fakeEntry->setProxyMode(true)
-    			->setId($this->getId());
-    		$this->setRoot($fakeEntry)
-	    		->setPath(trim($this->getId()))
-	    		->save();
-    	}
     }
     /**
      * (non-PHPdoc)

@@ -35,7 +35,7 @@ class Controller extends DetailsPageAbstract
 		if($id === 'new' && (isset($_REQUEST['parentId']) && ($parent = AccountEntry::get($_REQUEST['parentId'])) || isset($_REQUEST['typeId']) && ($type = AccountType::get($_REQUEST['typeId'])))) {
 			$entity = new AccountEntry();
 			if($parent instanceof AccountEntry)
-				$entity->setParent($parent);
+				$entity->setParent($parent)->setType($parent->getType());
 			else if($type instanceof AccountType)
 				$entity->setType($type);
 			else
@@ -65,7 +65,7 @@ class Controller extends DetailsPageAbstract
 				throw new Exception('No name provided.');
 
 			$parent = null;
-			if(isset($params->CallbackParameter->parentId) && ($parent = AccountEntry::get(trim($params->CallbackParameter->parentId))) instanceof AccountEntry)
+			if(isset($params->CallbackParameter->parentId) && !($parent = AccountEntry::get(trim($params->CallbackParameter->parentId))) instanceof AccountEntry)
 				throw new Exception('Invalid parent account provided.');
 			$initValue = 0;
 			if(isset($params->CallbackParameter->initValue) && !is_numeric($initValue = trim($params->CallbackParameter->initValue)))
@@ -79,7 +79,7 @@ class Controller extends DetailsPageAbstract
 			else
 				$account = AccountEntry::createRootAccount(Core::getOrganization(), $name, $type, $initValue, $description);
 			$results['item'] = $account->getJson();
-			Dao::rollbackTransaction();
+			Dao::commitTransaction();
 
 		} catch(Exception $ex) {
 			Dao::rollbackTransaction();

@@ -1,5 +1,6 @@
 <com:TContent ID="MainContent">
 	<com:Application.controls.bootstrapTreeGrid.bootstrapTreeGrid />
+	<com:Application.controls.FancyBox.FancyBox />
 	<com:TCallback ID="getAccountsBtn" onCallback="Page.getAccounts" />
 	<div class="container" id="page-wrapper"></div>
 </table>

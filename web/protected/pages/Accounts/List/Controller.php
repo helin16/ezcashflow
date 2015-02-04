@@ -25,9 +25,10 @@ class Controller extends BackEndPageAbstract
 	{
 		$results = $errors = array();
 		try {
-			if(!isset($params->CallbackParameter->typeId))
+			if(!isset($params->CallbackParameter->typeId) || ($typeId = trim($params->CallbackParameter->typeId)) === '')
 				throw new Exception('No typeId provided.');
-
+			$accounts = AccountEntry::getAllByCriteria('typeId = ? and organizationId = ?', array($typeId, Core::getOrganization()->getId()), true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('acc_entry.path' => 'asc'));
+			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
 		} catch(Exception $ex) {
 			$errors[] = $ex->getMessage();
 		}

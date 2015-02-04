@@ -92,8 +92,6 @@ abstract class Core
 		self::$_storage['user'] = self::$_storage['user'] instanceof UserAccount ? self::$_storage['user'] : (isset($array['userId']) ? UserAccount::get($array['userId']) : null);
 		self::$_storage['role'] = self::$_storage['role'] instanceof Role ? self::$_storage['role'] : (isset($array['roleId']) ? Role::get($array['roleId']) : null);
 		self::$_storage['organization'] = self::$_storage['organization'] instanceof Organization ? self::$_storage['organization'] : (isset($array['organizationId']) ? Organization::get($array['organizationId']) : null);
-		if(self::$_storage['user'] instanceof UserAccount)
-			Core::setUser(self::$_storage['user'], self::$_storage['role'], self::$_storage['organization']);
 		return self::$_storage;
 	}
 	/**

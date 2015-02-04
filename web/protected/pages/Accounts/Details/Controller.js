@@ -6,7 +6,7 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 	_showEditPanel: function() {
 		var tmp = {};
 		tmp.me = this;
-		tmp.creatingTitle = 'Creating a ' + (tmp.me._entity.type && tmp.me._entity.type.id ? '<span class="label label-success">' + tmp.me._entity.type.name + '</span>' : '') + ' Account ' + (tmp.me._entity.parent && tmp.me._entity.parent.id ? 'under ' . tmp.me._entity.parent.breadCrumbs.join('/') : '') + ':';
+		tmp.creatingTitle = 'Creating a ' + (tmp.me._entity.type && tmp.me._entity.type.id ? '<span class="label label-success">' + tmp.me._entity.type.name + '</span>' : '') + ' Account ' + (tmp.me._entity.parent && tmp.me._entity.parent.id ? 'under ' + tmp.me._entity.parent.breadCrumbs.join('/') : '') + ':';
 		tmp.newDiv = new Element('div', {'id': 'save-panel'})
 			.insert({'bottom': new Element('h4').update(!tmp.me._entity.id || tmp.me._entity.id.blank() ?  tmp.creatingTitle : 'Editing an AccountEntry: ' + tmp.me._entity.breadCrumbs.join('/')) })
 			.insert({'bottom': new Element('div')
@@ -16,7 +16,7 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 				})
 				.insert({'bottom': new Element('div', {'class': 'form-group'})
 					.insert({'bottom': new Element('label', {'class': 'control-label hidden-xs hidden-sm'}).update('Init Value:') })
-					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The initial value or Opening Balance of this account.', 'name': 'initValue', 'save-panel': 'initValue'}) })
+					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The initial value or Opening Balance of this account.', 'name': 'initValue', 'save-panel': 'initValue', 'value': 0}) })
 				})
 				.insert({'bottom': new Element('div', {'class': 'form-group'})
 					.insert({'bottom': new Element('label', {'class': 'control-label hidden-xs hidden-sm'}).update('Description:') })
@@ -35,12 +35,13 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		tmp.data = {};
-		tmp.savePanel = $(tmp.me.getHTMLID('result-div')).down('#save-panel');
+		tmp.resultPanel = $(tmp.me.getHTMLID('result-div'));
+		tmp.savePanel = tmp.resultPanel.down('#save-panel');
 		tmp.savePanel.getElementsBySelector('[save-panel]').each(function(item){
 			tmp.field = item.readAttribute('save-panel');
 			tmp.data[tmp.field] = (tmp.field === 'initValue' ? tmp.me.getValueFromCurrency($F(item)) : $F(item));
 		});
-		tmp.loadingDiv = tmp.me._getLoadingDiv().setStyle("margin-top: 30px;");
+		tmp.loadingDiv = tmp.me._getLoadingDiv().addClassName("panel-body");
 		tmp.me.postAjax(tmp.me.getCallbackId('saveItem'), tmp.data, {
 			'onLoading': function() {
 				tmp.savePanel.insert({'after': tmp.loadingDiv}).hide();
@@ -48,20 +49,32 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 			,'onSuccess': function(sender, param) {
 				try {
 					tmp.result = tmp.me.getResp(param, false, true);
-					if(!tmp.result)
+					if(!tmp.result || !tmp.result.item)
 						return;
-					tmp.savePanel.remove();
+					tmp.resultPanel.update(new Element('div', {'class': 'text-center'})
+						.insert({'bottom': new Element('h4', {'class': 'text-success'})
+							.insert({'bottom': new Element('i', {'class': 'fa fa-check-circle fa-6'})})
+						})
+						.insert({'bottom': new Element('strong', {'class': 'text-success'}).update('"' + tmp.result.item.name + '" saved successfully.')})
+					);
+					tmp.me._refreshParentWindow(tmp.result.item);
 				} catch(e) {
 					tmp.me.showModalBox('<strong class="text-danger">Error</strong>', e);
 				}
 			}
 			,'onComplete': function() {
 				tmp.loadingDiv.remove();
-				tmp.savePanel = $(tmp.me.getHTMLID('result-div')).down('#save-panel');
+				tmp.savePanel = tmp.resultPanel.down('#save-panel');
 				if(tmp.savePanel)
 					tmp.savePanel.show();
 			}
 		})
+		return tmp.me;
+	}
+	,_refreshParentWindow(item) {
+		var tmp = {};
+		tmp.me = this;
+
 		return tmp.me;
 	}
 	,_initForm: function() {
