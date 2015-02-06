@@ -64,6 +64,12 @@ class AccountEntry extends BaseEntityAbstract
      */
     protected $type;
     /**
+     * The account no of the account
+     *
+     * @var int
+     */
+    private $accountNo;
+    /**
      * Getter for name
      *
      * @return string
@@ -222,6 +228,27 @@ class AccountEntry extends BaseEntityAbstract
     {
     	return explode(self::PATH_SEPARATOR, $this->getPath());
     }
+   	/**
+   	 * Getter for accountNo
+   	 *
+   	 * @return int
+   	 */
+   	public function getAccountNo()
+   	{
+   	    return $this->accountNo;
+   	}
+   	/**
+   	 * Setter for accountNo
+   	 *
+   	 * @param int $value The accountNo
+   	 *
+   	 * @return AccountEntry
+   	 */
+   	public function setAccountNo($value)
+   	{
+   	    $this->accountNo = $value;
+   	    return $this;
+   	}
     /**
      * Getting the BreadCrumbs of the AccountEntry from the path
      *
@@ -298,9 +325,21 @@ class AccountEntry extends BaseEntityAbstract
 	    		if($this->getParent()->getIsSumAcc())
 	    			throw new EntityException('You can ONLY create an account under a summary account.');
 	    		$this->setRoot($this->getParent()->getRoot())
-	    			->setType($this->getParent()->getType());
+	    			->setType($this->getParent()->getType())
+	    			->setOrganization($this->getParent()->getOrganization());
 	    	}
     	}
+
+    	$where ='accountNo = ? and organizationId = ?';
+    	$params = array(trim($this->getAccountNo()), $this->getOrganization()->getId());
+    	if(trim($this->getId()) === '') {
+			$where .= ' AND id != ?';
+	    	$params[] = trim($this->getId());
+    	}
+    	if(self::countByCriteria($where, $params) > 0)
+    		throw new EntityException('There is such an accountNo already: ' . $this->getAccountNo());
+    	if(substr(trim($this->getAccountNo()), 0, 1) !== trim($this->getType()->getId()))
+    		throw new EntityException('The account number should start with: '. $this->getType()->getId() . ', but got: ' . $this->getAccountNo());
     }
     /**
      * (non-PHPdoc)
@@ -344,6 +383,7 @@ class AccountEntry extends BaseEntityAbstract
     {
     	DaoMap::begin($this, 'acc_entry');
     	DaoMap::setStringType('name', 'varchar', 100);
+    	DaoMap::setIntType('accountNo', 'int', 10);
     	DaoMap::setManyToOne('type', 'AccountType', 'acc_entry_type');
     	DaoMap::setManyToOne('organization', "Organization", 'acc_entry_org');
     	DaoMap::setIntType('initValue', 'double', '10,4', false);
@@ -356,7 +396,21 @@ class AccountEntry extends BaseEntityAbstract
     	DaoMap::createIndex('name');
     	DaoMap::createIndex('initValue');
     	DaoMap::createIndex('path');
+    	DaoMap::createIndex('accountNo');
     	DaoMap::commit();
+    }
+    /**
+     * Getting the accountentry by accounting code
+     *
+     * @param Organization $org
+     * @param string       $accountNo
+     *
+     * @return Ambigous <NULL, BaseEntityAbstract>
+     */
+    public static function getAccountByCode(Organization $org, $accountNo)
+    {
+		$accounts = self::getAllByCriteria('accountNo = ? and organizationId = ?', array(trim($accountNo), trim($org->getId())), true, 1, 1);
+		return (count($accounts) > 0 ? $accounts[0] : null);
     }
     /**
      * Creating a RootAccount
@@ -369,14 +423,15 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public static function createRootAccount(Organization $org, $name, AccountType $type, $initValue = 0, $description = '')
+    public static function createRootAccount(Organization $org, $name, AccountType $type, $initValue = 0, $description = '', $accountNo = '')
     {
     	$item = new AccountEntry();
     	return $item->setName(trim($name))
     		->setOrganization($org)
     		->setType($type)
     		->setInitValue($initValue)
-    		->setDescription($description)
+    		->setDescription(trim($description))
+    		->setAccountNo(trim($accountNo))
     		->save();
     }
     /**
@@ -390,7 +445,7 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public static function create(Organization $org, AccountEntry $parent, $name, $initValue = 0, $description = '')
+    public static function create(Organization $org, AccountEntry $parent, $name, $initValue = 0, $description = '', $accountNo = '')
     {
     	$item = new AccountEntry();
     	return $item->setName(trim($name))
@@ -399,6 +454,7 @@ class AccountEntry extends BaseEntityAbstract
     		->setInitValue($initValue)
     		->setDescription(trim($description))
     		->setType($parent->getType())
+    		->setAccountNo(trim($accountNo))
     		->save();
     }
 }

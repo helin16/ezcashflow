@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS `accountentry`;
 CREATE TABLE `accountentry` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 	`name` varchar(100) NOT NULL DEFAULT '',
+	`accountNo` int(10) unsigned NOT NULL DEFAULT 0,
 	`typeId` int(10) unsigned NOT NULL DEFAULT 0,
 	`organizationId` int(10) unsigned NOT NULL DEFAULT 0,
 	`initValue` double(10,4) NOT NULL DEFAULT 0,
@@ -28,6 +29,7 @@ CREATE TABLE `accountentry` (
 	,INDEX (`name`)
 	,INDEX (`initValue`)
 	,INDEX (`path`)
+	,INDEX (`accountNo`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `accounttype`;
 CREATE TABLE `accounttype` (

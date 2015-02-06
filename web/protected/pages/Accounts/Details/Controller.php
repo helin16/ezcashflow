@@ -63,6 +63,8 @@ class Controller extends DetailsPageAbstract
 				throw new Exception('No typeId provided.');
 			if(!isset($params->CallbackParameter->name) || ($name = trim($params->CallbackParameter->name)) === '')
 				throw new Exception('No name provided.');
+			if(!isset($params->CallbackParameter->accountNo) || ($accountNo = trim($params->CallbackParameter->accountNo)) === '')
+				throw new Exception('No accountNo provided.');
 
 			$parent = null;
 			if(isset($params->CallbackParameter->parentId) && !($parent = AccountEntry::get(trim($params->CallbackParameter->parentId))) instanceof AccountEntry)
@@ -75,9 +77,9 @@ class Controller extends DetailsPageAbstract
 				$description = trim($params->CallbackParameter->description);
 
 			if($parent instanceof AccountEntry)
-				$account = AccountEntry::create(Core::getOrganization(), $parent, $name, $initValue, $description);
+				$account = AccountEntry::create(Core::getOrganization(), $parent, $name, $initValue, $description, $accountNo);
 			else
-				$account = AccountEntry::createRootAccount(Core::getOrganization(), $name, $type, $initValue, $description);
+				$account = AccountEntry::createRootAccount(Core::getOrganization(), $name, $type, $initValue, $description, $accountNo);
 			$results['item'] = $account->getJson();
 			Dao::commitTransaction();
 

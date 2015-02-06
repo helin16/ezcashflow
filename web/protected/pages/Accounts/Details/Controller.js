@@ -12,15 +12,19 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 			.insert({'bottom': new Element('div')
 				.insert({'bottom': new Element('div', {'class': 'form-group'})
 					.insert({'bottom': new Element('label', {'class': 'control-label hidden-xs hidden-sm'}).update('Account Name:') })
-					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The name of the account.', 'name': 'name', 'save-panel': 'name'}) })
+					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The name of the account.', 'name': 'name', 'save-panel': 'name', 'value': (tmp.me._entity.name ? tmp.me._entity.name : '')}) })
+				})
+				.insert({'bottom': new Element('div', {'class': 'form-group'})
+					.insert({'bottom': new Element('label', {'class': 'control-label hidden-xs hidden-sm'}).update('Account Number:') })
+					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The unique account number', 'name': 'accountNo', 'save-panel': 'accountNo', 'value': (tmp.me._entity.accountNo ? tmp.me._entity.accountNo : '')}) })
 				})
 				.insert({'bottom': new Element('div', {'class': 'form-group'})
 					.insert({'bottom': new Element('label', {'class': 'control-label hidden-xs hidden-sm'}).update('Init Value:') })
-					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The initial value or Opening Balance of this account.', 'name': 'initValue', 'save-panel': 'initValue', 'value': 0}) })
+					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The initial value or Opening Balance of this account.', 'name': 'initValue', 'save-panel': 'initValue', 'value': (tmp.me._entity.initValue ? tmp.me._entity.initValue : 0)}) })
 				})
 				.insert({'bottom': new Element('div', {'class': 'form-group'})
 					.insert({'bottom': new Element('label', {'class': 'control-label hidden-xs hidden-sm'}).update('Description:') })
-					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The description of this account', 'save-panel': 'description'}) })
+					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The description of this account', 'save-panel': 'description', 'value': (tmp.me._entity.description ? tmp.me._entity.description : '')}) })
 				})
 				.insert({'bottom': new Element('div', {'class': 'form-group'})
 					.insert({'bottom': (tmp.me._entity.type && tmp.me._entity.type.id ? new Element('input', {'type': 'hidden', 'value': tmp.me._entity.type.id, 'save-panel': 'typeId'}) : '') })
@@ -74,7 +78,11 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 	,_refreshParentWindow(item) {
 		var tmp = {};
 		tmp.me = this;
-
+		if(window.parent) {
+			window.parent.pageJs._showAccounts(item.type, function() {
+				window.parent.pageJs._closeAccDetailsPanel();
+			});
+		}
 		return tmp.me;
 	}
 	,_initForm: function() {
@@ -96,6 +104,13 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 	                    }
                     }
 	        	}
+		        ,'accountNo': {
+		        	validators: {
+		        		notEmpty: {
+		        			message: 'Account is required'
+		        		}
+		        	}
+		        }
 	        	,'initValue': {
 	        		validators: {
                         callback: {

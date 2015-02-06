@@ -26,13 +26,23 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		});
 		return tmp.newDiv;
 	}
-	,_openAccDetailsPanel: function(accId, parentId, typeId) {
+	,_openAccDetailsPanel: function(acc, parent, type) {
 		var tmp = {};
 		tmp.me = this;
 		jQuery.fancybox({
+			'autoScale'     : false,
+			'autoDimensions': false,
+			'fitToView'     : false,
+			'autoSize'      : false,
 			'type'			: 'iframe',
-			'href'			: '/accounts/new.html?blanklayout=1&' + (parentId ? 'parentId=' + parentId : '') + (typeId ? 'typeId=' + typeId : '')
+			'href'			: '/accounts/' + (acc && acc.id ? acc.id : 'new') + '.html?blanklayout=1' + (parent && parent.id ? '&parentId=' + parent.id : '') + (type && type.id ? '&typeId=' + type.id : '')
  		});
+		return tmp.me;
+	}
+	,_closeAccDetailsPanel: function() {
+		var tmp = {};
+		tmp.me = this;
+		jQuery.fancybox.close();
 		return tmp.me;
 	}
 	,_getNewRootAccountEntryPanel: function(type) {
@@ -44,7 +54,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 				.insert({'bottom': new Element('div', {'class': 'glyphicon glyphicon-plus'}) })
 				.insert({'bottom': new Element('span').update(' create a ' + type.name + ' account') })
 				.observe('click', function() {
-					tmp.me._openAccDetailsPanel('', null, type.id);
+					tmp.me._openAccDetailsPanel(null, null, type);
 				})
 			});
 		return tmp.newDiv;
@@ -54,7 +64,34 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.me = this;
 		tmp.tag = acc.id ? 'td' : 'th';
 		tmp.newDiv = new Element('tr', {'class': (acc.id ? 'treegrid-' + acc.id : 'header') })
-			.insert({'bottom': new Element(tmp.tag).update(acc.name) });
+			.store('data', acc)
+			.insert({'bottom': new Element(tmp.tag).update(new Element('abbr', {'title': acc.description}).update(acc.name)) })
+			.insert({'bottom': new Element(tmp.tag).update(acc.accountNo) })
+			.insert({'bottom': new Element(tmp.tag, {'title': 'Opening Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.initValue) : acc.initValue) })
+			.insert({'bottom': new Element(tmp.tag, {'title': 'Running Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.sumValue) : acc.sumValue) })
+			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1 text-right'}).update(!acc.id ? '' :
+				new Element('span', {'class': 'btn-group btn-group-xs visible-lg visible-md visible-sm visible-xs'})
+					.insert({'bottom': new Element('span', {'class': 'btn btn-success', 'title': 'Add an new account under: ' + acc.name})
+						.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-plus'}) })
+						.insert({'bottom': new Element('span', {'class': 'hidden-sm hidden-xs'}).update(' Add') })
+						.observe('click', function() {
+							tmp.me._openAccDetailsPanel(null, acc, null);
+						})
+					})
+					.insert({'bottom': new Element('span', {'class': 'btn btn-success dropdown-toggle', 'data-toggle': 'dropdown'})
+						.insert({'bottom': new Element('span', {'class': 'caret'}) })
+					})
+					.insert({'bottom': new Element('ul', {'class': 'dropdown-menu', 'role': 'menu'})
+						.insert({'bottom': new Element('li', {'title': 'Edit this account: ' + acc.name}).update(new Element('a', {'href': 'javascript: void(0);'})
+							.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-pencil'}) })
+							.insert({'bottom': new Element('span', {'class': 'hidden-sm hidden-xs'}).update(' Edit') })
+						)})
+						.observe('click', function() {
+							tmp.me._openAccDetailsPanel(acc, null, null);
+						})
+					})
+			) })
+			;
 		if(acc.parent && acc.parent.id) {
 			tmp.newDiv.addClassName('treegrid-parent-' + acc.parent.id);
 		}
@@ -63,15 +100,15 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 	,_getAccountsDiv: function(items) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.newDiv = new Element('table', {'class': 'table'})
-			.insert({'bottom': tmp.me._getAccountRow({'name': 'Name'}).wrap(new Element('thead'))})
+		tmp.newDiv = new Element('table', {'class': 'table table-hover'})
+			.insert({'bottom': tmp.me._getAccountRow({'name': 'Name', 'initValue': 'O.B.', 'sumValue': 'R.B.', 'accountNo': 'Acc. No.'}).wrap(new Element('thead'))})
 			.insert({'bottom': tmp.tbody = new Element('tbody')});
 		items.each(function(item) {
 			tmp.tbody.insert({'bottom': tmp.me._getAccountRow(item) });
 		})
 		return tmp.newDiv;
 	}
-	,_showAccounts: function(type) {
+	,_showAccounts: function(type, afterFunc) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.layout = tmp.me._getLayout(type);
@@ -95,6 +132,8 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 						tmp.me._signRandID(tmp.table);
 						jQuery('#' + tmp.table.id).treegrid();
 					}
+					if(typeof(afterFunc) === 'function')
+						afterFunc(tmp.result.items);
 				} catch (e) {
 					tmp.resultDiv.update(tmp.me.getAlertBox('ERR: ', e).addClassName('alert-danger'));
 				}
