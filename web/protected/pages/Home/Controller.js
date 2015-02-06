@@ -69,7 +69,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.me = this;
 		tmp.me._ressultPanelId = ressultPanelId;
 		$(tmp.me._ressultPanelId).update(tmp.layout = tmp.me._getLayout())
-			.store('transForm', new transFormJs().init(tmp.layout.down('.trans-input-panel-wrapper'), tmp.me, jQueryFormSelector));
+			.store('transForm', new TransFormJs().init(tmp.layout.down('.trans-input-panel-wrapper'), tmp.me, jQueryFormSelector));
 		return tmp.me;
 	}
 });

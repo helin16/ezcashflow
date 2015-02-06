@@ -1,16 +1,18 @@
-var transFormJs = new Class.create();
-transFormJs.prototype = {
-	_searchAccUrl: '/ajax/getAccounts'
+var TransFormJs = new Class.create();
+TransFormJs.prototype = {
+	searchCallbackId: ''
 	//constructor
 	,initialize: function() {}
 	,init: function(_inputPanel, _pageJs, _jQueryFormSelector) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._pageJs = _pageJs;
+		tmp.me.searchCallbackId = TransFormJs.searchCallbackId;
 		tmp.me._jQueryFormSelector = _jQueryFormSelector;
 		$(_inputPanel).update(tmp._inputPane = tmp.me._getInputPanel());
 		tmp.me._initFileUploader(tmp._inputPane)
-			._initSelect2(tmp._inputPane)
+			._initSelect2(tmp._inputPane.down('[input-panel="from-acc-id"]'))
+			._initSelect2(tmp._inputPane.down('[input-panel="to-acc-id"]'))
 			._initValidator(tmp.me._jQueryFormSelector);
 		return tmp.me;
 	}
@@ -124,7 +126,7 @@ transFormJs.prototype = {
         ;
 		return tmp.me;
 	}
-	
+
 	,_initFileUploader: function (layout) {
 		var tmp = {};
 		tmp.me = this;
@@ -175,28 +177,26 @@ transFormJs.prototype = {
         	.parent().addClass(jQuery.support.fileInput ? undefined : 'disabled');
 		return tmp.me;
 	}
-	,_initSelect2: function (layout) {
+	,_initSelect2: function (selectBox) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.fromAccBox = layout.down('[input-panel="from-acc-id"]');
-		tmp.me._pageJs._signRandID(tmp.fromAccBox);
-		jQuery('#' + tmp.fromAccBox.id).select2({
-			 minimumInputLength: 1,
+		tmp.me._pageJs._signRandID(selectBox);
+		jQuery('#' + selectBox.id).select2({
+			 minimumInputLength: 3,
 			 multiple: false,
 			 ajax: {
-				 delay: 250,
-				 url: tmp.me._searchAccUrl
-			 }
-		});
-
-		tmp.toAccBox = layout.down('[input-panel="to-acc-id"]');
-		tmp.me._pageJs._signRandID(tmp.toAccBox);
-		jQuery('#' + tmp.toAccBox.id).select2({
-			minimumInputLength: 1,
-			 multiple: false,
-			 ajax: {
-				 delay: 250,
-				 url: tmp.me._searchAccUrl
+				 delay: 250
+				 ,url: window.url
+		         ,type: 'POST'
+	        	 ,data: function (params) {
+	        		 tmp.data = {"searchTxt": params};
+	        		 return {'PRADO_CALLBACK_PARAMETER': JSON.stringify(tmp.data), 'PRADO_CALLBACK_TARGET': tmp.me.searchCallbackId, 'PRADO_PAGESTATE': $F('PRADO_PAGESTATE')}
+	        	 }
+				 ,results: function(data, page, query) {
+					 console.debug(data.resultData.items);
+		    		 return data.resultData && data.resultData.items ? data.resultData.items : [];
+		    	 }
+				 ,cache: true
 			 }
 		});
 		return tmp.me;
