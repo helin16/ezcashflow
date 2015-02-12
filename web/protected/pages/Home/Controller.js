@@ -35,17 +35,34 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.me = this;
 		tmp.newDiv = new Element('div', {'class': 'input-panel'})
 			.insert({'bottom': new Element('ul', {'class': 'nav nav-tabs nav-justified', 'role': 'tablist'})
-				.insert({'bottom': new Element('li', {'class': 'active'})
+				.insert({'bottom': new Element('li', {'class': 'trans-type-switcher'})
+					.store('data', {'fromAccTypeIds': [1, 2], 'toAccTypeIds': [4]})
 					.insert({'bottom': new Element('a', {'href': 'javascript:void(0);'}).update('Spend') })
 				})
-				.insert({'bottom': new Element('li')
+				.insert({'bottom': new Element('li', {'class': 'trans-type-switcher'})
+					.store('data', {'fromAccTypeIds': [3], 'toAccTypeIds': [1]})
 					.insert({'bottom': new Element('a', {'href': 'javascript:void(0);'}).update('Earn') })
 				})
-				.insert({'bottom': new Element('li')
+				.insert({'bottom': new Element('li', {'class': 'trans-type-switcher'})
+					.store('data', {'fromAccTypeIds': [1, 2], 'toAccTypeIds': [1, 2]})
 					.insert({'bottom': new Element('a', {'href': 'javascript:void(0);'}).update('Transfer') })
 				})
 			})
-			.insert({'bottom': new Element('div', {'class': 'trans-input-panel-wrapper'}) });
+			.insert({'bottom': tmp.inputPanelWrapper = new Element('div', {'class': 'trans-input-panel-wrapper'}) });
+		tmp.newDiv.getElementsBySelector('.trans-type-switcher').each(function(item){
+			item.observe('click', function(){
+				tmp.li = $(this);
+				tmp.li.up('.input-panel').getElementsBySelector('.trans-type-switcher').each(function(li){
+					li.removeClassName('active');
+				});
+				tmp.li.addClassName('active');
+				tmp.AccTypeIds = tmp.li.retrieve('data');
+				$(tmp.me._ressultPanelId)
+					.retrieve('transForm')
+					.setAccTypeIds(tmp.AccTypeIds.fromAccTypeIds, tmp.AccTypeIds.toAccTypeIds)
+					.resetForm();
+			});
+		});
 		return tmp.newDiv;
 	}
 	,_getLayout: function() {
@@ -69,7 +86,8 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.me = this;
 		tmp.me._ressultPanelId = ressultPanelId;
 		$(tmp.me._ressultPanelId).update(tmp.layout = tmp.me._getLayout())
-			.store('transForm', new TransFormJs().init(tmp.layout.down('.trans-input-panel-wrapper'), tmp.me, jQueryFormSelector));
+			.store('transForm', new TransFormJs(tmp.me, jQueryFormSelector).render(tmp.layout.down('.trans-input-panel-wrapper')))
+			.down('.trans-type-switcher').click();
 		return tmp.me;
 	}
 });

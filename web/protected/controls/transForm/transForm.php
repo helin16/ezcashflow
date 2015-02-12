@@ -22,7 +22,20 @@ class transForm extends TTemplateControl
 		try {
 			if(!isset($params->CallbackParameter->searchTxt) || ($searchTxt = trim($params->CallbackParameter->searchTxt)) === '')
 				throw new Exception('Please provide some word to search for the account entry.');
-			$accounts = AccountEntry::getAllByCriteria('isSumAcc = 0 and (name like :searchTxt or accountNo like :searchTxt)', array('searchTxt' => '%' . $searchTxt . '%'));
+			if(!isset($params->CallbackParameter->accTypeIds) || count($accTypeIds = ($params->CallbackParameter->accTypeIds)) === 0)
+				throw new Exception('System Error: no Account Types passed in.');
+			$accTypeString = array();
+			$param = array('searchTxt' => '%' . $searchTxt . '%');
+			$where = 'isSumAcc = 0 and (name like :searchTxt or accountNo like :searchTxt)';
+			foreach($accTypeIds as $index => $accTypeId) {
+				$key = "accTypeId" . $index;
+				$accTypeString[] = ':' . $key;
+				$param[$key] = $accTypeId;
+			}
+			if(count($accTypeString) > 0) {
+				$where .= ' AND typeId in (' . implode(', ', $accTypeString) . ')';
+			}
+			$accounts = AccountEntry::getAllByCriteria($where, $param);
 			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
 		} catch(Exception $ex) {
 			$errors[] = $ex->getMessage();
@@ -36,11 +49,34 @@ class transForm extends TTemplateControl
 	{
 		$results = $errors = array();
 		try {
-// 			if(!isset($params->CallbackParameter->searchTxt) || ($searchTxt = trim($params->CallbackParameter->searchTxt)) === '')
-// 				throw new Exception('Please provide some word to search for the account entry.');
-// 			$accounts = AccountEntry::getAllByCriteria('isSumAcc = 0 and (name like :searchTxt or accountNo like :searchTxt)', array('searchTxt' => '%' . $searchTxt . '%'));
-// 			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
+			Dao::beginTransaction();
+			if(!isset($params->CallbackParameter->fromAccId) || !($fromAcc = AccountEntry::get($params->CallbackParameter->fromAccId)) instanceof AccountEntry || intval($fromAcc->getIsSumAcc()) === 1)
+				throw new Exception('From Account is invalid!');
+			if(!isset($params->CallbackParameter->fromAccId) || !($toAcc = AccountEntry::get($params->CallbackParameter->toAccId)) instanceof AccountEntry || intval($toAcc->getIsSumAcc()) === 1)
+				throw new Exception('To Account is invalid!');
+			if($fromAcc->getId() === $toAcc->getId())
+				throw new Exception('Can NOT make a transaction between the same account!');
+			if(!isset($params->CallbackParameter->amount) || !($amount = trim($params->CallbackParameter->amount)) === '')
+				throw new Exception('The amount is invalid!');
+			$comments = "";
+			if(isset($params->CallbackParameter->comments) )
+				$comments = trim($params->CallbackParameter->comments);
+			$transactions = array(
+				Transaction::create($fromAcc, 0, $amount, $comments),
+				Transaction::create($toAcc, 0, $amount, $comments)
+			);
+			//if there is attachments
+			if(isset($params->CallbackParameter->files) && count($files = $params->CallbackParameter->files)  > 0) {
+				foreach($files as $file) {
+					$asset = Asset::registerAsset($file->fileName, $file->filePath);
+					foreach($transactions as $transaction) {
+						$transaction->addAttachment($asset);
+					}
+				}
+			}
+			Dao::commitTransaction();
 		} catch(Exception $ex) {
+			Dao::rollbackTransaction();
 			$errors[] = $ex->getMessage();
 		}
 		$params->ResponseData = StringUtilsAbstract::getJson($results, $errors);

@@ -2,19 +2,36 @@ var TransFormJs = new Class.create();
 TransFormJs.prototype = {
 	searchCallbackId: ''
 	,saveTransCallbackId: ''
+	,_saveSuccFunc: ''
+	,_accTypeIds: {'from': [], 'to': []}
 	//constructor
-	,initialize: function() {}
-	,init: function(_inputPanel, _pageJs, _jQueryFormSelector) {
+	,initialize: function( _pageJs, _jQueryFormSelector) {
+		this._pageJs = _pageJs;
+		this._jQueryFormSelector = _jQueryFormSelector;
+		this.searchCallbackId = TransFormJs.searchCallbackId;
+		this.saveTransCallbackId = TransFormJs.saveTransCallbackId;
+	}
+	,setAccTypeIds: function(fromAccTypeIds, toTypeIds) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.me._pageJs = _pageJs;
-		tmp.me.searchCallbackId = TransFormJs.searchCallbackId;
-		tmp.me.saveTransCallbackId = TransFormJs.saveTransCallbackId;
-		tmp.me._jQueryFormSelector = _jQueryFormSelector;
-		$(_inputPanel).update(tmp._inputPane = tmp.me._getInputPanel());
+		tmp.me._accTypeIds.from = fromAccTypeIds;
+		tmp.me._accTypeIds.to = toTypeIds;
+		return tmp.me;
+	}
+	,setSaveSuccFunc: function (_saveSuccFunc) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.me._saveSuccFunc = _saveSuccFunc;
+		return tmp.me;
+	}
+	,render: function(_inputPanel) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.me._inputPanel = _inputPanel;
+		$(tmp.me._inputPanel).update(tmp._inputPane = tmp.me._getInputPanel());
 		tmp.me._initFileUploader(tmp._inputPane)
-			._initSelect2(tmp._inputPane.down('[input-panel="fromAccId"]'))
-			._initSelect2(tmp._inputPane.down('[input-panel="toAccId"]'))
+			._initSelect2(tmp._inputPane.down('[input-panel="fromAccId"]'), 'from')
+			._initSelect2(tmp._inputPane.down('[input-panel="toAccId"]'), 'to')
 			._initValidator(tmp._inputPane);
 		return tmp.me;
 	}
@@ -31,21 +48,32 @@ TransFormJs.prototype = {
 		tmp.me = this;
 		tmp.me._pageJs._signRandID(btn);
 		tmp.inputPanel = $(btn).up('.trans-input-panel');
-		tmp.data = {};
+		tmp.data = {'files': []};
 		tmp.inputPanel.getElementsBySelector('[input-panel]').each(function(item){
-			tmp.data[item.readAttribute('input-panel')] = $F(item);
+			tmp.fieldName = item.readAttribute('input-panel').strip();
+			if(tmp.fieldName === 'files') {
+				tmp.data['files'].push(item.retrieve('data'));
+			}
+			else
+				tmp.data[tmp.fieldName] = $F(item);
 		});
-		return;
-
 		tmp.me._pageJs.postAjax(tmp.me.saveTransCallbackId, tmp.data, {
 			'onLoading': function() {
+				tmp.me._pageJs._signRandID(tmp.inputPanel)
+				jQuery('#' + tmp.inputPanel.id + ' .msg-div').html('');
 				jQuery('#' + btn.id).button('loading');
 			}
 			,'onSuccess': function(sender, param) {
 				try {
-
+					tmp.result = tmp.me._pageJs.getResp(param, false, true);
+					if(!tmp.result)
+						return;
+					if(typeof(tmp.me._saveSuccFunc) === 'function')
+						tmp.me._saveSuccFunc(tmp.result);
+					tmp.me.resetForm();
+					jQuery('#' + tmp.inputPanel.id + ' .msg-div').html(tmp.me._pageJs.getAlertBox('Saved Successfully!', '').addClassName('alert-success'));
 				} catch (e) {
-
+					jQuery('#' + tmp.inputPanel.id + ' .msg-div').html(tmp.me._pageJs.getAlertBox('Error: ', e).addClassName('alert-danger'));
 				}
 			}
 			,'onComplete': function(){
@@ -72,7 +100,7 @@ TransFormJs.prototype = {
 					, new Element('label', {'class': 'control-label col-sm-2'}).update('Amount:')
 				) })
 				.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
-						.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'comments', 'placeholder': 'Some comments for this transaction'}) })
+						.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'comments', 'placeholder': 'Some comments for this transaction', 'name': 'comments'}) })
 					, new Element('label', {'class': 'control-label col-sm-2'}).update('Comments:')
 				) })
 				.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
@@ -94,6 +122,18 @@ TransFormJs.prototype = {
 				})
 			});
 		return tmp.newDiv;
+	}
+	,resetForm: function() {
+		var tmp = {};
+		tmp.me = this;
+		tmp._inputPane =$(tmp.me._inputPanel);
+		jQuery(tmp.me._jQueryFormSelector).data('bootstrapValidator').resetForm(true);
+		tmp.me._initSelect2(tmp._inputPane.down('[input-panel="fromAccId"]'), 'from')
+			._initSelect2(tmp._inputPane.down('[input-panel="toAccId"]'), 'to');
+		tmp._inputPane.down('.file-uploader-results').update('');
+		tmp._inputPane.down('.file-uploading-results').update('');
+		tmp._inputPane.down('.msg-div').update('');
+		return tmp.me;
 	}
 	,_initValidator: function(_inputPane) {
 		var tmp = {};
@@ -144,6 +184,7 @@ TransFormJs.prototype = {
 	        			}
 	        		}
 	        	}
+	        	,'comments': {}
 	        }
 		})
 		.on('success.form.bv', function(e) {
@@ -158,8 +199,9 @@ TransFormJs.prototype = {
         })
         .on('click', '.save-trans-btn', function(e){
         	jQuery('#' + tmp._inputPane.id + ' .msg-div').html('');
-            if(jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('validate').data('bootstrapValidator').isValid())
+            if(jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('validate').data('bootstrapValidator').isValid()) {
             	tmp.me._saveTrans(tmp._inputPane.down('.save-trans-btn'));
+            }
         })
         .find('[name="from_acc_id"]')
         	.change(function(e) {
@@ -212,7 +254,9 @@ TransFormJs.prototype = {
 	        	tmp.result = data.result.resultData;
 	        	if(!tmp.result || !tmp.result.file || !tmp.result.file.name)
 	        		return;
-	        	tmp.resultPanel.insert({'bottom': new Element('div', {'class': 'btn-group', 'input-panel': 'files'}).setStyle('margin-right: 4px; margin-bottom: 4px;').store('file', tmp.result)
+	        	tmp.resultPanel.insert({'bottom': new Element('div', {'class': 'btn-group', 'input-panel': 'files'})
+		        	.store('data', tmp.result)
+	        		.setStyle('margin-right: 4px; margin-bottom: 4px;')
 		        	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'}).update(tmp.result.file.name) })
 		        	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'})
 			        	.insert({'bottom': new Element('span', {'class': 'text-danger'})
@@ -232,7 +276,7 @@ TransFormJs.prototype = {
         	.parent().addClass(jQuery.support.fileInput ? undefined : 'disabled');
 		return tmp.me;
 	}
-	,_initSelect2: function (selectBox) {
+	,_initSelect2: function (selectBox, type) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._pageJs._signRandID(selectBox);
@@ -241,25 +285,42 @@ TransFormJs.prototype = {
 			 multiple: false,
 			 ajax: {
 				 delay: 250
-				 ,url: window.url
+				 ,url: document.URL
 		         ,type: 'POST'
 	        	 ,data: function (params) {
-	        		 tmp.data = {"searchTxt": params};
+	        		 tmp.data = {"searchTxt": params, 'accTypeIds': tmp.me._accTypeIds[type]};
 	        		 return {'PRADO_CALLBACK_PARAMETER': JSON.stringify(tmp.data), 'PRADO_CALLBACK_TARGET': tmp.me.searchCallbackId, 'PRADO_PAGESTATE': $F('PRADO_PAGESTATE')}
 	        	 }
 				 ,results: function(data, page, query) {
-					 tmp.result = [];
+					 tmp.resultMap = {};
 					 if(data.resultData && data.resultData.items) {
 						 data.resultData.items.each(function(item) {
-							 tmp.result.push({'id': item.id, 'text': item.breadCrumbs.join(' / '), 'data': item})
+							 tmp.typeId = item.type.id;
+							 if(!tmp.resultMap[tmp.typeId]) {
+								 tmp.resultMap[tmp.typeId] = {'text': item.type.name, 'children': []};
+							 }
+							 tmp.resultMap[tmp.typeId]['children'].push({'id': item.id, 'text': item.breadCrumbs.join(' / ') , 'data': item})
 						 });
 					 }
+					 tmp.result = [];
+					 $H(tmp.resultMap).each(function(val){
+						 tmp.result.push(val.value);
+					 });
 		    		 return { 'results' : tmp.result };
 		    	 }
 				 ,cache: true
 			 }
-			,formatResult :  function (ex) {
-				return '<div>' + ex.data.breadCrumbs.join(' / ') + '<span class="badge pull-right">' + + '</span></div>';
+			,
+			formatResult : function(result, label, query, escapeMarkup) {
+				tmp.markup = [];
+				tmp.option = this.text(result);
+				if(!result.data)
+					return tmp.option;
+
+				return '<div>' + tmp.option + '<span class="badge pull-right">' + tmp.me._pageJs.getCurrency(result.data.sumValue) + '</span></div>';
+			}
+			,formatNoMatches: function() {
+				return '<div><a href="javascript: void(0);" target="_BLANK" onclick="window.open(' + "'/accounts.html'" + ');">No Accounts Found, create one?</a></div>';
 			}
 		});
 		return tmp.me;

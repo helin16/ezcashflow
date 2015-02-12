@@ -23,19 +23,6 @@ abstract class StringUtilsAbstract
 	    return strtolower(substr($string, 0, 1)) . substr($string, 1);
 	}
 	/**
-	 * Getting the CDKey for the supplier
-	 *
-	 * @param string $key
-	 * @param string $username
-	 * @param string $libCode
-	 *
-	 * @return string
-	 */
-	public static function getCDKey($key, $username, $libCode)
-	{
-		return trim(md5($key . $username . $libCode));
-	}
-	/**
 	 * Getting a random key
 	 *
 	 * @param string $salt The salt of making one string
