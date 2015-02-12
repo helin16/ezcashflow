@@ -12,10 +12,10 @@
 			</div>
 			<div class="collapse navbar-collapse" id="top-menu-div">
 				<ul class="nav navbar-nav navbar-right top-menu" >
-					<li><a href="/#header">Home</a></li>
-					<li><a href="/#why">Why</a></li>
-					<li><a href="/#about">About</a></li>
-					<li><a href="/#contactus">Contact</a></li>
+					<li><a href="/">Home</a></li>
+					<li><a href="/accounts.html">Accounts</a></li>
+					<li><a href="/properties.html">Properties</a></li>
+					<li><a href="/logout.html">Logout</a></li>
 				</ul>
 			</div>
 		</div>

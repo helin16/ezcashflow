@@ -332,7 +332,7 @@ class AccountEntry extends BaseEntityAbstract
 
     	$where ='accountNo = ? and organizationId = ?';
     	$params = array(trim($this->getAccountNo()), $this->getOrganization()->getId());
-    	if(trim($this->getId()) === '') {
+    	if(trim($this->getId()) !== '') {
 			$where .= ' AND id != ?';
 	    	$params[] = trim($this->getId());
     	}
@@ -340,6 +340,8 @@ class AccountEntry extends BaseEntityAbstract
     		throw new EntityException('There is such an accountNo already: ' . $this->getAccountNo());
     	if(substr(trim($this->getAccountNo()), 0, 1) !== trim($this->getType()->getId()))
     		throw new EntityException('The account number should start with: '. $this->getType()->getId() . ', but got: ' . $this->getAccountNo());
+    	if(intval($this->getIsSumAcc()) === true && Transaction::countByCriteria('accountEntryId = ?', array($this->getId())) > 0)
+    		throw new EntityException('There are transactions against this account, it can NOT be a Summary Account!');
     }
     /**
      * (non-PHPdoc)
@@ -383,6 +385,7 @@ class AccountEntry extends BaseEntityAbstract
     {
     	DaoMap::begin($this, 'acc_entry');
     	DaoMap::setStringType('name', 'varchar', 100);
+    	DaoMap::setBoolType('isSumAcc');
     	DaoMap::setIntType('accountNo', 'int', 10);
     	DaoMap::setManyToOne('type', 'AccountType', 'acc_entry_type');
     	DaoMap::setManyToOne('organization', "Organization", 'acc_entry_org');
@@ -397,6 +400,7 @@ class AccountEntry extends BaseEntityAbstract
     	DaoMap::createIndex('initValue');
     	DaoMap::createIndex('path');
     	DaoMap::createIndex('accountNo');
+    	DaoMap::createIndex('isSumAcc');
     	DaoMap::commit();
     }
     /**
@@ -430,6 +434,7 @@ class AccountEntry extends BaseEntityAbstract
     		->setOrganization($org)
     		->setType($type)
     		->setInitValue($initValue)
+    		->setIsSumAcc(true)
     		->setDescription(trim($description))
     		->setAccountNo(trim($accountNo))
     		->save();
@@ -445,13 +450,14 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public static function create(Organization $org, AccountEntry $parent, $name, $initValue = 0, $description = '', $accountNo = '')
+    public static function create(Organization $org, AccountEntry $parent, $name, $isSumAcc = false, $initValue = 0, $description = '', $accountNo = '')
     {
     	$item = new AccountEntry();
     	return $item->setName(trim($name))
     		->setOrganization($org)
     		->setParent($parent)
     		->setInitValue($initValue)
+    		->setIsSumAcc($isSumAcc)
     		->setDescription(trim($description))
     		->setType($parent->getType())
     		->setAccountNo(trim($accountNo))
