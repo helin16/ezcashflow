@@ -14,6 +14,7 @@
 				<ul class="nav navbar-nav navbar-right top-menu" >
 					<li><a href="/">Home</a></li>
 					<li><a href="/accounts.html">Accounts</a></li>
+					<li><a href="/transactions.html">Transactions</a></li>
 					<li><a href="/properties.html">Properties</a></li>
 					<li><a href="/logout.html">Logout</a></li>
 				</ul>

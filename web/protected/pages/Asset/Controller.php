@@ -72,6 +72,8 @@ class Controller extends TService
 	    	$response = $upload_handler->get_response();
 	    	if(count($response) === 0)
 	    		throw new Exception('System Error: can NOT get the response back.');
+	    	if(!isset($response['files'][0]) || !isset($response['files'][0]->name))
+	    		throw new Exception('System Error: File failed to upload.');
 	    	$filePath = $dir . ($filename = $response['files'][0]->name);
 	    	if(!is_file($filePath))
 	    		throw new Exception('System Error: file not exsits:' . $filePath);

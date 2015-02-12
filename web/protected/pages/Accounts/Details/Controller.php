@@ -65,7 +65,9 @@ class Controller extends DetailsPageAbstract
 				throw new Exception('No name provided.');
 			if(!isset($params->CallbackParameter->accountNo) || ($accountNo = trim($params->CallbackParameter->accountNo)) === '')
 				throw new Exception('No accountNo provided.');
-
+			$isSumAcc = false;
+			if(isset($params->CallbackParameter->isSumAcc))
+				$isSumAcc = intval($params->CallbackParameter->isSumAcc) === 1 ? true : false;
 			$parent = null;
 			if(isset($params->CallbackParameter->parentId) && !($parent = AccountEntry::get(trim($params->CallbackParameter->parentId))) instanceof AccountEntry)
 				throw new Exception('Invalid parent account provided.');
@@ -76,10 +78,21 @@ class Controller extends DetailsPageAbstract
 			if(isset($params->CallbackParameter->description))
 				$description = trim($params->CallbackParameter->description);
 
-			if($parent instanceof AccountEntry)
-				$account = AccountEntry::create(Core::getOrganization(), $parent, $name, $initValue, $description, $accountNo);
+			if(isset($params->CallbackParameter->accId)) {
+				$accountId = trim($params->CallbackParameter->accId);
+				if(!($account = AccountEntry::get($accountId)) instanceof AccountEntry)
+					throw new Exception('Invalid Account: ' . $accountId);
+				$account->setDescription($description)
+					->setName($name)
+					->setInitValue($initValue)
+					->setAccountNo($accountNo)
+					->setIsSumAcc($isSumAcc)
+					->save();
+			}
+			else if($parent instanceof AccountEntry)
+				$account = AccountEntry::create(Core::getOrganization(), $parent, $name, $isSumAcc, $initValue, $description, $accountNo);
 			else
-				$account = AccountEntry::createRootAccount(Core::getOrganization(), $name, $type, $initValue, $description, $accountNo);
+				$account = AccountEntry::createRootAccount(Core::getOrganization(), $name, $type, $isSumAcc, $initValue, $description, $accountNo);
 			$results['item'] = $account->getJson();
 			Dao::commitTransaction();
 

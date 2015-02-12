@@ -322,7 +322,7 @@ class AccountEntry extends BaseEntityAbstract
     		}
     	} else {
 	    	if($this->getParent() instanceof AccountEntry) {
-	    		if($this->getParent()->getIsSumAcc())
+	    		if(intval($this->getParent()->getIsSumAcc()) === 0)
 	    			throw new EntityException('You can ONLY create an account under a summary account.');
 	    		$this->setRoot($this->getParent()->getRoot())
 	    			->setType($this->getParent()->getType())
@@ -362,6 +362,17 @@ class AccountEntry extends BaseEntityAbstract
     		self::updateByCriteria('path = ?', 'id = ?', array($path, $this->getId()));
     	}
     }
+    /**
+     * The running balance
+     *
+     * @return number
+     */
+    public function getSumValue()
+    {
+		$sum = $this->getInitValue();
+		//TODO: the running balance here!!!!
+		return $sum;
+    }
 	/**
      * (non-PHPdoc)
      * @see BaseEntityAbstract::getJson()
@@ -374,6 +385,7 @@ class AccountEntry extends BaseEntityAbstract
     		$array['breadCrumbs'] = $this->getBreadCrumbs();
     		$array['parent'] = $this->getParent() instanceof AccountEntry ? $this->getParent()->getJson() : null;
     		$array['type'] = $this->getType() instanceof AccountType ? $this->getType()->getJson() : null;
+    		$array['sumValue'] = $this->getSumValue();
     	}
     	return parent::getJson($array, $reset);
     }
@@ -427,14 +439,14 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public static function createRootAccount(Organization $org, $name, AccountType $type, $initValue = 0, $description = '', $accountNo = '')
+    public static function createRootAccount(Organization $org, $name, AccountType $type, $isSumAcc = true, $initValue = 0, $description = '', $accountNo = '')
     {
     	$item = new AccountEntry();
     	return $item->setName(trim($name))
     		->setOrganization($org)
     		->setType($type)
     		->setInitValue($initValue)
-    		->setIsSumAcc(true)
+    		->setIsSumAcc($isSumAcc)
     		->setDescription(trim($description))
     		->setAccountNo(trim($accountNo))
     		->save();

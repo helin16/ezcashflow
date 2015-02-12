@@ -12,7 +12,7 @@ class transForm extends TTemplateControl
 			$clientScript = $this->getPage()->getClientScript();
 			$clientScript->registerPradoScript('ajax');
 			$clientScript->registerScriptFile('transForm.js', $this->publishAsset(get_class($this) . '.js'));
-			$clientScript->registerBeginScript('transForm.init.js', 'TransFormJs.searchCallbackId="' . $this->searchAccountsBtn->getUniqueID() . '";');
+			$clientScript->registerBeginScript('transForm.init.js', 'TransFormJs.searchCallbackId="' . $this->searchAccountsBtn->getUniqueID() . '";TransFormJs.saveTransCallbackId="' . $this->saveTransBtn->getUniqueID() . '";');
 		}
 	}
 
@@ -22,7 +22,7 @@ class transForm extends TTemplateControl
 		try {
 			if(!isset($params->CallbackParameter->searchTxt) || ($searchTxt = trim($params->CallbackParameter->searchTxt)) === '')
 				throw new Exception('Please provide some word to search for the account entry.');
-			$accounts = AccountEntry::getAllByCriteria('name like :searchTxt or accountNo like :searchTxt', array('searchTxt' => '%' . $searchTxt . '%'));
+			$accounts = AccountEntry::getAllByCriteria('isSumAcc = 0 and (name like :searchTxt or accountNo like :searchTxt)', array('searchTxt' => '%' . $searchTxt . '%'));
 			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
 		} catch(Exception $ex) {
 			$errors[] = $ex->getMessage();
@@ -30,5 +30,19 @@ class transForm extends TTemplateControl
 		header('Content-Type: application/json');
 		echo StringUtilsAbstract::getJson($results, $errors);
 		die();
+	}
+
+	public function saveTrans($sender, $params)
+	{
+		$results = $errors = array();
+		try {
+// 			if(!isset($params->CallbackParameter->searchTxt) || ($searchTxt = trim($params->CallbackParameter->searchTxt)) === '')
+// 				throw new Exception('Please provide some word to search for the account entry.');
+// 			$accounts = AccountEntry::getAllByCriteria('isSumAcc = 0 and (name like :searchTxt or accountNo like :searchTxt)', array('searchTxt' => '%' . $searchTxt . '%'));
+// 			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
+		} catch(Exception $ex) {
+			$errors[] = $ex->getMessage();
+		}
+		$params->ResponseData = StringUtilsAbstract::getJson($results, $errors);
 	}
 }

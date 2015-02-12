@@ -27,6 +27,12 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 					.insert({'bottom': new Element('input', {'class': 'form-control', 'placeholder': 'The description of this account', 'save-panel': 'description', 'value': (tmp.me._entity.description ? tmp.me._entity.description : '')}) })
 				})
 				.insert({'bottom': new Element('div', {'class': 'form-group'})
+					.insert({'bottom': new Element('label')
+						.insert({'bottom': new Element('span').update('Is a Summary Account: ') })
+						.insert({'bottom': new Element('input', {'type': 'checkbox', 'save-panel': 'isSumAcc', 'checked': tmp.me._entity.isSumAcc}) })
+					})
+				})
+				.insert({'bottom': new Element('div', {'class': 'form-group'})
 					.insert({'bottom': (tmp.me._entity.type && tmp.me._entity.type.id ? new Element('input', {'type': 'hidden', 'value': tmp.me._entity.type.id, 'save-panel': 'typeId'}) : '') })
 					.insert({'bottom': (tmp.me._entity.parent && tmp.me._entity.parent.id ? new Element('input', {'type': 'hidden', 'value': tmp.me._entity.parent.id, 'save-panel': 'parentId'}) : '') })
 					.insert({'bottom': new Element('button', {'type': 'submit', 'class': 'save-panel-submit-btn btn btn-primary col-xs-12 col-sm-6 col-md-4 col-lg-3'}).update('save') })
@@ -45,6 +51,11 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 			tmp.field = item.readAttribute('save-panel');
 			tmp.data[tmp.field] = (tmp.field === 'initValue' ? tmp.me.getValueFromCurrency($F(item)) : $F(item));
 		});
+		//editing
+		if(tmp.me._entity.id && !tmp.me._entity.id.blank()) {
+			tmp.data.accId = tmp.me._entity.id;
+		}
+
 		tmp.loadingDiv = tmp.me._getLoadingDiv().addClassName("panel-body");
 		tmp.me.postAjax(tmp.me.getCallbackId('saveItem'), tmp.data, {
 			'onLoading': function() {

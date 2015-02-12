@@ -67,6 +67,9 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 			.store('data', acc)
 			.insert({'bottom': new Element(tmp.tag).update(new Element('abbr', {'title': acc.description}).update(acc.name)) })
 			.insert({'bottom': new Element(tmp.tag).update(acc.accountNo) })
+			.insert({'bottom': new Element(tmp.tag).update(!acc.id ? acc.isSumAcc :
+				(acc.isSumAcc === true ? new Element('span', {'class': 'text-success'}).update(new Element('span', {'class': 'glyphicon glyphicon-ok'})) : '')
+			) })
 			.insert({'bottom': new Element(tmp.tag, {'title': 'Opening Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.initValue) : acc.initValue) })
 			.insert({'bottom': new Element(tmp.tag, {'title': 'Running Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.sumValue) : acc.sumValue) })
 			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1 text-right'}).update(!acc.id ? '' :
@@ -101,7 +104,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		tmp.newDiv = new Element('table', {'class': 'table table-hover'})
-			.insert({'bottom': tmp.me._getAccountRow({'name': 'Name', 'initValue': 'O.B.', 'sumValue': 'R.B.', 'accountNo': 'Acc. No.'}).wrap(new Element('thead'))})
+			.insert({'bottom': tmp.me._getAccountRow({'name': 'Name', 'initValue': 'O.B.', 'sumValue': 'R.B.', 'accountNo': 'Acc. No.', 'isSumAcc': 'Sum Acc?'}).wrap(new Element('thead'))})
 			.insert({'bottom': tmp.tbody = new Element('tbody')});
 		items.each(function(item) {
 			tmp.tbody.insert({'bottom': tmp.me._getAccountRow(item) });
