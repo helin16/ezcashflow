@@ -18,6 +18,7 @@ class Controller extends BackEndPageAbstract
 		$js = parent::_getEndJs();
 		$js .= 'pageJs';
 		$js .= '.setCallbackId("getLatestTrans", "' . $this->getLatestTransBtn->getUniqueID() . '")';
+		$js .= '.setCallbackId("getSummary", "' . $this->getSummaryBtn->getUniqueID() . '")';
 		$js .= '.init("page-wrapper", "#' . $this->getForm()->getClientID() . '");';
 		return $js;
 	}
@@ -34,6 +35,17 @@ class Controller extends BackEndPageAbstract
 		try {
 			$transactions = Transaction::getAll(true, 1, 10, array('trans.id' => 'desc'));
 			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $transactions);
+		} catch(Exception $ex) {
+			$errors[] = $ex->getMessage();
+		}
+		$params->ResponseData = StringUtilsAbstract::getJson($results, $errors);
+	}
+	public function getSummary($sender, $params)
+	{
+		$results = $errors = array();
+		try {
+			$results['items'] = array();
+
 		} catch(Exception $ex) {
 			$errors[] = $ex->getMessage();
 		}
