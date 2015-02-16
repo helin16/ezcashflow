@@ -8,6 +8,8 @@
  */
 class Transaction extends BaseEntityAbstract
 {
+	const TYPE_CREDIT = 'CREDIT';
+	const TYPE_DEBIT = 'DEBIT';
 	/**
 	 * AccountEntry
 	 * @var AccountEntry
@@ -18,13 +20,13 @@ class Transaction extends BaseEntityAbstract
 	 *
 	 * @var double
 	 */
-	private $credit = 0;
+	private $credit = null;
 	/**
 	 * The debit amount
 	 *
 	 * @var double
 	 */
-	private $debit = 0;
+	private $debit = null;
 	/**
 	 * The description for transcation
 	 *
@@ -155,12 +157,69 @@ class Transaction extends BaseEntityAbstract
 	 */
 	public function preSave()
 	{
-		if(intval($this->getCredit()) !== 0 && intval($this->getDebit()) !== 0)
+		if($this->getCredit() === null && $this->getDebit() === null)
+			throw new EntityException('One value needed: credit or debit!');
+		if($this->getCredit() !== null && $this->getDebit() !== null)
 			throw new EntityException('You can NOT save this transaction with both credit or debit at the same time, diffrent transaction needed!');
 		if(trim(self::$_groupId) === '')
 			self::$_groupId = StringUtilsAbstract::getRandKey(__CLASS__);
 		if(trim($this->getGroupId()) === '')
 			$this->setGroupId(self::$_groupId);
+	}
+	/**
+	 * (non-PHPdoc)
+	 * @see BaseEntityAbstract::postSave()
+	 */
+	public function postSave()
+	{
+		if(intval($this->getActive()) === 0) {
+			self::updateByCriteria('active = 0', 'groupId = ?', array(trim($this->getGroupId())));
+		}
+	}
+	/**
+	 * Getting the type of the transaction
+	 *
+	 * @return string
+	 */
+	public function getType()
+	{
+		return $this->getCredit() === null ? self::TYPE_DEBIT : self::TYPE_CREDIT;
+	}
+	/**
+	 * Getting signed value of the transaction base on the account
+	 *
+	 * @return number
+	 */
+	public function getValue()
+	{
+		if(!$this->getAccountEntry() instanceof AccountEntry || !$this->getAccountEntry()->getType() instanceof AccountType)
+			return null;
+		$value = ($this->getCredit() === null ? $this->getDebit() : $this->getCredit());
+		$type = $this->getType();
+		if($this->getType() === self::TYPE_CREDIT) { //credit
+			if(in_array($this->getAccountEntry()->getType()->getId(), array(AccountType::ID_ASSET)))
+				return 0 - $value;
+			return $value;
+		} else { //debit
+			if(in_array($this->getAccountEntry()->getType()->getId(), array(AccountType::ID_ASSET, AccountType::ID_EXPENSE)))
+				return $value;
+			return 0 - $value;
+		}
+	}
+	/**
+	 * (non-PHPdoc)
+	 * @see BaseEntityAbstract::getJson()
+	 */
+	public function getJson($extra = '', $reset = false)
+	{
+		$array = array();
+		if(!$this->isJsonLoaded($reset))
+		{
+			$array['accountEntry'] = $this->getAccountEntry()->getJson();
+			$array['value'] = $this->getValue();
+			$array['type'] = $this->getType();
+		}
+		return parent::getJson($array, $reset);
 	}
     /**
      * (non-PHPdoc)
@@ -170,8 +229,8 @@ class Transaction extends BaseEntityAbstract
     {
     	DaoMap::begin($this, 'trans');
     	DaoMap::setManyToOne('accountEntry', 'AccountEntry', 'trans_acc');
-    	DaoMap::setIntType('credit', 'double', '10,4', false);
-    	DaoMap::setIntType('debit', 'double', '10,4', false);
+    	DaoMap::setIntType('credit', 'double', '10,4', false, true);
+    	DaoMap::setIntType('debit', 'double', '10,4', false, true);
     	DaoMap::setStringType('description', 'varchar', 255);
     	parent::__loadDaoMap();
 
@@ -186,7 +245,7 @@ class Transaction extends BaseEntityAbstract
      *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public static function create(AccountEntry $acc, $credit = 0, $debit = 0, $description = '')
+    public static function create(AccountEntry $acc, $credit = null, $debit = null, $description = '')
     {
     	$item = new Transaction();
     	return $item->setAccountEntry($acc)

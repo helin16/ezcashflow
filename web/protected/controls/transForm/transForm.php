@@ -62,8 +62,8 @@ class transForm extends TTemplateControl
 			if(isset($params->CallbackParameter->comments) )
 				$comments = trim($params->CallbackParameter->comments);
 			$transactions = array(
-				Transaction::create($fromAcc, 0, $amount, $comments),
-				Transaction::create($toAcc, 0, $amount, $comments)
+				Transaction::create($fromAcc, $amount, null, $comments),
+				Transaction::create($toAcc, null, $amount, $comments)
 			);
 			//if there is attachments
 			if(isset($params->CallbackParameter->files) && count($files = $params->CallbackParameter->files)  > 0) {

@@ -12,16 +12,16 @@
 						<div class="msg-div"></div>
 						<div class="form-group" title="Your email address">
 							<div class="input-group">
-								<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span> 
-								<input login-panel="email" name="login_email" type="email" class="form-control login-form login-page-form" placeholder="Your email / username" submit-btn="#loginbtn" />
+								<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+								<input login-panel="email" name="login_email" type="email" class="form-control login-form login-page-form" placeholder="Your email" submit-btn="#loginbtn" />
 							</div>
-						</div> 
+						</div>
 						<div class="form-group" title="Your password">
 							<div class="input-group">
-								<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span> 
+								<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
 								<input login-panel="password" name="login_pass" type="password" class="form-control login-form login-page-form" placeholder="Password" submit-btn="#loginbtn"/>
 							</div>
-						</div> 
+						</div>
 						<div class="form-group">
 							<a href="javascript: void(0);" onclick="pageJs.showRetrievePassPanel(true);">Forgot Password?</a>
 							<button id="loginbtn" class="btn btn-md btn-primary pull-right col-sm-4" type="submit" data-loading-text="Signing in...">Sign in</button>
@@ -38,7 +38,7 @@
 						<div class="msg-div"></div>
 						<div class="form-group" title="Your email address">
 							<div class="input-group">
-								<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span> 
+								<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
 								<input name="retrieve_pass_email" type="email" class="form-control retrieve-pass-form login-page-form", pass-retrieve-panel="email" placeholder="Your email that you signed up with." submit-btn="#retrievebtn"/>
 							</div>
 						</div>

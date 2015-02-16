@@ -9,6 +9,10 @@ html,body,.main-form {
 	line-height: 175%;
 }
 
+a {
+	outline: none;
+}
+
 .main-form>#mainbody {
 	min-height: 86%;
 }

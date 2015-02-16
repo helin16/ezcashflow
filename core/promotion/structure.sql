@@ -54,8 +54,8 @@ DROP TABLE IF EXISTS `transaction`;
 CREATE TABLE `transaction` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 	`accountEntryId` int(10) unsigned NOT NULL DEFAULT 0,
-	`credit` double(10,4) NOT NULL DEFAULT 0,
-	`debit` double(10,4) NOT NULL DEFAULT 0,
+	`credit` double(10,4) NULL DEFAULT 0,
+	`debit` double(10,4) NULL DEFAULT 0,
 	`description` varchar(255) NOT NULL DEFAULT '',
 	`active` bool NOT NULL DEFAULT 1,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
