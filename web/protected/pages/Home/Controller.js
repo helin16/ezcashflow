@@ -13,7 +13,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 			.insert({'bottom': new Element(tmp.tag).update(row.title)});
 		if(row.dateRange) {
 			$H(row.dateRange).each(function(item){
-				tmp.popoverText = (item.value.from.toDateString ? item.value.from.toDateString() : '') + (item.value.to.toDateString ? '~' + item.value.to.toDateString() : '');
+				tmp.popoverText = (item.value.from.toLocaleString ? item.value.from.toLocaleString() : '') + (item.value.to.toLocaleString ? '~' + item.value.to.toLocaleString() : '');
 				if(tmp.isTitle === true) {
 					tmp.newRow.insert({'bottom': new Element(tmp.tag, {'class': 'text-uppercase', 'title': tmp.popoverText}).update(item.key)});
 				} else {
@@ -23,21 +23,39 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		}
 		return tmp.newRow;
 	}
+	,_getDateRange: function() {
+		var tmp = {};
+		tmp.me = this;
+		tmp.dateRange = {};
+		tmp.now = new Date();
+
+		tmp.beginOfToday = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate());
+		tmp.endOfToday = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate(), 23, 59, 59);
+		tmp.dateRange.today = {'from': tmp.beginOfToday, 'to': tmp.endOfToday};
+
+		tmp.beginOfWeek = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate() - tmp.now.getDay() + (tmp.now.getDay() == 0 ? -6:1));
+		tmp.endOfWeek = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate() + 7 - tmp.now.getDay(), 23, 59, 59);
+		tmp.dateRange.week = {'from': tmp.beginOfWeek, 'to': tmp.endOfWeek};
+
+		tmp.beginOfMonth = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), 1);
+		tmp.endOfMonth = new Date(tmp.now.getFullYear(), tmp.now.getMonth() + 1, 0, 23, 59, 59);
+		tmp.dateRange.month = {'from': tmp.beginOfMonth, 'to': tmp.endOfMonth};
+
+		tmp.beginOfYear = new Date(tmp.now.getFullYear(), 0, 1);
+		tmp.endOfYear = new Date(tmp.now.getFullYear(), 11, 31, 23, 59, 59);
+		tmp.dateRange.year = {'from': tmp.beginOfYear, 'to': tmp.endOfYear};
+
+		tmp.beginOfAll = new Date(tmp.now.getFullYear() - 10, 0, 1);
+		tmp.endOfAll = new Date(tmp.now.getFullYear(), 11, 31, 23, 59, 59);
+		tmp.dateRange.total = {'from': tmp.beginOfAll, 'to': tmp.endOfAll};
+		return tmp.dateRange;
+	}
 	,_getOverviewData: function(resultDiv) {
 		var tmp = {};
 		tmp.me = this;
 		tmp._resultDiv = resultDiv.down('.list-result');
 		tmp._loadingDiv = tmp.me._getLoadingDiv();
-		tmp.dateRange = {};
-		tmp.now = new Date();
-		tmp.dateRange.today = {'from': tmp.now, 'to': tmp.now};
-		tmp.dateRange.week = {'from': '', 'to': ''};
-		tmp.beginOfMonth = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), 1);
-		tmp.endOfMonth = new Date(tmp.now.getFullYear(), tmp.now.getMonth() + 1, 0);
-		tmp.dateRange.month = {'from': tmp.beginOfMonth, 'to': tmp.endOfMonth};
-		tmp.dateRange.year = {'from': '', 'to': ''};
-		tmp.dateRange.total = {'from': '', 'to': ''};
-
+		tmp.dateRange = tmp.me._getDateRange();
 		tmp.me.postAjax(tmp.me.getCallbackId('getSummary'), tmp.dateRange, {
 			'onLoading': function() {
 				if(tmp._resultDiv.hasClassName('table-responsive'))
