@@ -32,13 +32,17 @@ class Controller extends BackEndPageAbstract
 		$js .= ';';
 		return $js;
 	}
+	/**
+	 * Getting the transactions
+	 *
+	 * @param unknown $sender
+	 * @param unknown $param
+	 */
 	public function getTransactions($sender, $param)
 	{
 		$results = $errors = array ();
 		try {
-			$transactions = Transaction::getAll ( true, 1, 10, array (
-					'trans.id' => 'desc'
-			) );
+			$transactions = Transaction::getAll ( true, 1, 10, array ('trans.id' => 'desc') );
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 		} catch ( Exception $ex ) {
 			$errors [] = $ex->getMessage ();
