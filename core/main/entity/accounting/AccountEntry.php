@@ -367,10 +367,22 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return number
      */
-    public function getSumValue()
+    public function getSumValue($resetCache = false)
     {
-		$sum = $this->getInitValue();
-		//TODO: the running balance here!!!!
+    	$sum = $this->getInitValue();
+    	if(trim($this->getId()) === '')
+    		return $sum;
+    	$key = md5('SumValue' . $this->getId());
+    	if(self::getCache($key) && $resetCache !== true)
+    		return self::getCache($key);
+
+		$transactions = Transaction::getAllByCriteria('accountEntryId = ?', array($this->getId()));
+		foreach($transactions as $trans)
+			$sum += $trans->getValue();
+		$childrenAccounts = self::getAllByCriteria('parentId = ?', array($this->getId()));
+		foreach($childrenAccounts as $acc)
+			$sum += $acc->getSumValue();
+		self::addCache($key, $sum);
 		return $sum;
     }
 	/**

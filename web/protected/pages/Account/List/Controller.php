@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the home page
+ * This is the account entry listing page
  *
  * @package    Web
  * @subpackage Controller
@@ -8,6 +8,12 @@
  */
 class Controller extends BackEndPageAbstract
 {
+	/**
+	 * The menu item for the top menu
+	 *
+	 * @var string
+	 */
+	protected $_menuItem = 'accountentry.list';
 	/**
 	 * Getting The end javascript
 	 *
@@ -18,7 +24,10 @@ class Controller extends BackEndPageAbstract
 		$js = parent::_getEndJs();
 		$types = array_map(create_function('$a', 'return $a->getJson();'), AccountType::getAll());
 		$js .= 'pageJs.setCallbackId("getAccounts", "' . $this->getAccountsBtn->getUniqueID() . '")';
-		$js .= '.init("page-wrapper", ' . json_encode($types) . ');';
+		$js .= '.init("page-wrapper", ' . json_encode($types);
+		if(isset($_REQUEST['typeid']) && ($firstShowAccType = AccountType::get($_REQUEST['typeid'])) instanceof AccountType)
+			$js .= ', ' . json_encode($firstShowAccType->getJson());
+		$js .= ');';
 		return $js;
 	}
 	public function getAccounts($sender, $params)

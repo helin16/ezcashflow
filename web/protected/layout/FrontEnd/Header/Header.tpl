@@ -12,10 +12,10 @@
 			</div>
 			<div class="collapse navbar-collapse" id="top-menu-div">
 				<ul class="nav navbar-nav navbar-right top-menu" >
-					<li><a href="/">Home</a></li>
-					<li><a href="/accounts.html">Accounts</a></li>
-					<li><a href="/transactions.html">Transactions</a></li>
-					<li><a href="/properties.html">Properties</a></li>
+					<li class="<%= $this->isActive('home') === true ? 'active' : '' %>"><a href="/">Home</a></li>
+					<li class="<%= $this->isActive('accountentry.list') === true ? 'active' : '' %>"><a href="/accounts.html">Accounts</a></li>
+					<li class="<%= $this->isActive('transaction.list') === true ? 'active' : '' %>"><a href="/transactions.html">Transactions</a></li>
+					<li class="<%= $this->isActive('property.list') === true ? 'active' : '' %>"><a href="/properties.html">Properties</a></li>
 					<li><a href="/logout.html">Logout</a></li>
 				</ul>
 			</div>

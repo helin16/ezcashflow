@@ -66,9 +66,9 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.newDiv = new Element('tr', {'class': (acc.id ? 'treegrid-' + acc.id : 'header') })
 			.store('data', acc)
 			.insert({'bottom': new Element(tmp.tag).update(new Element('abbr', {'title': acc.description}).update(acc.name)) })
-			.insert({'bottom': new Element(tmp.tag).update(acc.accountNo) })
-			.insert({'bottom': new Element(tmp.tag).update(!acc.id ? acc.isSumAcc :
-				(acc.isSumAcc === true ? new Element('span', {'class': 'text-success'}).update(new Element('span', {'class': 'glyphicon glyphicon-ok'})) : '')
+			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1'}).update(acc.accountNo) })
+			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1'}).update(!acc.id ? acc.isSumAcc :
+				(acc.isSumAcc === true ? new Element('span', {'class': 'text-success'}).update(new Element('span', {'title': acc.name.toUpperCase() + ' is a summary account', 'class': 'glyphicon glyphicon-ok'})) : '')
 			) })
 			.insert({'bottom': new Element(tmp.tag, {'title': 'Opening Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.initValue) : acc.initValue) })
 			.insert({'bottom': new Element(tmp.tag, {'title': 'Running Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.sumValue) : acc.sumValue) })
@@ -150,12 +150,12 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 	/**
 	 * initialising
 	 */
-	,init: function(_resultPanelId, accTypes) {
+	,init: function(_resultPanelId, accTypes, firstShowAccType) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._resultPanelId = _resultPanelId;
 		tmp.me._accTypes = accTypes;
-		tmp.me._showAccounts(tmp.me._accTypes[0]);
+		tmp.me._showAccounts(firstShowAccType && firstShowAccType.id ? firstShowAccType : tmp.me._accTypes[0]);
 		return tmp.me;
 	}
 });

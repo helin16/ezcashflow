@@ -4,6 +4,14 @@
 var PageJs = new Class.create();
 PageJs.prototype = Object.extend(new FrontPageJs(), {
 	_ressultPanelId: ''
+	/**
+	 * Getting the overview row
+	 *
+	 * @param array row     The row data
+	 * @param bool  isTitle Whether this row is a title row
+	 *
+	 * @return Element The DOM Element row
+	 */
 	,_getOverviewRow: function (row, isTitle) {
 		var tmp = {};
 		tmp.me = this;
@@ -13,21 +21,32 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 			.insert({'bottom': new Element(tmp.tag).update(row.title)});
 		if(row.dateRange) {
 			$H(row.dateRange).each(function(item){
+				if(!item.value.from && !item.value.to)
+					return;
 				tmp.popoverText = (item.value.from.toLocaleString ? item.value.from.toLocaleString() : '') + (item.value.to.toLocaleString ? '~' + item.value.to.toLocaleString() : '');
 				if(tmp.isTitle === true) {
 					tmp.newRow.insert({'bottom': new Element(tmp.tag, {'class': 'text-uppercase', 'title': tmp.popoverText}).update(item.key)});
 				} else {
-
+					tmp.sumValue = row.data[item.key];
+					tmp.newRow.insert({'bottom': new Element(tmp.tag, {'title': row.title + ': ' + tmp.popoverText}).update(
+						new Element('span', {'class': (row.title !== 'Profit' ? '' : (tmp.sumValue < 0 ? 'text-danger' : '')) })
+							.update(tmp.me.getCurrency(tmp.sumValue))
+					) });
 				}
 			});
 		}
 		return tmp.newRow;
 	}
+	/**
+	 * Getting the date range for: today, week , month, year and all
+	 *
+	 * @return Object The date ranges
+	 */
 	,_getDateRange: function() {
 		var tmp = {};
 		tmp.me = this;
-		tmp.dateRange = {};
 		tmp.now = new Date();
+		tmp.dateRange = {};
 
 		tmp.beginOfToday = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate());
 		tmp.endOfToday = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate(), 23, 59, 59);
@@ -50,6 +69,13 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.dateRange.total = {'from': tmp.beginOfAll, 'to': tmp.endOfAll};
 		return tmp.dateRange;
 	}
+	/**
+	 * Ajax: Gettinghte overview data from the server end
+	 *
+	 * @param Element resultDiv The result div dom
+	 *
+	 * @return PageJs
+	 */
 	,_getOverviewData: function(resultDiv) {
 		var tmp = {};
 		tmp.me = this;
@@ -63,7 +89,6 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 				tmp._resultDiv.update(tmp._loadingDiv);
 			}
 			,'onSuccess': function(sender, param) {
-				$(tmp.me._ressultPanelId).down('.lastest-trans-div').retrieve('event:load')();
 				try {
 					tmp.result = tmp.me.getResp(param, false, true);
 					if(!tmp.result || !tmp.result.items)
@@ -71,15 +96,21 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 					tmp.resultTable = new Element('table', {'class': 'table table-hover table-striped'})
 						.insert({'bottom': new Element('thead').update( tmp.me._getOverviewRow({'title': '&nbsp;', 'dateRange': tmp.dateRange}, true) ) })
 						.insert({'bottom': tmp.tbody = new Element('tbody')});
-					tmp.tbody.insert({'bottom': tmp.me._getOverviewRow({'title': 'Income', 'dateRange': tmp.dateRange, 'data': tmp.result.items.income}) })
-						.insert({'bottom': tmp.me._getOverviewRow({'title': 'Expense', 'dateRange': tmp.dateRange, 'data': tmp.result.items.expense}) })
-						.insert({'bottom': tmp.me._getOverviewRow({'title': 'Profit', 'dateRange': tmp.dateRange, 'data': tmp.result.items.profit}) })
-
+					tmp.incomes = {};
+					tmp.expenses = {};
+					tmp.profits = {};
+					$H(tmp.result.items).each(function(item){
+						tmp.incomes[item.key] = item.value.income;
+						tmp.expenses[item.key] = item.value.expense;
+						tmp.profits[item.key] = item.value.income * 1 - (item.value.expense * 1);
+					});
+					tmp.tbody.insert({'bottom': tmp.me._getOverviewRow({'title': 'Income', 'dateRange': tmp.dateRange, 'data': tmp.incomes}) })
+						.insert({'bottom': tmp.me._getOverviewRow({'title': 'Expense', 'dateRange': tmp.dateRange, 'data': tmp.expenses}) })
+						.insert({'bottom': tmp.me._getOverviewRow({'title': 'Profit', 'dateRange': tmp.dateRange, 'data': tmp.profits}) });
 					if(!tmp._resultDiv.hasClassName('table-responsive'))
 						tmp._resultDiv.addClassName('table-responsive').removeClassName('panel-body');
 					tmp._resultDiv.update(tmp.resultTable);
 				} catch (e) {
-					console.error(e);
 					if(tmp._resultDiv.hasClassName('table-responsive'))
 						tmp._resultDiv.removeClassName('table-responsive').addClassName('panel-body');
 					tmp._resultDiv.update(tmp.me.getAlertBox('Error: ', e).addClassName('alert-danger'));
@@ -93,6 +124,11 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		});
 		return tmp.me;
 	}
+	/**
+	 * Getting the overview panel
+	 *
+	 * @return Element The Dom Element for the overview
+	 */
 	,_getOverviewPanel: function() {
 		var tmp = {};
 		tmp.me = this;
@@ -109,6 +145,13 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 			});
 		return tmp.newDiv;
 	}
+	/**
+	 * Ajax: Getting the lastest trans from server end
+	 *
+	 * @param Element resultDiv The dom for th result div
+	 *
+	 * @return PageJs
+	 */
 	,_getLastTrans: function (resultDiv) {
 		var tmp = {};
 		tmp.me = this;
@@ -148,6 +191,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 				}
 			}
 			,'onComplete': function() {
+				$(tmp.me._ressultPanelId).down('.overview-summary-div').retrieve('event:load')();
 				if(tmp._loadingDiv) {
 					tmp._loadingDiv.remove();
 				}
@@ -155,6 +199,11 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		});
 		return tmp.me;
 	}
+	/**
+	 * Getting the Lastest transtions div
+	 *
+	 * @return Element The list div
+	 */
 	,_getLastTransDiv: function() {
 		var tmp = {};
 		tmp.me = this;
@@ -171,6 +220,11 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 			});
 		return tmp.newDiv;
 	}
+	/**
+	 * Getting the transaction input div
+	 *
+	 * @return Element
+	 */
 	,_getInputPanel: function() {
 		var tmp = {};
 		tmp.me = this;
@@ -209,6 +263,11 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		});
 		return tmp.newDiv;
 	}
+	/**
+	 * getting initial layout dom
+	 *
+	 * @return Element
+	 */
 	,_getLayout: function() {
 		var tmp = {};
 		tmp.me = this;
@@ -223,16 +282,37 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		return tmp.newDiv;
 	}
 	/**
-	 * initialising
+	 * loading the data
+	 *
+	 * @return PageJs
+	 */
+	,_loadData: function() {
+		var tmp = {};
+		tmp.me = this;
+		$(tmp.me._ressultPanelId).down('.lastest-trans-div').retrieve('event:load')();
+		return tmp.me;
+	}
+	/**
+	 * initialising the script
+	 *
+	 * @param string ressultPanelId     The html ID of the result div
+	 * @param string jQueryFormSelector The form ID for the bootstrapvalidator
+	 *
+	 * @return PageJs
 	 */
 	,init: function(ressultPanelId, jQueryFormSelector) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._ressultPanelId = ressultPanelId;
 		$(tmp.me._ressultPanelId).update(tmp.layout = tmp.me._getLayout())
-			.store('transForm', new TransFormJs(tmp.me, jQueryFormSelector).render(tmp.layout.down('.trans-input-panel-wrapper')))
+			.store('transForm', new TransFormJs(tmp.me, jQueryFormSelector)
+				.setSaveSuccFunc(function() {
+					tmp.me._loadData()
+				})
+				.render(tmp.layout.down('.trans-input-panel-wrapper'))
+			)
 			.down('.trans-type-switcher').click();
-		tmp.layout.down('.overview-summary-div').retrieve('event:load')();
+		tmp.me._loadData();
 		return tmp.me;
 	}
 });

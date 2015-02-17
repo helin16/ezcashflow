@@ -23,11 +23,14 @@
 			<url ServiceParameter="Logout.Controller" pattern="logout.html" />
 
 			<!-- Accounts:: list -->
-			<url ServiceParameter="Accounts.List.Controller" pattern="accounts.html" />
+			<url ServiceParameter="Account.List.Controller" pattern="accounts.html" />
 			<!-- Accounts:: new -->
-			<url ServiceParameter="Accounts.Details.Controller" pattern="accounts/{id}.html" parameters.id="new"/>
+			<url ServiceParameter="Account.Details.Controller" pattern="accounts/{id}.html" parameters.id="new"/>
 			<!-- Accounts:: edit -->
-			<url ServiceParameter="Accounts.Details.Controller" pattern="accounts/{id}.html" parameters.id="\d+"/>
+			<url ServiceParameter="Account.Details.Controller" pattern="accounts/{id}.html" parameters.id="\d+"/>
+
+			<!-- Transactions:: list -->
+			<url ServiceParameter="Transaction.List.Controller" pattern="transactions.html" />
 
 			<!-- ajax service -->
 			<url ServiceId="ajax" ServiceParameter="" pattern="ajax/{method}" parameters.method="\w+"  />

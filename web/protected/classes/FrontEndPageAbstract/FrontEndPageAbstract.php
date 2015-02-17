@@ -1,13 +1,19 @@
 <?php
 /**
  * The FrontEnd Page Abstract
- * 
+ *
  * @package    Web
  * @subpackage Class
  * @author     lhe<helin16@gmail.com>
  */
-abstract class FrontEndPageAbstract extends TPage 
+abstract class FrontEndPageAbstract extends TPage
 {
+	/**
+	 * The menu item for the top menu
+	 *
+	 * @var string
+	 */
+	protected $_menuItem;
 	/**
 	 * constructor
 	 */
@@ -43,10 +49,10 @@ abstract class FrontEndPageAbstract extends TPage
 	}
 	/**
 	 * Getting The end javascript
-	 * 
+	 *
 	 * @return string
 	 */
-	protected function _getEndJs() 
+	protected function _getEndJs()
 	{
 	    $js = 'if(typeof(PageJs) !== "undefined"){var pageJs = new PageJs(); }';
 	    return $js;
@@ -108,14 +114,14 @@ abstract class FrontEndPageAbstract extends TPage
 		$clientScript->registerHeadScriptFile('TweenMax.scrollTo.js', $folder .  '/scrollTo.js');
 		//jquery noconflict
 		$clientScript->registerHeadScript('jquery.noConflict', 'jQuery.noConflict();');
-		
+
 	    return $this;
 	}
 	/**
 	 * Getting the lastest version of Js and Css under the Class'file path
-	 * 
+	 *
 	 * @param string $className The class name
-	 * 
+	 *
 	 * @return multitype:string
 	 */
 	public static function getLastestJS($className)
@@ -182,11 +188,20 @@ abstract class FrontEndPageAbstract extends TPage
 		return isset($array['logo']) ? trim($array['logo']) : '';
 	}
 	/**
+	 * Getting the menu item
+	 *
+	 * @return string
+	 */
+	public function getMenuItem()
+	{
+		return trim($this->_menuItem);
+	}
+	/**
 	 * Getting the 404 page
-	 * 
+	 *
 	 * @param string $title   The title of the page
 	 * @param string $content The html code content
-	 * 
+	 *
 	 * @return string The html code of the page
 	 */
 	public static function show404Page($title, $content)
