@@ -22,13 +22,28 @@ class Controller extends BackEndPageAbstract
 	protected function _getEndJs()
 	{
 		$js = parent::_getEndJs();
-		$js = 'pageJs';
-		$js = '.setHTMLID("result-list-div", "result-wrapper")';
-		$js = '.setHTMLID("search-panel-div", "result-wrapper")';
-		$js = '.setHTMLID("search-btn", "search-btn")';
-		$js = '.setCallbackId("getTransactions", "' . $this->getTransactionsBtn->getUniqueID() . '")';
-		$js = ';';
+		$js .= 'pageJs';
+		$js .= '.setHTMLID("result-list-div", "result-wrapper")';
+		$js .= '.setHTMLID("search-panel-div", "search-wrapper")';
+		$js .= '.setHTMLID("search-btn", "search-btn")';
+		$js .= '.setHTMLID("item-count", "item-count")';
+		$js .= '.setCallbackId("getTransactions", "' . $this->getTransactionsBtn->getUniqueID() . '")';
+		$js .= '.init()';
+		$js .= ';';
 		return $js;
+	}
+	public function getTransactions($sender, $param)
+	{
+		$results = $errors = array ();
+		try {
+			$transactions = Transaction::getAll ( true, 1, 10, array (
+					'trans.id' => 'desc'
+			) );
+			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
+		} catch ( Exception $ex ) {
+			$errors [] = $ex->getMessage ();
+		}
+		$param->ResponseData = StringUtilsAbstract::getJson ( $results, $errors );
 	}
 }
 ?>

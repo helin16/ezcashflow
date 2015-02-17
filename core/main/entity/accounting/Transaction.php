@@ -34,6 +34,12 @@ class Transaction extends BaseEntityAbstract
 	 */
 	private $description = '';
 	/**
+	 * The running balance of the account
+	 *
+	 * @var double
+	 */
+	private $balance;
+	/**
 	 * The groupId
 	 *
 	 * @var string
@@ -152,6 +158,27 @@ class Transaction extends BaseEntityAbstract
 	    return $this;
 	}
 	/**
+	 * Getter for balance
+	 *
+	 * @return number
+	 */
+	public function getBalance()
+	{
+	    return $this->balance;
+	}
+	/**
+	 * Setter for balance
+	 *
+	 * @param number $value The balance
+	 *
+	 * @return Transaction
+	 */
+	public function setBalance($value)
+	{
+	    $this->balance = $value;
+	    return $this;
+	}
+	/**
 	 * (non-PHPdoc)
 	 * @see BaseEntityAbstract::preSave()
 	 */
@@ -165,6 +192,8 @@ class Transaction extends BaseEntityAbstract
 			self::$_groupId = StringUtilsAbstract::getRandKey(__CLASS__);
 		if(trim($this->getGroupId()) === '')
 			$this->setGroupId(self::$_groupId);
+		if(trim($this->getBalance()) === '')
+			$this->setBalance($this->getAccountEntry()->getRuningBalance() + $this->getValue());
 	}
 	/**
 	 * (non-PHPdoc)
@@ -232,10 +261,9 @@ class Transaction extends BaseEntityAbstract
     	DaoMap::setIntType('credit', 'double', '10,4', false, true);
     	DaoMap::setIntType('debit', 'double', '10,4', false, true);
     	DaoMap::setStringType('description', 'varchar', 255);
+    	DaoMap::setIntType('balance', 'double', '10,4', false, true);
     	parent::__loadDaoMap();
 
-    	DaoMap::createIndex('credit');
-    	DaoMap::createIndex('debit');
     	DaoMap::commit();
     }
     /**

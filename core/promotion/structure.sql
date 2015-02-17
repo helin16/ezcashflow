@@ -57,6 +57,7 @@ CREATE TABLE `transaction` (
 	`credit` double(10,4) NULL DEFAULT 0,
 	`debit` double(10,4) NULL DEFAULT 0,
 	`description` varchar(255) NOT NULL DEFAULT '',
+	`balance` double(10,4) NULL DEFAULT 0,
 	`active` bool NOT NULL DEFAULT 1,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
@@ -69,8 +70,6 @@ CREATE TABLE `transaction` (
 	,INDEX (`active`)
 	,INDEX (`created`)
 	,INDEX (`updated`)
-	,INDEX (`credit`)
-	,INDEX (`debit`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `asset`;
 CREATE TABLE `asset` (

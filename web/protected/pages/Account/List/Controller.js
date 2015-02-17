@@ -63,7 +63,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		tmp.tag = acc.id ? 'td' : 'th';
-		tmp.newDiv = new Element('tr', {'class': (acc.id ? 'treegrid-' + acc.id : 'header') })
+		tmp.newDiv = new Element('tr', {'class': (acc.id ? 'treegrid-' + acc.id : 'header') + (acc.isSumAcc === true ? ' active' : '')  })
 			.store('data', acc)
 			.insert({'bottom': new Element(tmp.tag).update(new Element('abbr', {'title': acc.description}).update(acc.name)) })
 			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1'}).update(acc.accountNo) })
@@ -71,7 +71,8 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 				(acc.isSumAcc === true ? new Element('span', {'class': 'text-success'}).update(new Element('span', {'title': acc.name.toUpperCase() + ' is a summary account', 'class': 'glyphicon glyphicon-ok'})) : '')
 			) })
 			.insert({'bottom': new Element(tmp.tag, {'title': 'Opening Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.initValue) : acc.initValue) })
-			.insert({'bottom': new Element(tmp.tag, {'title': 'Running Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.sumValue) : acc.sumValue) })
+			.insert({'bottom': new Element(tmp.tag, {'title': 'Running Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.runingValue) : acc.runingValue) })
+			.insert({'bottom': new Element(tmp.tag, {'title': 'Total Value', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.sumValue) : acc.sumValue) })
 			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1 text-right'}).update(!acc.id ? '' :
 				new Element('span', {'class': 'btn-group btn-group-xs visible-lg visible-md visible-sm visible-xs'})
 					.insert({'bottom': new Element('span', {'class': 'btn btn-success', 'title': 'Add an new account under: ' + acc.name})
@@ -104,7 +105,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		tmp.newDiv = new Element('table', {'class': 'table table-hover'})
-			.insert({'bottom': tmp.me._getAccountRow({'name': 'Name', 'initValue': 'O.B.', 'sumValue': 'R.B.', 'accountNo': 'Acc. No.', 'isSumAcc': 'Sum Acc?'}).wrap(new Element('thead'))})
+			.insert({'bottom': tmp.me._getAccountRow({'name': 'Name', 'initValue': 'O.B.', 'runingValue': 'R.B.', 'sumValue': 'Total', 'accountNo': 'Acc. No.', 'isSumAcc': 'Sum Acc?'}).wrap(new Element('thead'))})
 			.insert({'bottom': tmp.tbody = new Element('tbody')});
 		items.each(function(item) {
 			tmp.tbody.insert({'bottom': tmp.me._getAccountRow(item) });

@@ -49,7 +49,13 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 		tmp.savePanel = tmp.resultPanel.down('#save-panel');
 		tmp.savePanel.getElementsBySelector('[save-panel]').each(function(item){
 			tmp.field = item.readAttribute('save-panel');
-			tmp.data[tmp.field] = (tmp.field === 'initValue' ? tmp.me.getValueFromCurrency($F(item)) : $F(item));
+			if(tmp.field === 'initValue') {
+				tmp.data[tmp.field] = tmp.me.getValueFromCurrency($F(item));
+			} else if(tmp.field === 'isSumAcc') {
+				tmp.data[tmp.field] = $(item).checked;
+			} else {
+				tmp.data[tmp.field] = $F(item);
+			}
 		});
 		//editing
 		if(tmp.me._entity.id && !tmp.me._entity.id.blank()) {
@@ -89,7 +95,7 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 	,_refreshParentWindow(item) {
 		var tmp = {};
 		tmp.me = this;
-		if(window.parent) {
+		if(window.parent && window.parent.pageJs && window.parent.pageJs._showAccounts) {
 			window.parent.pageJs._showAccounts(item.type, function() {
 				window.parent.pageJs._closeAccDetailsPanel();
 			});

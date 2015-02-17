@@ -2,7 +2,7 @@
  * The page Js file
  */
 var PageJs = new Class.create();
-PageJs.prototype = Object.extend(new FrontPageJs(), {
+PageJs.prototype = Object.extend(new BackEndPageJs(), {
 	_ressultPanelId: ''
 	/**
 	 * Getting the overview row

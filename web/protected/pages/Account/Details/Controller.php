@@ -83,11 +83,12 @@ class Controller extends DetailsPageAbstract
 				if(!($account = AccountEntry::get($accountId)) instanceof AccountEntry)
 					throw new Exception('Invalid Account: ' . $accountId);
 				$account->setDescription($description)
-					->setName($name)
-					->setInitValue($initValue)
 					->setAccountNo($accountNo)
 					->setIsSumAcc($isSumAcc)
+					->setName($name)
+					->setInitValue($initValue)
 					->save();
+				var_dump($account->getIsSumAcc());
 			}
 			else if($parent instanceof AccountEntry)
 				$account = AccountEntry::create(Core::getOrganization(), $parent, $name, $isSumAcc, $initValue, $description, $accountNo);

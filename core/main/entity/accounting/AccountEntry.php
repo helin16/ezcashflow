@@ -316,8 +316,9 @@ class AccountEntry extends BaseEntityAbstract
      */
     public function preSave()
     {
+    	var_dump('1: ' . intval($this->getIsSumAcc()));
     	if(trim($this->getId()) !== '') {
-    		if(count(self::countByCriteria('parentId = ?', array($this->getId()))) > 0) {
+    		if(self::countByCriteria('parentId = ?', array($this->getId())) > 0) {
     			$this->setIsSumAcc(true);
     		}
     	} else {
@@ -329,7 +330,6 @@ class AccountEntry extends BaseEntityAbstract
 	    			->setOrganization($this->getParent()->getOrganization());
 	    	}
     	}
-
     	$where ='accountNo = ? and organizationId = ?';
     	$params = array(trim($this->getAccountNo()), $this->getOrganization()->getId());
     	if(trim($this->getId()) !== '') {
@@ -363,6 +363,24 @@ class AccountEntry extends BaseEntityAbstract
     	}
     }
     /**
+     * Getting the Running Balance
+     *
+     * @return number
+     */
+    public function getRuningBalance($resetCache = false)
+    {
+    	if(trim($this->getId()) === '')
+    		return 0;
+    	$key = md5('RuningBalance_' . $this->getId());
+    	if(self::cacheExsits($key) === true && $resetCache !== true)
+    		return self::getCache($key);
+
+    	$lastTrans = Transaction::getAllByCriteria('accountEntryId = ?', array($this->getId()), true, 1, 1, array('trans.id' => 'desc'));
+    	$balance = (count($lastTrans) === 0 ? 0 : $lastTrans[0]->getBalance());
+    	self::addCache($key, $balance);
+    	return $balance;
+    }
+    /**
      * The running balance
      *
      * @return number
@@ -372,17 +390,15 @@ class AccountEntry extends BaseEntityAbstract
     	$sum = $this->getInitValue();
     	if(trim($this->getId()) === '')
     		return $sum;
-    	$key = md5('SumValue' . $this->getId());
-    	if(self::getCache($key) && $resetCache !== true)
+    	$key = md5('SumValue_' . $this->getId());
+    	if(self::cacheExsits($key) === true && $resetCache !== true)
     		return self::getCache($key);
 
-		$transactions = Transaction::getAllByCriteria('accountEntryId = ?', array($this->getId()));
-		foreach($transactions as $trans)
-			$sum += $trans->getValue();
-		$childrenAccounts = self::getAllByCriteria('parentId = ?', array($this->getId()));
-		foreach($childrenAccounts as $acc)
-			$sum += $acc->getSumValue();
-		self::addCache($key, $sum);
+    	$sum += $this->getRuningBalance($resetCache);
+    	$childrenAccounts = self::getAllByCriteria('parentId = ?', array($this->getId()));
+    	foreach($childrenAccounts as $acc)
+    		$sum += $acc->getSumValue();
+    	self::addCache($key, $sum);
 		return $sum;
     }
 	/**
@@ -397,7 +413,8 @@ class AccountEntry extends BaseEntityAbstract
     		$array['breadCrumbs'] = $this->getBreadCrumbs();
     		$array['parent'] = $this->getParent() instanceof AccountEntry ? $this->getParent()->getJson() : null;
     		$array['type'] = $this->getType() instanceof AccountType ? $this->getType()->getJson() : null;
-    		$array['sumValue'] = $this->getSumValue();
+    		$array['runingValue'] = $this->getRuningBalance($reset);
+    		$array['sumValue'] = $this->getSumValue($reset);
     	}
     	return parent::getJson($array, $reset);
     }
