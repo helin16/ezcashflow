@@ -40,6 +40,12 @@ class Transaction extends BaseEntityAbstract
 	 */
 	private $balance;
 	/**
+	 * The transaction log date
+	 * 
+	 * @var UDate
+	 */
+	private $logDate;
+	/**
 	 * The groupId
 	 *
 	 * @var string
@@ -179,6 +185,27 @@ class Transaction extends BaseEntityAbstract
 	    return $this;
 	}
 	/**
+	 * The getter for logDate
+	 *
+	 * @return UDate
+	 */
+	public function getLogDate ()
+	{
+	    return $this->logDate;
+	}
+	/**
+	 * Setter for logDate
+	 * 
+	 * @param mixed $value The new value of logDate
+	 *
+	 * @return Transaction
+	 */
+	public function setLogDate ($value)
+	{
+	    $this->logDate = $value;
+	    return $this;
+	}
+	/**
 	 * (non-PHPdoc)
 	 * @see BaseEntityAbstract::preSave()
 	 */
@@ -194,6 +221,8 @@ class Transaction extends BaseEntityAbstract
 			$this->setGroupId(self::$_groupId);
 		if(trim($this->getBalance()) === '')
 			$this->setBalance($this->getAccountEntry()->getRuningBalance() + $this->getValue());
+		if(trim($this->getLogDate()) === '')
+			$this->setLogDate(new UDate());
 	}
 	/**
 	 * (non-PHPdoc)
@@ -257,6 +286,8 @@ class Transaction extends BaseEntityAbstract
     public function __loadDaoMap()
     {
     	DaoMap::begin($this, 'trans');
+    	DaoMap::setStringType('groupId', 'varchar', 32);
+    	DaoMap::setDateType('logDate');
     	DaoMap::setManyToOne('accountEntry', 'AccountEntry', 'trans_acc');
     	DaoMap::setIntType('credit', 'double', '10,4', false, true);
     	DaoMap::setIntType('debit', 'double', '10,4', false, true);
@@ -264,6 +295,8 @@ class Transaction extends BaseEntityAbstract
     	DaoMap::setIntType('balance', 'double', '10,4', false, true);
     	parent::__loadDaoMap();
 
+    	DaoMap::createIndex('logDate');
+    	DaoMap::createIndex('groupId');
     	DaoMap::commit();
     }
     /**
@@ -273,12 +306,13 @@ class Transaction extends BaseEntityAbstract
      *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public static function create(AccountEntry $acc, $credit = null, $debit = null, $description = '')
+    public static function create(AccountEntry $acc, UDate $logDate = null, $credit = null, $debit = null, $description = '')
     {
     	$item = new Transaction();
     	return $item->setAccountEntry($acc)
     		->setCredit($credit)
     		->setDebit($debit)
+    		->setLogDate($logDate)
     		->setDescription($description)
     		->save();
     }

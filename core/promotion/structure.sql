@@ -53,6 +53,8 @@ CREATE TABLE `accounttype` (
 DROP TABLE IF EXISTS `transaction`;
 CREATE TABLE `transaction` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	`groupId` varchar(32) NOT NULL DEFAULT '',
+	`logDate` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`accountEntryId` int(10) unsigned NOT NULL DEFAULT 0,
 	`credit` double(10,4) NULL DEFAULT 0,
 	`debit` double(10,4) NULL DEFAULT 0,
@@ -70,6 +72,8 @@ CREATE TABLE `transaction` (
 	,INDEX (`active`)
 	,INDEX (`created`)
 	,INDEX (`updated`)
+	,INDEX (`logDate`)
+	,INDEX (`groupId`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `asset`;
 CREATE TABLE `asset` (
