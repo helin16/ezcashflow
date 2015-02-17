@@ -316,7 +316,6 @@ class AccountEntry extends BaseEntityAbstract
      */
     public function preSave()
     {
-    	var_dump('1: ' . intval($this->getIsSumAcc()));
     	if(trim($this->getId()) !== '') {
     		if(self::countByCriteria('parentId = ?', array($this->getId())) > 0) {
     			$this->setIsSumAcc(true);
