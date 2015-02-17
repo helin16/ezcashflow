@@ -54,7 +54,7 @@ abstract class FrontEndPageAbstract extends TPage
 	 */
 	protected function _getEndJs()
 	{
-	    $js = 'if(typeof(PageJs) !== "undefined"){var pageJs = new PageJs(); }';
+	    $js = 'window.onbeforeunload=function(){Prado.CallbackRequest.abortRequest();}; if(typeof(PageJs) !== "undefined"){var pageJs = new PageJs(); }';
 	    return $js;
 	}
 	/**

@@ -1,5 +1,21 @@
 <com:TContent ID="MainContent">
-	<com:TCallback ID="getAccountsBtn" onCallback="Page.getAccounts" />
-	<div class="container" id="page-wrapper"></div>
+	<com:TCallback ID="getTransactionsBtn" onCallback="Page.getTransactions" />
+	<div class="container" >
+		<div id="result-wrapper" class="panel panel-default search-panel">
+			<div class="panel-heading">
+				<label style="margin: 0px; padding: 0"> Show Search Criteria?
+					<input type="checkbox" checked onclick="$(this).up('.panel').down('.panel-body').toggle();"/>
+				</label>
+				<span id="search-btn" class="btn btn-primary pull-right btn-xs" data-loading-text="<span class='fa fa-spinner fa-spin'></span>">
+					<span class="glyphicon glyphicon-search"></span>
+					<span class="hidden-xs hidden-sm"> Search</span>
+				</span>
+			</div>
+			<div class="panel-body">
+				testt
+			</div>
+		</div>
+		<div id="result-wrapper"></div>
+	</div>
 </table>
 </com:TContent>

@@ -1,12 +1,12 @@
 <?php
 /**
  * The BackEnd Page Abstract
- * 
+ *
  * @package    Web
  * @subpackage Class
  * @author     lhe<helin16@gmail.com>
  */
-abstract class BackEndPageAbstract extends FrontEndPageAbstract 
+abstract class BackEndPageAbstract extends FrontEndPageAbstract
 {
 	/**
 	 * constructor
@@ -24,16 +24,6 @@ abstract class BackEndPageAbstract extends FrontEndPageAbstract
 		if(!Core::getUser() instanceof UserAccount || (Core::getUser()->getId() === UserAccount::ID_GUEST_ACCOUNT))
 			die(FrontEndPageAbstract::show404Page('Page Not Found', 'Oops, the page you are looking for is not there'));
 		return true;
-	}
-	/**
-	 * Getting The end javascript
-	 *
-	 * @return string
-	 */
-	protected function _getEndJs()
-	{
-		$js = 'if(typeof(PageJs) !== "undefined"){var pageJs = new PageJs(); }';
-		return $js;
 	}
 	/**
 	 * loading the page js class files
