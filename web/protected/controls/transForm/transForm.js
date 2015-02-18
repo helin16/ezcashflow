@@ -275,13 +275,36 @@ TransFormJs.prototype = {
 	        	tmp.result = data.result.resultData;
 	        	if(!tmp.result || !tmp.result.file || !tmp.result.file.name)
 	        		return;
-	        	tmp.resultPanel.insert({'bottom': new Element('div', {'class': 'btn-group', 'input-panel': 'files'})
+	        	tmp.resultPanel.insert({'bottom': new Element('div', {'class': 'btn-group file-btn', 'input-panel': 'files'})
 		        	.store('data', tmp.result)
 	        		.setStyle('margin-right: 4px; margin-bottom: 4px;')
 		        	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'}).update(tmp.result.file.name) })
 		        	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'})
 			        	.insert({'bottom': new Element('span', {'class': 'text-danger'})
 			        		.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-remove'}) })
+			        	})
+			        	.observe('click', function(){
+			        		tmp.fileBtn = $(this).up('.file-btn');
+			        		tmp.fileBtnData = tmp.fileBtn.retrieve('data');
+			        		tmp.confirmDiv = new Element('div')
+			        			.insert({'bottom': new Element('p').update('Are you sure you want to delete this file: <strong>' + tmp.fileBtnData.file.name + '</strong>?') })
+				        		.insert({'bottom': new Element('div')
+					        		.insert({'bottom': new Element('span', {'class': 'btn btn-danger'})
+					        			.update('YES')
+					        			.observe('click', function(){
+					        				tmp.fileBtn.remove();
+					        				tmp.me._pageJs.hideModalBox();
+					        			})
+					        		})
+					        		.insert({'bottom': new Element('span', {'class': 'btn btn-default pull-right'})
+					        			.update('NO')
+					        			.observe('click', function(){
+					        				tmp.me._pageJs.hideModalBox();
+					        			})
+					        		})
+				        		})
+			        		;
+			        		tmp.me._pageJs.showModalBox('Confirm Deletion:', tmp.confirmDiv, true);
 			        	})
 		        	})
 	        	});
