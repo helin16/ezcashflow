@@ -54,6 +54,8 @@ class transForm extends TTemplateControl
 				throw new Exception('From Account is invalid!');
 			if(!isset($params->CallbackParameter->fromAccId) || !($toAcc = AccountEntry::get($params->CallbackParameter->toAccId)) instanceof AccountEntry || intval($toAcc->getIsSumAcc()) === 1)
 				throw new Exception('To Account is invalid!');
+			if(!isset($params->CallbackParameter->logDate) || !($logDate = new UDate(trim($params->CallbackParameter->logDate))) instanceof UDate || trim($logDate) === trim(UDate::zeroDate()))
+				$logDate = new UDate();
 			if($fromAcc->getId() === $toAcc->getId())
 				throw new Exception('Can NOT make a transaction between the same account!');
 			if(!isset($params->CallbackParameter->amount) || !($amount = trim($params->CallbackParameter->amount)) === '')
@@ -62,8 +64,8 @@ class transForm extends TTemplateControl
 			if(isset($params->CallbackParameter->comments) )
 				$comments = trim($params->CallbackParameter->comments);
 			$transactions = array(
-				Transaction::create($fromAcc, $amount, null, $comments),
-				Transaction::create($toAcc, null, $amount, $comments)
+				Transaction::create($fromAcc, $logDate, $amount, null, $comments),
+				Transaction::create($toAcc, $logDate, null, $amount, $comments)
 			);
 			//if there is attachments
 			if(isset($params->CallbackParameter->files) && count($files = $params->CallbackParameter->files)  > 0) {

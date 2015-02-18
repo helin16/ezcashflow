@@ -16,6 +16,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				.insert({'bottom': new Element('div', {'class': 'col-xs-1 hidden-sm hidden-xs'}).update(!row.id ? 'Type' : row.accountEntry.type.name) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-1 hidden-sm hidden-xs'}).update(!row.id ? 'Credit' : ((row.credit && !row.credit.blank()) ? tmp.me.getCurrency(row.credit) : '')) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-1 hidden-sm hidden-xs'}).update(!row.id ? 'Debit' : ((row.debit && !row.debit.blank()) ? tmp.me.getCurrency(row.debit) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-1 hidden-sm hidden-xs'}).update(!row.id ? 'Balance' : ((row.balance && !row.balance.blank()) ? tmp.me.getCurrency(row.balance) : '')) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-1 visible-sm visible-xs'})
 					.addClassName((row.id && row.value < 0) ? 'text-danger' : '')
 					.update(

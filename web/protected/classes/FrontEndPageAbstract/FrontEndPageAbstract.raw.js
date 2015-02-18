@@ -10,7 +10,27 @@ FrontPageJs.prototype = {
 	,callbackIds: {}
 
 	//constructor
-	,initialize: function () {}
+	,initialize: function () {
+		this._disablePrototypeJS('show');
+		this._disablePrototypeJS('hide');
+	}
+
+	/**
+	 * _disable PrototypeJS for show, hide
+	 */
+	,_disablePrototypeJS: function (method) {
+		var tmp = {};
+		tmp.handler = function (event) {
+            event.target[method] = undefined;
+            setTimeout(function () {
+                delete event.target[method];
+            }, 0);
+        };
+        ['collapse', 'dropdown', 'modal', 'tooltip', 'popover', 'tab'].each(function (plugin) {
+            jQuery(window).on(method + '.bs.' + plugin, tmp.handler);
+        });
+        return this;
+	}
 
 	,setCallbackId: function(key, callbackid) {
 		this.callbackIds[key] = callbackid;
@@ -203,13 +223,6 @@ FrontPageJs.prototype = {
 		tmp.dateStrings = tmp.strings[0].split('-');
 		tmp.timeStrings = tmp.strings[1].split(':');
 		return new Date(Date.UTC(tmp.dateStrings[0], (tmp.dateStrings[1] * 1 - 1), tmp.dateStrings[2], tmp.timeStrings[0], tmp.timeStrings[1], tmp.timeStrings[2]));
-	}
-	/**
-	 * validate email via Regex
-	 */
-	,validateEmail: function (email) {
-	    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-	    return re.test(email);
 	}
 	/**
 	 * Getting a loading image div

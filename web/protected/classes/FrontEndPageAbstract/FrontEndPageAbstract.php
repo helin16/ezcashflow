@@ -54,7 +54,9 @@ abstract class FrontEndPageAbstract extends TPage
 	 */
 	protected function _getEndJs()
 	{
-	    $js = 'window.onbeforeunload=function(){Prado.CallbackRequest.abortRequest();}; if(typeof(PageJs) !== "undefined"){var pageJs = new PageJs(); }';
+	    $js = 'window.onbeforeunload=function(){Prado.CallbackRequest.abortRequest();};';
+	    $js .= 'if(typeof(PageJs) !== "undefined"){var pageJs = new PageJs(); }';
+	    $js .= 'if(typeof(PageJs) !== "undefined"){var pageJs = new PageJs(); }';
 	    return $js;
 	}
 	/**
@@ -107,10 +109,6 @@ abstract class FrontEndPageAbstract extends TPage
 		$folder = $this->publishFilePath(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'bootstrapValidator' . DIRECTORY_SEPARATOR);
 		$clientScript->registerHeadScriptFile('Bootstrap.validator.js', $folder . '/js/bootstrapValidator.min.js');
 		$clientScript->registerStyleSheetFile('Bootstrap.validator.css', $folder . '/css/bootstrapValidator.min.css');
-		//bootstrap form validator
-		$folder = $this->publishFilePath(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'bootstrap-date-picker' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR);
-		$clientScript->registerHeadScriptFile('Bootstrap.date-picker.js', $folder . '/js/bootstrap-datepicker.min.js');
-		$clientScript->registerStyleSheetFile('Bootstrap.date-picker.css', $folder . '/css/datepicker3.min.css');
 		//tweenmax
 		$folder = $this->publishFilePath(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'TweenMax' . DIRECTORY_SEPARATOR);
 		$clientScript->registerHeadScriptFile('TweenMax.js', $folder .  '/TweenMax.js');

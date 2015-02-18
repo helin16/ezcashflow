@@ -24,17 +24,6 @@ TransFormJs.prototype = {
 		tmp.me._saveSuccFunc = _saveSuccFunc;
 		return tmp.me;
 	}
-	,render: function(_inputPanel) {
-		var tmp = {};
-		tmp.me = this;
-		tmp.me._inputPanel = _inputPanel;
-		$(tmp.me._inputPanel).update(tmp._inputPane = tmp.me._getInputPanel());
-		tmp.me._initFileUploader(tmp._inputPane)
-			._initSelect2(tmp._inputPane.down('[input-panel="fromAccId"]'), 'from')
-			._initSelect2(tmp._inputPane.down('[input-panel="toAccId"]'), 'to')
-			._initValidator(tmp._inputPane);
-		return tmp.me;
-	}
 	,_getFormGroup: function(control, label) {
 		var tmp = {};
 		tmp.me = this;
@@ -53,6 +42,8 @@ TransFormJs.prototype = {
 			tmp.fieldName = item.readAttribute('input-panel').strip();
 			if(tmp.fieldName === 'files') {
 				tmp.data['files'].push(item.retrieve('data'));
+			} else if (tmp.fieldName === 'logDate') {
+				tmp.data['logDate'] = jQuery('#' + $(item).up('.date').id).data('datetimepicker').getDate();
 			}
 			else
 				tmp.data[tmp.fieldName] = $F(item);
@@ -87,6 +78,19 @@ TransFormJs.prototype = {
 		tmp.me = this;
 		tmp.newDiv = new Element('div', {'class': 'trans-input-panel'})
 			.insert({'bottom': new Element('div', {'class': 'panel-body form-horizontal'})
+				.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
+						.insert({'bottom': new Element('div', {'class': 'input-group input-append date'})
+							.insert({'bottom': new Element('span', {'class': 'input-group-addon add-on'})
+								.insert({'bottom': new Element('i', {'data-time-icon': 'glyphicon glyphicon-time', 'data-date-icon': 'glyphicon glyphicon-calendar'}) })
+							})
+							.insert({'bottom': new Element('input', {'type': 'text', 'class': 'form-control', 'input-panel': 'logDate', 'placeholder': 'DD/MM/YYYY HH:MM:SS', 'name': 'log_date', 'data-format': "dd/MM/yyyy hh:mm:ss", 'disabled': true})
+								.observe('click', function() {
+									$(this).up('.date').down('.add-on').click();
+								})
+							})
+						})
+					, new Element('label', {'class': 'control-label col-sm-2'}).update('Log Date:')
+				) })
 				.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
 						.insert({'bottom': new Element('input', {'class': 'form-control', 'input-panel': 'fromAccId', 'placeholder': 'Spending from:', 'name': 'from_acc_id'}) })
 					, new Element('label', {'class': 'control-label col-sm-2'}).update('From:')
@@ -130,6 +134,7 @@ TransFormJs.prototype = {
 		jQuery(tmp.me._jQueryFormSelector).data('bootstrapValidator').resetForm(true);
 		tmp.me._initSelect2(tmp._inputPane.down('[input-panel="fromAccId"]'), 'from')
 			._initSelect2(tmp._inputPane.down('[input-panel="toAccId"]'), 'to');
+		tmp._inputPane.down('[input-panel="logDate"]').up('.date').retrieve('event:load')();
 		tmp._inputPane.down('.file-uploader-results').update('');
 		tmp._inputPane.down('.file-uploading-results').update('');
 		tmp._inputPane.down('.msg-div').update('');
@@ -149,7 +154,18 @@ TransFormJs.prototype = {
 	            validating: 'glyphicon glyphicon-refresh'
 	        },
 	        fields: {
-	        	'from_acc_id': {
+	        	'log_date': {
+	        		validators: {
+	        			notEmpty: {
+	        				message: 'Date is required.'
+	        			}
+	        			,date: {
+	                        format: 'DD/MM/YYYY',
+	                        message: 'Invalid formmat. It should be DD/MM/YYYY HH:MM:SS.'
+	                    }
+	        		}
+	        	}
+	        	,'from_acc_id': {
 	        		validators: {
                         callback: {
                             message: 'Please Select a From Account.',
@@ -203,7 +219,12 @@ TransFormJs.prototype = {
             	tmp.me._saveTrans(tmp._inputPane.down('.save-trans-btn'));
             }
         })
-        .find('[name="from_acc_id"]')
+        .find('[name="log_date"]')
+        	.change(function(e) {
+        		jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('revalidateField', 'log_date');
+        	})
+        	.end()
+    	.find('[name="from_acc_id"]')
         	.change(function(e) {
         		jQuery(tmp.me._jQueryFormSelector).bootstrapValidator('revalidateField', 'from_acc_id');
         	})
@@ -322,6 +343,35 @@ TransFormJs.prototype = {
 			,formatNoMatches: function() {
 				return '<div><a href="javascript: void(0);" target="_BLANK" onclick="window.open(' + "'/accounts.html'" + ');">No Accounts Found, create one?</a></div>';
 			}
+		});
+		return tmp.me;
+	}
+	,_initDatePicker: function(inputBox) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.me._pageJs._signRandID(inputBox);
+		jQuery('#' + inputBox.id).datetimepicker();
+		return tmp.me;
+	}
+	,render: function(_inputPanel) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.me._inputPanel = _inputPanel;
+		$(tmp.me._inputPanel).update(tmp._inputPane = tmp.me._getInputPanel());
+		tmp.me
+			._initDatePicker(tmp.logDateDiv = tmp._inputPane.down('[input-panel="logDate"]')
+				.up('.date')
+				.store('event:load', function() {
+					tmp.me._pageJs._signRandID(tmp.logDateDiv);
+					jQuery('#' + tmp.logDateDiv.id).data('datetimepicker').setLocalDate(new Date());
+				})
+			)
+			._initFileUploader(tmp._inputPane)
+			._initSelect2(tmp._inputPane.down('[input-panel="fromAccId"]'), 'from')
+			._initSelect2(tmp._inputPane.down('[input-panel="toAccId"]'), 'to')
+			._initValidator(tmp._inputPane);
+		jQuery(window).load(function(){
+			tmp.logDateDiv.retrieve('event:load')();
 		});
 		return tmp.me;
 	}
