@@ -172,7 +172,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 					if(tmp._resultDiv.hasClassName('panel-body'))
 						tmp._resultDiv.removeClassName('panel-body').addClassName('list-group');
 					tmp.result.items.each(function(item) {
-						tmp.localeTime = tmp.me.loadUTCTime(item.created);
+						tmp.localeTime = tmp.me.loadUTCTime(item.logDate);
 						tmp._resultDiv.insert({'bottom': new Element('a', {'class': 'list-group-item', 'href': 'javascript: void(0)'})
 							.store('data', item)
 							.insert({'bottom': new Element('strong', {'class': 'list-group-item-heading'}).update(item.accountEntry.breadCrumbs.join(' / ')) })

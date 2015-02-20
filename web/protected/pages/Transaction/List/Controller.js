@@ -4,20 +4,21 @@
 var PageJs = new Class.create();
 PageJs.prototype = Object.extend(new BackEndPageJs(), {
 	_pageSize : 30
+	,_searchCriteria : null
 	,_getTransactionRow : function(row) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.newRow = new Element('a', {'href': 'javascript: void(0);', 'class' : 'list-group-item', 'title': (row.id ? 'Description: ' + row.description : '')})
 			.store('data', row)
 			.insert({'bottom': new Element('div', {'class': 'row'})
-				.insert({'bottom': new Element('div', {'class': 'col-sm-6 col-xs-8'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-4 col-sm-2'}).update(!row.id ? 'Date' : tmp.me.loadUTCTime(row.logDate).toLocaleString() ) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-6 col-sm-4'})
 					.update(!row.id ? 'Account' : row.accountEntry.breadCrumbs.join(' / '))
 				})
-				.insert({'bottom': new Element('div', {'class': 'col-xs-1 hidden-sm hidden-xs'}).update(!row.id ? 'Type' : row.accountEntry.type.name) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-1 hidden-sm hidden-xs'}).update(!row.id ? 'Credit' : ((row.credit && !row.credit.blank()) ? tmp.me.getCurrency(row.credit) : '')) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-1 hidden-sm hidden-xs'}).update(!row.id ? 'Debit' : ((row.debit && !row.debit.blank()) ? tmp.me.getCurrency(row.debit) : '')) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-1 hidden-sm hidden-xs'}).update(!row.id ? 'Balance' : ((row.balance && !row.balance.blank()) ? tmp.me.getCurrency(row.balance) : '')) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-1 visible-sm visible-xs'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Credit' : ((row.credit && !row.credit.blank()) ? tmp.me.getCurrency(row.credit) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Debit' : ((row.debit && !row.debit.blank()) ? tmp.me.getCurrency(row.debit) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Balance' : ((row.balance && !row.balance.blank()) ? tmp.me.getCurrency(row.balance) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 visible-sm visible-xs text-right'})
 					.addClassName((row.id && row.value < 0) ? 'text-danger' : '')
 					.update(
 							!row.id ? 'Value' : ((row.value < 0 ? '-' : '+') + tmp.me.getCurrency(Math.abs(row.value)))
@@ -34,7 +35,11 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		tmp.me._signRandID(tmp.btn);
 		tmp.resultDiv = $(tmp.me.getHTMLID('result-list-div'));
 		tmp._loadingDiv = tmp.me._getLoadingDiv();
-		tmp.data = {'searchCriteria' : tmp.me.searchCriteria, 'pagination' : {'pageNo' : tmp.pageNo, 'pageSize' : tmp.me._pageSize} };
+		if(tmp.me._searchCriteria === null){
+			tmp.me.showModalBox('<strong class="text-danger">No Search Criteria Provided.</strong>', 'No Search Criteria Provided. Please provide some first.');
+			return;
+		}
+		tmp.data = {'searchCriteria' : tmp.me._searchCriteria, 'pagination' : {'pageNo' : tmp.pageNo, 'pageSize' : tmp.me._pageSize} };
 		tmp.me.postAjax(tmp.me.getCallbackId('getTransactions'), tmp.data, {
 			'onLoading' : function() {
 				tmp.resultDiv.up('.panel').show();
@@ -74,6 +79,81 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		});
 		return tmp.me;
 	}
+	,_initSelect2: function (selectBox) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.me._signRandID(selectBox);
+		jQuery('#' + selectBox.id).select2({
+			 minimumInputLength: 3,
+			 multiple: true,
+			 ajax: {
+				 delay: 250
+				 ,url: '/ajax/getAccounts'
+		         ,type: 'POST'
+	        	 ,data: function (params) {
+	        		 return {"searchTxt": params};
+	        	 }
+				 ,results: function(data, page, query) {
+					 tmp.resultMap = {};
+					 if(data.resultData && data.resultData.items) {
+						 data.resultData.items.each(function(item) {
+							 tmp.typeId = item.type.id;
+							 if(!tmp.resultMap[tmp.typeId]) {
+								 tmp.resultMap[tmp.typeId] = {'text': item.type.name, 'children': []};
+							 }
+							 tmp.resultMap[tmp.typeId]['children'].push({'id': item.id, 'text': item.breadCrumbs.join(' / ') , 'data': item})
+						 });
+					 }
+					 tmp.result = [];
+					 $H(tmp.resultMap).each(function(val){
+						 tmp.result.push(val.value);
+					 });
+		    		 return { 'results' : tmp.result };
+		    	 }
+				 ,cache: true
+			 }
+			,
+			formatResult : function(result, label, query, escapeMarkup) {
+				tmp.markup = [];
+				tmp.option = this.text(result);
+				if(!result.data)
+					return tmp.option;
+
+				return '<div>' + tmp.option + '<span class="badge pull-right">' + tmp.me.getCurrency(result.data.sumValue) + '</span></div>';
+			}
+			,formatNoMatches: function() {
+				return '<div>No Accounts found.</div>';
+			}
+		});
+		return tmp.me;
+	}
+	,_collectSearchCriteria: function() {
+		var tmp = {};
+		tmp.me = this;
+		tmp.foundData = false;
+		tmp.data = {};
+		$(tmp.me.getHTMLID('search-panel-div')).getElementsBySelector('[search-panel]').each(function(item){
+			if(!$F(item).blank()) {
+				tmp.data[item.readAttribute('search-panel')] = $F(item);
+				tmp.foundData = true;
+			}
+		});
+		if(tmp.foundData === true)
+			tmp.me._searchCriteria = tmp.data;
+		return tmp.me;
+	}
+	,_initDatePicker: function() {
+		var tmp = {};
+		tmp.me = this;
+		jQuery('.datepicker')
+			.datetimepicker()
+			.find('.date-input')
+			.click(function(){
+				jQuery(this).parent().children('.add-on').click();
+			})
+			;
+		return tmp.me;
+	}
 	/**
 	 * initialising
 	 */
@@ -81,8 +161,11 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		$(tmp.me.getHTMLID('search-btn')).observe('click', function() {
-			tmp.me._getTransactions(1);
+			tmp.me._collectSearchCriteria()
+				._getTransactions(1);
 		});
+		tmp.me._initDatePicker()
+			._initSelect2($(tmp.me.getHTMLID('search-panel-div')).down('[search-panel="accounts"]'));
 		return tmp.me;
 	}
 });

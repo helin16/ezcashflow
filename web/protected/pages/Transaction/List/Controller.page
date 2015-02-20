@@ -1,4 +1,6 @@
 <com:TContent ID="MainContent">
+	<com:Application.controls.select2.select2 />
+	<com:Application.controls.bootstrapDateTimePicker.bootstrapDateTimePicker />
 	<com:TCallback ID="getTransactionsBtn" onCallback="Page.getTransactions" />
 	<div class="container" >
 		<div id="search-wrapper" class="panel panel-default search-panel">
@@ -12,7 +14,32 @@
 				</span>
 			</div>
 			<div class="panel-body">
-				testt
+				<div class="col-sm-4">
+					<div class="form-group">
+						<label>Accounts:</label>
+						<input search-panel="accounts" class="form-control input-sm" placeholder="AccountEntry"/>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="form-group">
+						<label>Dates:</label>
+						<div class="input-group">
+							<div class="date input-append datepicker">
+								<input class="form-control input-sm date-input" search-panel="logDate.from" placeholder="from:"/>
+								<span class="input-group-addon add-on" style="display: none;">
+									<i data-time-icon='glyphicon glyphicon-time' data-date-icon='glyphicon glyphicon-calendar'></i>
+								</span>
+							</div>
+							  <span class="input-group-btn" style="width:0px;"></span>
+							<div class="date input-append datepicker">
+								<input class="form-control input-sm date-input" search-panel="logDate.to" placeholder="to:"/>
+								<span class="input-group-addon add-on" style="display: none;">
+									<i data-time-icon='glyphicon glyphicon-time' data-date-icon='glyphicon glyphicon-calendar'></i>
+								</span>
+							</div>
+						</div
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="panel panel-default" style="display: none;">

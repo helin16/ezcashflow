@@ -329,11 +329,10 @@ TransFormJs.prototype = {
 			 multiple: false,
 			 ajax: {
 				 delay: 250
-				 ,url: document.URL
+				 ,url: '/ajax/getAccounts'
 		         ,type: 'POST'
 	        	 ,data: function (params) {
-	        		 tmp.data = {"searchTxt": params, 'accTypeIds': tmp.me._accTypeIds[type]};
-	        		 return {'PRADO_CALLBACK_PARAMETER': JSON.stringify(tmp.data), 'PRADO_CALLBACK_TARGET': tmp.me.searchCallbackId, 'PRADO_PAGESTATE': $F('PRADO_PAGESTATE')}
+	        		 return {"searchTxt": params, 'accTypeIds': tmp.me._accTypeIds[type]};
 	        	 }
 				 ,results: function(data, page, query) {
 					 tmp.resultMap = {};

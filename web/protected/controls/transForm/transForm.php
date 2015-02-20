@@ -16,35 +16,6 @@ class transForm extends TTemplateControl
 		}
 	}
 
-	public function searchAccounts($sender, $params)
-	{
-		$results = $errors = array();
-		try {
-			if(!isset($params->CallbackParameter->searchTxt) || ($searchTxt = trim($params->CallbackParameter->searchTxt)) === '')
-				throw new Exception('Please provide some word to search for the account entry.');
-			if(!isset($params->CallbackParameter->accTypeIds) || count($accTypeIds = ($params->CallbackParameter->accTypeIds)) === 0)
-				throw new Exception('System Error: no Account Types passed in.');
-			$accTypeString = array();
-			$param = array('searchTxt' => '%' . $searchTxt . '%');
-			$where = 'isSumAcc = 0 and (name like :searchTxt or accountNo like :searchTxt)';
-			foreach($accTypeIds as $index => $accTypeId) {
-				$key = "accTypeId" . $index;
-				$accTypeString[] = ':' . $key;
-				$param[$key] = $accTypeId;
-			}
-			if(count($accTypeString) > 0) {
-				$where .= ' AND typeId in (' . implode(', ', $accTypeString) . ')';
-			}
-			$accounts = AccountEntry::getAllByCriteria($where, $param);
-			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
-		} catch(Exception $ex) {
-			$errors[] = $ex->getMessage();
-		}
-		header('Content-Type: application/json');
-		echo StringUtilsAbstract::getJson($results, $errors);
-		die();
-	}
-
 	public function saveTrans($sender, $params)
 	{
 		$results = $errors = array();
