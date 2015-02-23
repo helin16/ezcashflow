@@ -5,6 +5,9 @@ var PageJs = new Class.create();
 PageJs.prototype = Object.extend(new BackEndPageJs(), {
 	_pageSize : 30
 	,_searchCriteria : null
+	/**
+	 * Getting the transaction row
+	 */
 	,_getTransactionRow : function(row) {
 		var tmp = {};
 		tmp.me = this;
@@ -27,6 +30,9 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			});
 		return tmp.newRow;
 	}
+	/**
+	 * getting the Transactions
+	 */
 	,_getTransactions : function(pageNo) {
 		var tmp = {};
 		tmp.me = this;
@@ -61,6 +67,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 					tmp.result.items.each(function(item){
 						tmp.resultDiv.insert({'bottom': tmp.me._getTransactionRow(item) });
 					});
+					$(tmp.me.getHTMLID('item-count')).update(tmp.result.pagination.totalRows);
 				} catch (e) {
 					if (tmp.pageNo === 1) {
 						if (!tmp.resultDiv.hasClassName('panel-body'))
@@ -79,6 +86,9 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		});
 		return tmp.me;
 	}
+	/**
+	 * initialize select2
+	 */
 	,_initSelect2: function (selectBox) {
 		var tmp = {};
 		tmp.me = this;
@@ -127,14 +137,23 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		});
 		return tmp.me;
 	}
+	/**
+	 * collects search criteria
+	 */
 	,_collectSearchCriteria: function() {
 		var tmp = {};
 		tmp.me = this;
 		tmp.foundData = false;
 		tmp.data = {};
 		$(tmp.me.getHTMLID('search-panel-div')).getElementsBySelector('[search-panel]').each(function(item){
+			tmp.field = item.readAttribute('search-panel');
 			if(!$F(item).blank()) {
-				tmp.data[item.readAttribute('search-panel')] = $F(item);
+				if(tmp.field === 'logDate_from' || tmp.field === 'logDate_to') {
+					tmp.me._signRandID(item);
+					tmp.data[tmp.field] = jQuery('#' + item.id).data('DateTimePicker').date().utc().format();
+				} else {
+					tmp.data[tmp.field] = $F(item);
+				}
 				tmp.foundData = true;
 			}
 		});
@@ -142,16 +161,14 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			tmp.me._searchCriteria = tmp.data;
 		return tmp.me;
 	}
+	/**
+	 * Initialize date picker
+	 */
 	,_initDatePicker: function() {
 		var tmp = {};
 		tmp.me = this;
 		jQuery('.datepicker')
-			.datetimepicker()
-			.find('.date-input')
-			.click(function(){
-				jQuery(this).parent().children('.add-on').click();
-			})
-			;
+			.datetimepicker();
 		return tmp.me;
 	}
 	/**
@@ -165,7 +182,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				._getTransactions(1);
 		});
 		tmp.me._initDatePicker()
-			._initSelect2($(tmp.me.getHTMLID('search-panel-div')).down('[search-panel="accounts"]'));
+			._initSelect2($(tmp.me.getHTMLID('search-panel-div')).down('[search-panel="accountsIds"]'));
 		return tmp.me;
 	}
 });

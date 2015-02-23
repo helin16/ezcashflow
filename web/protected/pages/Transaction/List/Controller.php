@@ -42,8 +42,35 @@ class Controller extends BackEndPageAbstract
 	{
 		$results = $errors = array ();
 		try {
-			$transactions = Transaction::getAll ( true, 1, 10, array ('trans.id' => 'desc') );
+			$pageNo = 1;
+			$pageSize = DaoQuery::DEFAUTL_PAGE_SIZE;
+			if(isset($param->CallbackParameter->pagination)) {
+				$pageNo = isset($param->CallbackParameter->pagination->pageNo) ? trim($param->CallbackParameter->pagination->pageNo) : $pageNo;
+				$pageSize = isset($param->CallbackParameter->pagination->pageSize) ? trim($param->CallbackParameter->pagination->pageSize) : $pageSize;
+			}
+
+			$where = $params = array();
+			if(isset($param->CallbackParameter->searchCriteria->accountsIds) && trim($param->CallbackParameter->searchCriteria->accountsIds) !== '') {
+				$accountIds = explode(',', $param->CallbackParameter->accountsIds);
+				$where[] = 'accountEntryId in (' . implode(',', array_fill(0, count($accountIds), '?') . ')');
+				$params = array_merge($params, $accountIds);
+			}
+			if(isset($param->CallbackParameter->searchCriteria->logDate_from) && ($dateFrom = trim($param->CallbackParameter->searchCriteria->logDate_from)) !== '') {
+				$where[] = 'logDate >= ?';
+				$params[] = trim(new UDate($dateFrom));
+			}
+			if(isset($param->CallbackParameter->searchCriteria->logDate_to) && ($dateTo = trim($param->CallbackParameter->searchCriteria->logDate_to)) !== '') {
+				$where[] = 'logDate <= ?';
+				$params[] = trim(new UDate($dateTo));
+			}
+			var_dump($where);
+			var_dump($params);
+
+			$transactions = $stats = array();
+			if(count($where) > 0)
+				$transactions = Transaction::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('trans.id' => 'desc'), $stats );
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
+			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {
 			$errors [] = $ex->getMessage ();
 		}

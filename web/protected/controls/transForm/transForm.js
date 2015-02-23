@@ -43,7 +43,7 @@ TransFormJs.prototype = {
 			if(tmp.fieldName === 'files') {
 				tmp.data['files'].push(item.retrieve('data'));
 			} else if (tmp.fieldName === 'logDate') {
-				tmp.data['logDate'] = jQuery('#' + $(item).up('.date').id).data('datetimepicker').getDate();
+				tmp.data['logDate'] = jQuery('#' + $(item).up('.date').id).data('DateTimePicker').date().utc().format();
 			}
 			else
 				tmp.data[tmp.fieldName] = $F(item);
@@ -79,13 +79,13 @@ TransFormJs.prototype = {
 		tmp.newDiv = new Element('div', {'class': 'trans-input-panel'})
 			.insert({'bottom': new Element('div', {'class': 'panel-body form-horizontal'})
 				.insert({'bottom': tmp.me._getFormGroup(new Element('div', {'class': 'col-sm-10'})
-						.insert({'bottom': new Element('div', {'class': 'input-group input-append date'})
-							.insert({'bottom': new Element('span', {'class': 'input-group-addon add-on'})
-								.insert({'bottom': new Element('i', {'data-time-icon': 'glyphicon glyphicon-time', 'data-date-icon': 'glyphicon glyphicon-calendar'}) })
+						.insert({'bottom': new Element('div', {'class': 'input-group date'})
+							.insert({'bottom': new Element('span', {'class': 'input-group-addon'})
+								.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-calendar'}) })
 							})
-							.insert({'bottom': new Element('input', {'type': 'text', 'class': 'form-control', 'input-panel': 'logDate', 'placeholder': 'DD/MM/YYYY HH:MM:SS', 'name': 'log_date', 'data-format': "dd/MM/yyyy hh:mm:ss", 'disabled': true})
+							.insert({'bottom': new Element('input', {'type': 'text', 'class': 'form-control', 'input-panel': 'logDate', 'placeholder': 'DD/MM/YYYY HH:MM:SS', 'name': 'log_date'})
 								.observe('click', function() {
-									$(this).up('.date').down('.add-on').click();
+									$(this).up('.date').down('.input-group-addon').click();
 								})
 							})
 						})
@@ -159,10 +159,6 @@ TransFormJs.prototype = {
 	        			notEmpty: {
 	        				message: 'Date is required.'
 	        			}
-	        			,date: {
-	                        format: 'DD/MM/YYYY',
-	                        message: 'Invalid formmat. It should be DD/MM/YYYY HH:MM:SS.'
-	                    }
 	        		}
 	        	}
 	        	,'from_acc_id': {
@@ -372,7 +368,7 @@ TransFormJs.prototype = {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._pageJs._signRandID(inputBox);
-		jQuery('#' + inputBox.id).datetimepicker();
+		jQuery('#' + inputBox.id).datetimepicker( {});
 		return tmp.me;
 	}
 	,render: function(_inputPanel) {
@@ -385,7 +381,7 @@ TransFormJs.prototype = {
 				.up('.date')
 				.store('event:load', function() {
 					tmp.me._pageJs._signRandID(tmp.logDateDiv);
-					jQuery('#' + tmp.logDateDiv.id).data('datetimepicker').setLocalDate(new Date());
+					jQuery('#' + tmp.logDateDiv.id).data('DateTimePicker').date(new Date());
 				})
 			)
 			._initFileUploader(tmp._inputPane)
