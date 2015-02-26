@@ -28,6 +28,14 @@ class Controller extends BackEndPageAbstract
 		$js .= '.setHTMLID("search-btn", "search-btn")';
 		$js .= '.setHTMLID("item-count", "item-count")';
 		$js .= '.setCallbackId("getTransactions", "' . $this->getTransactionsBtn->getUniqueID() . '")';
+		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate'])) {
+			$accounts = array();
+			$accountIds = explode(',', $_REQUEST['accountids']);
+			$accountIds = array_filter($accountIds);
+			if(count($accountIds) > 0)
+				$accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($accountIds), '?')) . ')', $accountIds);
+			$js .= '._setPreData(' . json_encode(array_map(create_function('$a', 'return $a->getJson();'), $accounts)). ')';
+		}
 		$js .= '.init()';
 		$js .= ';';
 		return $js;
@@ -63,8 +71,6 @@ class Controller extends BackEndPageAbstract
 				$where[] = 'logDate <= ?';
 				$params[] = trim(new UDate($dateTo));
 			}
-			var_dump($where);
-			var_dump($params);
 
 			$transactions = $stats = array();
 			if(count($where) > 0)

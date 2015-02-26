@@ -25,21 +25,10 @@
 						<label>Dates:</label>
 						<div>
 							<div class="col-sm-6 ">
-								<div class="input-group">
-									<input class="form-control input-sm date-input" search-panel="logDate_from" placeholder="from:"/>
-									<span class="input-group-addon add-on">
-										<i data-time-icon='glyphicon glyphicon-time' data-date-icon='glyphicon glyphicon-calendar'></i>
-									</span>
-								</div>
+								<input class="form-control input-sm date-input" search-panel="logDate_from" placeholder="from:" name="logDate_from"/>
 							</div>
-							<span class="input-group-btn" style="width:0px;"></span>
-							<div class="col-sm-6 date input-append datepicker" style="margin:0px; padding: 0px 2px;">
-								<div class="input-group">
-									<input class="form-control input-sm date-input" search-panel="logDate_to" placeholder="to:"/>
-									<span class="input-group-addon add-on">
-										<i data-time-icon='glyphicon glyphicon-time' data-date-icon='glyphicon glyphicon-calendar'></i>
-									</span>
-								</div>
+							<div class="col-sm-6">
+								<input class="form-control input-sm date-input" search-panel="logDate_to" placeholder="to:" name="logDate_to"/>
 							</div>
 						</div>
 					</div>

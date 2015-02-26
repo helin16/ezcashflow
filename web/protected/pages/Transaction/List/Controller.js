@@ -93,6 +93,12 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._signRandID(selectBox);
+		tmp.preLoadedData = [];
+		if(tmp.me._accounts && tmp.me.accounts.size() > 0) {
+			tmp.me.accounts.each(function(account){
+				tmp.preLoadedData.push({''})
+			})
+		}
 		jQuery('#' + selectBox.id).select2({
 			 minimumInputLength: 3,
 			 multiple: true,
@@ -167,8 +173,15 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 	,_initDatePicker: function() {
 		var tmp = {};
 		tmp.me = this;
-		jQuery('.datepicker')
+		jQuery('.date-input')
 			.datetimepicker();
+		return tmp.me;
+	}
+	,_setPreData(accounts, dates) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.me._accounts = (accounts || []);
+		tmp.me._dates = (dates || {});
 		return tmp.me;
 	}
 	/**
