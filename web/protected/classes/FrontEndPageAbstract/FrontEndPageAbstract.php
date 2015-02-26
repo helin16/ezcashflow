@@ -106,9 +106,10 @@ abstract class FrontEndPageAbstract extends TPage
 		$clientScript->registerHeadScriptFile('Bootstrap.transition.js', $folder . '/js/transition.js');
 		$clientScript->registerHeadScriptFile('Bootstrap.collapse.js', $folder . '/js/collapse.js');
 		//bootstrap form validator
-		$folder = $this->publishFilePath(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'bootstrapValidator' . DIRECTORY_SEPARATOR);
-		$clientScript->registerHeadScriptFile('Bootstrap.validator.js', $folder . '/js/bootstrapValidator.min.js');
-		$clientScript->registerStyleSheetFile('Bootstrap.validator.css', $folder . '/css/bootstrapValidator.min.css');
+		$folder = $this->publishFilePath(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'bootstrapValidator' . DIRECTORY_SEPARATOR . 'dist' . DIRECTORY_SEPARATOR);
+		$clientScript->registerHeadScriptFile('Bootstrap.validator.js', $folder . '/js/formValidation.min.js');
+		$clientScript->registerHeadScriptFile('Bootstrap.validator.framework.js', $folder . '/js/framework/bootstrap.min.js');
+		$clientScript->registerStyleSheetFile('Bootstrap.validator.css', $folder . '/css/formValidation.min.css');
 		//tweenmax
 		$folder = $this->publishFilePath(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'TweenMax' . DIRECTORY_SEPARATOR);
 		$clientScript->registerHeadScriptFile('TweenMax.js', $folder .  '/TweenMax.js');
