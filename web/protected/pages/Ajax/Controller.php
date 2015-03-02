@@ -33,6 +33,48 @@ class Controller extends TService
         $this->getResponse()->write(StringUtilsAbstract::getJson($results, $errors));
     }
     /**
+     * Getting an entity
+     *
+     * @param unknown $params
+     *
+     * @throws Exception
+     * @return multitype:
+     */
+    private function _get($params)
+    {
+    	if(!isset($params['entityName']) || ($entityName = trim($params['entityName'])) === '')
+    		throw new Exception('What are we going to get?');
+    	if(!isset($params['entityId']) || ($entityId = trim($params['entityId'])) === '')
+    		throw new Exception('What are we going to get with?');
+    	return ($entity = $entityName::get($entityId)) instanceof BaseEntityAbstract ? $entity->getJson() : array();
+    }
+    /**
+     * Getting All for entity
+     *
+     * @param unknown $params
+     *
+     * @throws Exception
+     * @return multitype:multitype:
+     */
+    private function _getAll($params)
+    {
+    	if(!isset($params['entityName']) || ($entityName = trim($params['entityName'])) === '')
+    		throw new Exception('What are we going to get?');
+    	if(!isset($params['entityId']) || ($entityId = trim($params['entityId'])) === '')
+    		throw new Exception('What are we going to get with?');
+    	$searchTxt = trim(isset($params['searchTxt']) ? trim($params['searchTxt']) : '');
+    	$searchParams = trim(isset($params['searchParams']) ? $params['searchParams'] : array());
+    	$entityName = isset($params['entityName']) ? trim($params['entityName']) : '';
+    	$pageNo = isset($params['pageNo']) ? trim($params['pageNo']) : null;
+    	$pageSize = isset($params['pageSize']) ? trim($params['pageSize']) : DaoQuery::DEFAUTL_PAGE_SIZE;
+    	$active = isset($params['active']) ? intval($params['active']) : null;
+    	$orderBy = isset($params['orderBy']) ? trim($params['orderBy']) : array();
+
+    	$stats = array();
+    	$items = $entityName::getAllByCriteria($searchTxt, $searchParams, $active, $pageNo, $pageSize, $orderBy, $stats);
+    	return array('items' => array_map(create_function('$a', 'return $a->getJson();'), $items), 'pagination' => $stats);
+    }
+    /**
      * Getting the accounts
      * @param unknown $params
      * @return multitype:multitype:
