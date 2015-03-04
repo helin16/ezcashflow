@@ -3,7 +3,7 @@
  */
 var PageJs = new Class.create();
 PageJs.prototype = Object.extend(new BackEndPageJs(), {
-	_pageSize : 30
+	_pageSize : 10
 	,_searchCriteria : null
 	/**
 	 * Getting the transaction row
@@ -33,11 +33,11 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 	/**
 	 * getting the Transactions
 	 */
-	,_getTransactions : function(pageNo) {
+	,_getTransactions : function(btn, pageNo) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.pageNo = (pageNo || 1);
-		tmp.btn = $(tmp.me.getHTMLID('search-btn'));
+		tmp.btn = btn;
 		tmp.me._signRandID(tmp.btn);
 		tmp.resultDiv = $(tmp.me.getHTMLID('result-list-div'));
 		tmp._loadingDiv = tmp.me._getLoadingDiv();
@@ -48,8 +48,8 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		tmp.data = {'searchCriteria' : tmp.me._searchCriteria, 'pagination' : {'pageNo' : tmp.pageNo, 'pageSize' : tmp.me._pageSize} };
 		tmp.me.postAjax(tmp.me.getCallbackId('getTransactions'), tmp.data, {
 			'onLoading' : function() {
-				tmp.resultDiv.up('.panel').show();
 				jQuery('#' + tmp.btn.id).button('loading');
+				tmp.resultDiv.up('.panel').show();
 				if (tmp.pageNo === 1) {
 					if (!tmp.resultDiv.update(tmp._loadingDiv).hasClassName('panel-body'))
 						tmp.resultDiv.addClassName('panel-body').removeClassName('group-list');
@@ -61,13 +61,26 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 					if (!tmp.result || !tmp.result.items)
 						return;
 					if (tmp.pageNo === 1) {
-						if (!tmp.resultDiv.update(tmp.me._getTransactionRow({}).setStyle('font-weight:bold;')).hasClassName('list-group'))
-							tmp.resultDiv.addClassName('list-group').removeClassName('panel-body');
+						tmp.resultDiv.update(new Element('div', {'class': 'list-group-item disabled'}).setStyle('font-weight:bold;').update(tmp.me._getTransactionRow({}).innerHTML) );
+						tmp.resultDiv.removeClassName('panel-body').addClassName('list-group');
 					}
+					//removing the get more btns
+					if(tmp.resultDiv.down('.get-more-btn-wrapper')) {
+						tmp.resultDiv.down('.get-more-btn-wrapper').remove();
+					}
+
 					tmp.result.items.each(function(item){
 						tmp.resultDiv.insert({'bottom': tmp.me._getTransactionRow(item) });
 					});
 					$(tmp.me.getHTMLID('item-count')).update(tmp.result.pagination.totalRows);
+					if(tmp.result.pagination.pageNumber < tmp.result.pagination.totalPages) {
+						tmp.resultDiv.insert({'bottom': new Element('a', {'href': 'javascript: void(0);', 'class': 'list-group-item list-group-item-info get-more-btn-wrapper text-center', 'data-loading-text': 'Getting More ...'})
+							.update('Get More Transactions')
+							.observe('click', function() {
+								tmp.me._getTransactions(this, pageNo * 1 + 1);
+							})
+						})
+					}
 				} catch (e) {
 					if (tmp.pageNo === 1) {
 						if (!tmp.resultDiv.hasClassName('panel-body'))
@@ -94,10 +107,10 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		tmp.me = this;
 		tmp.me._signRandID(selectBox);
 		tmp.preLoadedData = [];
-		if(tmp.me._accounts && tmp.me.accounts.size() > 0) {
-			tmp.me.accounts.each(function(account){
-				tmp.preLoadedData.push({''})
-			})
+		if(tmp.me._preSetData && tmp.me._preSetData.accounts && tmp.me._preSetData.accounts.size() > 0) {
+			tmp.me._preSetData.accounts.each(function(account){
+				tmp.preLoadedData.push({'id': account.id, 'text': account.breadCrumbs.join(' / '), 'data': account});
+			});
 		}
 		jQuery('#' + selectBox.id).select2({
 			 minimumInputLength: 3,
@@ -127,8 +140,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		    		 return { 'results' : tmp.result };
 		    	 }
 				 ,cache: true
-			 }
-			,
+			 },
 			formatResult : function(result, label, query, escapeMarkup) {
 				tmp.markup = [];
 				tmp.option = this.text(result);
@@ -141,6 +153,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				return '<div>No Accounts found.</div>';
 			}
 		});
+		jQuery('#' + selectBox.id).select2('data', tmp.preLoadedData, true);
 		return tmp.me;
 	}
 	/**
@@ -174,14 +187,18 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		jQuery('.date-input')
-			.datetimepicker();
+			.datetimepicker({
+				format: 'DD/MMM/YYYY HH:mm A'
+			});
 		return tmp.me;
 	}
-	,_setPreData(accounts, dates) {
+	/**
+	 * Setting the preset data
+	 */
+	,_setPreData(preSetData) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.me._accounts = (accounts || []);
-		tmp.me._dates = (dates || {});
+		tmp.me._preSetData = (preSetData || []);
 		return tmp.me;
 	}
 	/**
@@ -192,7 +209,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		tmp.me = this;
 		$(tmp.me.getHTMLID('search-btn')).observe('click', function() {
 			tmp.me._collectSearchCriteria()
-				._getTransactions(1);
+				._getTransactions(this, 1);
 		});
 		tmp.me._initDatePicker()
 			._initSelect2($(tmp.me.getHTMLID('search-panel-div')).down('[search-panel="accountsIds"]'));

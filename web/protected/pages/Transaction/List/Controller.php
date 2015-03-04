@@ -28,16 +28,23 @@ class Controller extends BackEndPageAbstract
 		$js .= '.setHTMLID("search-btn", "search-btn")';
 		$js .= '.setHTMLID("item-count", "item-count")';
 		$js .= '.setCallbackId("getTransactions", "' . $this->getTransactionsBtn->getUniqueID() . '")';
+		$preSetData = array();
 		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate'])) {
 			$accounts = array();
 			$accountIds = explode(',', $_REQUEST['accountids']);
 			$accountIds = array_filter($accountIds);
 			if(count($accountIds) > 0)
 				$accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($accountIds), '?')) . ')', $accountIds);
-			$js .= '._setPreData(' . json_encode(array_map(create_function('$a', 'return $a->getJson();'), $accounts)). ')';
+			$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
+		}
+		if(count($preSetData) > 0) {
+			$js .= '._setPreData(' . json_encode($preSetData). ')';
 		}
 		$js .= '.init()';
 		$js .= ';';
+		if(count($preSetData) > 0) {
+			$js .= '$("search-btn").click()';
+		}
 		return $js;
 	}
 	/**
@@ -59,8 +66,10 @@ class Controller extends BackEndPageAbstract
 
 			$where = $params = array();
 			if(isset($param->CallbackParameter->searchCriteria->accountsIds) && trim($param->CallbackParameter->searchCriteria->accountsIds) !== '') {
-				$accountIds = explode(',', $param->CallbackParameter->accountsIds);
-				$where[] = 'accountEntryId in (' . implode(',', array_fill(0, count($accountIds), '?') . ')');
+				var_dump($param->CallbackParameter->searchCriteria->accountsIds);
+				$accountIds = explode(',', $param->CallbackParameter->searchCriteria->accountsIds);
+				var_dump($accountIds);
+				$where[] = 'accountEntryId in (' . implode(',', array_fill(0, count($accountIds), '?')) . ')';
 				$params = array_merge($params, $accountIds);
 			}
 			if(isset($param->CallbackParameter->searchCriteria->logDate_from) && ($dateFrom = trim($param->CallbackParameter->searchCriteria->logDate_from)) !== '') {
@@ -73,8 +82,11 @@ class Controller extends BackEndPageAbstract
 			}
 
 			$transactions = $stats = array();
+			var_dump($where);
+			Dao::$debug = true;
 			if(count($where) > 0)
 				$transactions = Transaction::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('trans.id' => 'desc'), $stats );
+			Dao::$debug = false;
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {
