@@ -9,83 +9,96 @@ class Attachment extends BaseEntityAbstract
 {
 	/**
 	 * The id of the entity
-	 * 
+	 *
 	 * @var int
 	 */
 	private $entityId;
 	/**
 	 * The entity tag
-	 * 
+	 *
 	 * @var string
 	 */
 	private $entityName;
 	/**
 	 * The asset of the attachment
-	 * 
+	 *
 	 * @var Asset
 	 */
 	protected $asset;
 	/**
 	 * Getter for entityId
 	 */
-	public function getEntityId() 
+	public function getEntityId()
 	{
 	    return $this->entityId;
 	}
 	/**
 	 * Setter of the EntityId
-	 * 
+	 *
 	 * @param idt $value The id of entity
-	 * 
+	 *
 	 * @return Attachment
 	 */
-	public function setEntityId($value) 
+	public function setEntityId($value)
 	{
 	    $this->entityId = $value;
 	    return $this;
 	}
 	/**
 	 * Getter for the entity tag
-	 * 
+	 *
 	 * @return string
 	 */
-	public function getEntityName() 
+	public function getEntityName()
 	{
 	    return $this->entityName;
 	}
 	/**
 	 * Setter for the entity tag
-	 * 
+	 *
 	 * @param string $value The tag of the entity
-	 * 
+	 *
 	 * @return Attachment
 	 */
-	public function setEntityName($value) 
+	public function setEntityName($value)
 	{
 	    $this->entityName = $value;
 	    return $this;
 	}
 	/**
 	 * Getter for the tag
-	 * 
+	 *
 	 * @return Asset
 	 */
-	public function getAsset() 
+	public function getAsset()
 	{
 		$this->loadManyToOne('asset');
 	    return $this->asset;
 	}
 	/**
 	 * Setter for the Asset
-	 * 
+	 *
 	 * @param Asset $value The tag of the function
-	 * 
+	 *
 	 * @return Attachment
 	 */
-	public function setAsset(Asset $value) 
+	public function setAsset(Asset $value)
 	{
 	    $this->asset = $value;
 	    return $this;
+	}
+	/**
+	 * (non-PHPdoc)
+	 * @see BaseEntityAbstract::getJson()
+	 */
+	public function getJson($extra = '', $reset = false)
+	{
+		$array = array();
+		if(!$this->isJsonLoaded($reset))
+		{
+			$array['asset'] = $this->getAsset() instanceof Asset ? $this->getAsset()->getJson() : array();
+		}
+		return parent::getJson($array, $reset);
 	}
 	/**
 	 * (non-PHPdoc)
@@ -94,26 +107,26 @@ class Attachment extends BaseEntityAbstract
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'attachment');
-	
+
 		DaoMap::setIntType('entityId');
 		DaoMap::setStringType('EntityName','varchar', 100);
 		DaoMap::setManyToOne('asset','Asset', 'attachment_ass');
-	
+
 		parent::__loadDaoMap();
-	
+
 		DaoMap::createIndex('entityId');
 		DaoMap::createIndex('EntityName');
-	
+
 		DaoMap::commit();
 	}
 	/**
 	 * creating a Attachment
-	 * 
+	 *
 	 * @param int     $entityId
 	 * @param string  $EntityName
 	 * @param Asset   $asset
 	 * @param string  $type
-	 * 
+	 *
 	 * @return EntityTag
 	 */
 	public static function create($entityId, $EntityName, Asset $asset)
@@ -127,9 +140,9 @@ class Attachment extends BaseEntityAbstract
 	}
 	/**
 	 * Getting the asset from asset or assetId
-	 * 
+	 *
 	 * @param Mixed $assetOrAssetId
-	 * 
+	 *
 	 * @return Asset|null
 	 */
 	private static function _getAsset($assetOrAssetId)
@@ -142,11 +155,11 @@ class Attachment extends BaseEntityAbstract
 	}
 	/**
 	 * attach to an entity
-	 * 
+	 *
 	 * @param BaseEntityAbstract $entity
 	 * @param string             $tagName
 	 * @param mixed              $assetOrAssetId
-	 * 
+	 *
 	 * @return EntityTag
 	 */
 	public static function attachToEntity(BaseEntityAbstract $entity, $assetOrAssetId)
@@ -157,10 +170,10 @@ class Attachment extends BaseEntityAbstract
 	}
 	/**
 	 * Remove the attachment for an entity
-	 * 
+	 *
 	 * @param BaseEntityAbstract $entity
 	 * @param mixed              $assetOrAssetId  When null,  it will clear all attachment for that entity
-	 * 
+	 *
 	 * @return BaseEntityAbstract
 	 */
 	public static function rmFromEntity(BaseEntityAbstract $entity, $assetOrAssetId)
@@ -173,13 +186,13 @@ class Attachment extends BaseEntityAbstract
 	}
 	/**
 	 * Getting all for an entity
-	 * 
+	 *
 	 * @param BaseEntityAbstract $entity
 	 * @param int                $pageNo
 	 * @param int                $pageSize
 	 * @param array              $orderBy
 	 * @param array              $stats
-	 * 
+	 *
 	 * @return multiple:Attachment
 	 */
 	public static function getAllForEntity(BaseEntityAbstract $entity, $pageNo = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array(), &$stats = array())

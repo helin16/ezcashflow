@@ -66,9 +66,7 @@ class Controller extends BackEndPageAbstract
 
 			$where = $params = array();
 			if(isset($param->CallbackParameter->searchCriteria->accountsIds) && trim($param->CallbackParameter->searchCriteria->accountsIds) !== '') {
-				var_dump($param->CallbackParameter->searchCriteria->accountsIds);
 				$accountIds = explode(',', $param->CallbackParameter->searchCriteria->accountsIds);
-				var_dump($accountIds);
 				$where[] = 'accountEntryId in (' . implode(',', array_fill(0, count($accountIds), '?')) . ')';
 				$params = array_merge($params, $accountIds);
 			}
@@ -82,11 +80,8 @@ class Controller extends BackEndPageAbstract
 			}
 
 			$transactions = $stats = array();
-			var_dump($where);
-			Dao::$debug = true;
 			if(count($where) > 0)
 				$transactions = Transaction::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('trans.id' => 'desc'), $stats );
-			Dao::$debug = false;
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {

@@ -41,7 +41,7 @@ class Transaction extends BaseEntityAbstract
 	private $balance;
 	/**
 	 * The transaction log date
-	 * 
+	 *
 	 * @var UDate
 	 */
 	private $logDate;
@@ -195,7 +195,7 @@ class Transaction extends BaseEntityAbstract
 	}
 	/**
 	 * Setter for logDate
-	 * 
+	 *
 	 * @param mixed $value The new value of logDate
 	 *
 	 * @return Transaction
@@ -276,6 +276,8 @@ class Transaction extends BaseEntityAbstract
 			$array['accountEntry'] = $this->getAccountEntry()->getJson();
 			$array['value'] = $this->getValue();
 			$array['type'] = $this->getType();
+			$attachments = $this->getAttachments();
+			$array['attachments'] = count($attachments) === 0 ? array() : array_map(create_function('$a', 'return $a->getJson();'), $attachments);
 		}
 		return parent::getJson($array, $reset);
 	}

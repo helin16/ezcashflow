@@ -3,7 +3,7 @@
  */
 var PageJs = new Class.create();
 PageJs.prototype = Object.extend(new BackEndPageJs(), {
-	_pageSize : 10
+	_pageSize : 30
 	,_searchCriteria : null
 	/**
 	 * Getting the transaction row
@@ -28,6 +28,13 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 					)
 				})
 			});
+		if(row.attachments && row.attachments.size() > 0) {
+			tmp.attachmentRow = new Element('div', {'class': ''});
+			row.attachments.each(function(attachment) {
+				tmp.attachmentRow.insert({'bottom': new Element('a', {'class': 'btn btn-success btn-xs', 'target': '_BLANK', 'href': '/asset/get?id=' + attachment.asset.skey}).update(attachment.asset.filename) });
+			})
+			tmp.newRow.insert({'bottom': tmp.attachmentRow });
+		}
 		return tmp.newRow;
 	}
 	/**
