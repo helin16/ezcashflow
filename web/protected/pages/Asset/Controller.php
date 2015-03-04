@@ -55,7 +55,7 @@ class Controller extends TService
 
     	if(!$asset instanceof Asset)
     		throw new Exception('invalid id(' . $assetId . ') to get!');
-    	$this->getResponse()->writeFile($asset->getFileName(), file_get_contents($asset->getPath()), $asset->getMimeType(), null, false);
+    	$this->getResponse()->writeFile($asset->getFileName(), $asset->getContent()->getContent(), $asset->getMimeType(), null, true);
     }
 
     private function _upload($params)

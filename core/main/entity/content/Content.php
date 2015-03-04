@@ -10,7 +10,7 @@ class Content extends BaseEntityAbstract
 {
     /**
      * The content of the file
-     * 
+     *
      * @var string
      */
     private $content;
@@ -19,7 +19,7 @@ class Content extends BaseEntityAbstract
      *
      * @return string
      */
-    public function getContent() 
+    public function getContent()
     {
         return $this->content;
     }
@@ -30,7 +30,7 @@ class Content extends BaseEntityAbstract
      *
      * @return Role
      */
-    public function setContent($value) 
+    public function setContent($value)
     {
         $this->content = $value;
         return $this;
@@ -46,7 +46,7 @@ class Content extends BaseEntityAbstract
     }
     /**
      * Getting max size of the content that system can store in bytes
-     * 
+     *
      * @return number
      */
     public static function getMaxSize()
@@ -57,7 +57,7 @@ class Content extends BaseEntityAbstract
 	    	$sql = 'SELECT character_maximum_length FROM information_schema.columns WHERE  table_schema = :db AND table_name = :tbl AND column_name = :col limit 1';
 	    	$results = Dao::getResultsNative($sql, array('db' => Config::get('Database', 'DB'), 'tbl' => strtolower(__CLASS__), 'col' => 'content'), PDO::FETCH_ASSOC);
 	    	self::addCache($key, count($results) === 0 ? 0 : $results[0]['character_maximum_length']);
-    	} 
+    	}
     	return self::getCache($key);
     }
     /**
@@ -81,16 +81,16 @@ class Content extends BaseEntityAbstract
     }
     /**
      * Creating a content
-     * 
+     *
      * @param string $content The string content of the file
-     * 
+     *
      * @return Content
      */
     public static function create($content)
     {
     	$class = get_called_class();
     	$item = new $class();
-    	return $item->setContent($content);
+    	return $item->setContent($content)->save();
     }
 }
 ?>

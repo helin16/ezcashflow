@@ -80,7 +80,7 @@ CREATE TABLE `asset` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 	`filename` varchar(100) NOT NULL DEFAULT '',
 	`mimeType` varchar(50) NOT NULL DEFAULT '',
-	`content` varchar(50) NOT NULL DEFAULT '',
+	`contentId` int(10) unsigned NOT NULL DEFAULT 0,
 	`skey` varchar(32) NOT NULL DEFAULT '',
 	`active` bool NOT NULL DEFAULT 1,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
@@ -88,6 +88,7 @@ CREATE TABLE `asset` (
 	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`)
+	,INDEX (`contentId`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
 	,INDEX (`active`)

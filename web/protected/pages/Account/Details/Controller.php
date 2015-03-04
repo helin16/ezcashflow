@@ -88,7 +88,6 @@ class Controller extends DetailsPageAbstract
 					->setName($name)
 					->setInitValue($initValue)
 					->save();
-				var_dump($account->getIsSumAcc());
 			}
 			else if($parent instanceof AccountEntry)
 				$account = AccountEntry::create(Core::getOrganization(), $parent, $name, $isSumAcc, $initValue, $description, $accountNo);

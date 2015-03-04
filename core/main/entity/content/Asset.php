@@ -18,8 +18,8 @@ class Asset extends EncryptedEntityAbstract
 	private $mimeType;
 	/**
 	 * The content of this asset
-	 * 
-	 * @var string
+	 *
+	 * @var Content
 	 */
 	protected $content;
 	/**
@@ -33,9 +33,9 @@ class Asset extends EncryptedEntityAbstract
 	}
 	/**
 	 * setter filename
-	 * 
+	 *
 	 * @param string $filename The filename of the asset
-	 * 
+	 *
 	 * @return Asset
 	 */
 	public function setFilename($filename)
@@ -54,9 +54,9 @@ class Asset extends EncryptedEntityAbstract
 	}
 	/**
 	 * setter mimeType
-	 * 
+	 *
 	 * @param string $mimeType The mimeType
-	 * 
+	 *
 	 * @return Asset
 	 */
 	public function setMimeType($mimeType)
@@ -69,7 +69,7 @@ class Asset extends EncryptedEntityAbstract
 	 *
 	 * @return Content
 	 */
-	public function getContent() 
+	public function getContent()
 	{
 		$this->loadManyToOne('content');
 	    return $this->content;
@@ -81,7 +81,7 @@ class Asset extends EncryptedEntityAbstract
 	 *
 	 * @return Asset
 	 */
-	public function setContent($value) 
+	public function setContent($value)
 	{
 	    $this->content = $value;
 	    return $this;
@@ -101,12 +101,12 @@ class Asset extends EncryptedEntityAbstract
 	public function __loadDaoMap()
 	{
 		DaoMap::begin($this, 'asset');
-		
+
 		DaoMap::setStringType('filename', 'varchar', 100);
 		DaoMap::setStringType('mimeType', 'varchar', 50);
-		DaoMap::setStringType('content');
+		DaoMap::setManyToOne('content', 'Content');
 		parent::__loadDaoMap();
-		
+
 		DaoMap::commit();
 	}
 	/**
@@ -120,7 +120,7 @@ class Asset extends EncryptedEntityAbstract
 	{
 		if(count($skeys) === 0)
 			return true;
-		
+
 		$where = 'skey in (' . implode(', ', array_fill(0, count($skeys), '?')) . ')';
 		$params = $skeys;
 		//delete the contents
@@ -142,14 +142,25 @@ class Asset extends EncryptedEntityAbstract
 	{
 		if(!is_string($dataOrFile) && (!is_file($dataOrFile)))
 			throw new CoreException(__CLASS__ . '::' . __FUNCTION__ . '() will ONLY take string to save!');
-		
 		$class = get_called_class();
 		$asset = new $class();
 		$asset->setFilename($filename)
 			->setMimeType(StringUtilsAbstract::getMimeType($filename))
-			->setContent(Content::create(is_file($dataOrFile) ? readfile($dataOrFile) : $dataOrFile))
+			->setContent(Content::create(is_file($dataOrFile) ? file_get_contents($dataOrFile) : $dataOrFile))
 			->save();
 		return $asset;
+	}
+	/**
+	 * Getting the assets
+	 *
+	 * @param unknown $assetId
+	 *
+	 * @return Asset|NULL
+	 */
+	public static function getAsset($assetId)
+	{
+		$assets = self::getAllByCriteria('skey = ?', array(trim($assetId)), true, 1, 1);
+		return (count($assets) > 0 ? $assets[0] : null);
 	}
 }
 

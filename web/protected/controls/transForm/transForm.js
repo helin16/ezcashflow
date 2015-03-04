@@ -368,7 +368,9 @@ TransFormJs.prototype = {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._pageJs._signRandID(inputBox);
-		jQuery('#' + inputBox.id).datetimepicker( {});
+		jQuery('#' + inputBox.id).datetimepicker({
+			'format': 'DD/MMM/YYYY HH:mm A'
+		});
 		return tmp.me;
 	}
 	,render: function(_inputPanel) {

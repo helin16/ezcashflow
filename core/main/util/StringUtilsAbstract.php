@@ -118,6 +118,7 @@ abstract class StringUtilsAbstract
 			case "xlc" :
 			case "xlw" :
 			case "xll" :
+			case "xlsx" :
 				return "application/vnd.ms-excel";
 
 			case "ppt" :
@@ -174,9 +175,9 @@ abstract class StringUtilsAbstract
 			default :
 		}
 
-		if(function_exists("mime_content_type"))
-			$fileSuffix = mime_content_type($filename);
+// 		if(function_exists("mime_content_type"))
+// 			$fileSuffix = mime_content_type($filename);
 
-		return "unknown/" . trim($fileSuffix[0], ".");
+		return "text/plain";
 	}
 }

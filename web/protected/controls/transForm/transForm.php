@@ -41,7 +41,7 @@ class transForm extends TTemplateControl
 			//if there is attachments
 			if(isset($params->CallbackParameter->files) && count($files = $params->CallbackParameter->files)  > 0) {
 				foreach($files as $file) {
-					$asset = Asset::registerAsset($file->fileName, $file->filePath);
+					$asset = Asset::registerAsset($file->file->name, $file->file->path);
 					foreach($transactions as $transaction) {
 						$transaction->addAttachment($asset);
 					}
