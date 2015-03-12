@@ -75,7 +75,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 			.insert({'bottom': new Element(tmp.tag, {'title': 'Total Value', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.sumValue) : acc.sumValue) })
 			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1 text-right'}).update(!acc.id ? '' :
 				new Element('span', {'class': 'btn-group btn-group-xs visible-lg visible-md visible-sm visible-xs'})
-					.insert({'bottom': new Element('span', {'class': 'btn btn-success', 'title': 'Add an new account under: ' + acc.name})
+					.insert({'bottom': new Element('span', {'class': 'btn btn-success', 'title': 'Add an new account under: ' + acc.name, 'disabled': !acc.isSumAcc})
 						.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-plus'}) })
 						.insert({'bottom': new Element('span', {'class': 'hidden-sm hidden-xs'}).update(' Add') })
 						.observe('click', function() {
@@ -86,12 +86,20 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 						.insert({'bottom': new Element('span', {'class': 'caret'}) })
 					})
 					.insert({'bottom': new Element('ul', {'class': 'dropdown-menu', 'role': 'menu'})
-						.insert({'bottom': new Element('li', {'title': 'Edit this account: ' + acc.name}).update(new Element('a', {'href': 'javascript: void(0);'})
-							.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-pencil'}) })
-							.insert({'bottom': new Element('span', {'class': 'hidden-sm hidden-xs'}).update(' Edit') })
-						)})
-						.observe('click', function() {
-							tmp.me._openAccDetailsPanel(acc, null, null);
+						.insert({'bottom': new Element('li', {'title': 'Edit this account: ' + acc.name})
+							.update(new Element('a', {'href': 'javascript: void(0);'})
+								.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-pencil'}) })
+								.insert({'bottom': new Element('span', {'class': 'hidden-sm hidden-xs'}).update(' Edit') })
+								.observe('click', function() {
+									tmp.me._openAccDetailsPanel(acc, null, null);
+								})
+							)
+						})
+						.insert({'bottom': acc.isSumAcc ? '' : new Element('li', {'title': 'View Transactions for : ' + acc.name})
+							.update(new Element('a', {'href': '/transactions.html?accountids=' + acc.id})
+								.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-list'}) })
+								.insert({'bottom': new Element('span', {'class': 'hidden-sm hidden-xs'}).update(' Transactions') })
+							)
 						})
 					})
 			) })
