@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html lang="English"><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<title>Internet Banking - Bill Payment Receipt</title>
+<style type="text/css">
+<!--
+body{font-family:arial,helvetica,sans-serif;color:black;font-size:small;margin:0px;padding:-0px}
+h1{font-family:arial,helvetica,sans-serif;font-size:medium;color:white;font-weight:bold}
+th{font-family:arial,helvetica,sans-serif;font-size:small;color:black;font-weight:bold}
+td{font-family:arial,helvetica,sans-serif;font-size:small;}
+.newpayeetext{font-family:arial,helvetica,sans-serif;font-size:small;color:#336699;font-weight:bold}
+input{font-family:Courier New}
+#A{font-family:arial,helvetica,sans-serif;font-size:small;color:#000000;text-decoration:none;font-weight:bold}
+.titletext{font-family:arial,helvetica,sans-serif;font-size:medium;color:white;font-weight:bold}
+.titletextblue{font-family:arial,helvetica,sans-serif;font-size:medium;color:blue;font-weight:bold}
+.helplinkbox{font-family:arial,helvetica,sans-serif;background-color:#32cd32;color:white;font-weight:bold;text-decoration:none}
+.dummytextbox{font-family:arial,helvetica,sans-serif;}
+.helptext{font-family:arial,helvetica,sans-serif;background-color:#808080;color:white;font-weight:bold;text-decoration:none}
+.helpnavtext{font-family:arial,helvetica,sans-serif;background-color:Red;color:white;font-weight:normal}
+.dateText{font-family:arial,helvetica,sans-serif;color:white;font-weight:normal;white-space:nowrap}
+.lista{font-family:arial,helvetica,sans-serif;font-size:small;color:#000000;text-decoration:underline;font-weight:bold}
+.listb{font-family:arial,helvetica,sans-serif;font-size:small;color:#000000;text-decoration:underline;font-weight:bold}
+.infoA{font-family:arial,helvetica,sans-serif;color:black;font-size:small;text-decoration:underline;font-weight:bold}
+.subnavtextwhite{font-family:arial,helvetica,sans-serif;background-color:#CCCCCC;color:black;font-weight:bold;text-decoration:none}
+.infoyellow{font-family:arial,helvetica,sans-serif;background-color:#F6CF30;color:black;font-weight:bold;text-decoration:none}
+.infowhite{font-family:arial,helvetica,sans-serif;background-color:#ffffff;color:black;font-weight:bold;text-decoration:none}
+.infogreen{font-family:arial,helvetica,sans-serif;background-color:#209520;color:white;font-weight:bold;text-decoration:none}
+.infored{font-family:arial,helvetica,sans-serif;background-color:red;color:white;font-weight:bold;text-decoration:none}
+.infoblue{font-family:arial,helvetica,sans-serif;background-color:#336699;color:#FFFFFF;font-weight:bold;text-decoration:none}
+.infotitle{font-family:arial,helvetica,sans-serif;background-color:#46403B;color:white;font-weight:bold;text-decoration:none}
+.infotext{font-family:arial,helvetica,sans-serif;font-size:small;background-color:#ffffff;color:black;text-decoration:none}
+.infotextnewpayee{font-family:arial,helvetica,sans-serif;font-size:small;background-color:#ffffff;color:#336699;font-weight:bolder;text-decoration:none}
+.linknewpayee{font-family:arial,helvetica,sans-serif;color:#336699}
+.infobox{background-color:#CCCCCC}
+.blacklabel{font-family:arial,helvetica,sans-serif;font-weight:bold}
+.titlecolor{font-family:arial,helvetica,sans-serif;background-color:#46403B;font-weight:bold;color:white}
+.subnavtext{font-family:arial,helvetica,sans-serif;font-weight:bold;text-decoration:none}
+.subnavlink{font-family:arial,helvetica,sans-serif;font-weight:normal;text-decoration:none}
+.subnavlink2{font-family:arial,helvetica,sans-serif;font-weight:normal;text-decoration:none}
+.subnavlink2:hover{font-family:arial,helvetica,sans-serif;font-weight:normal;text-decoration:underline;color:red;}
+.subnavtextactive{font-family:arial,helvetica,sans-serif;font-weight:normal;text-decoration:none;color:white}
+.text{font-family:arial,helvetica,sans-serif;font-size:small;}
+.textsmall{font-family:arial,helvetica,sans-serif;font-size:small;}
+.textunavail{font-family:arial,helvetica,sans-serif;color:#595959;font-weight:bold;}
+.buttonblack{font-family:arial,helvetica,sans-serif;font-weight:bold;width:160;}
+.buttonblacks{font-family:arial,helvetica,sans-serif;font-weight:bold;width:100;}
+
+	.buttonblackl{font-family:arial,helvetica,sans-serif;font-weight:bold;width:200;}
+
+.buttonblackel{font-family:arial,helvetica,sans-serif;font-weight:bold;width:250;}
+.button{font-family:arial,helvetica,sans-serif;font-weight:bold}
+.errorsymbol{font-family:arial,helvetica,sans-serif;font-size:large;text-decoration:none;font-weight:bold}
+.infosymbol{font-family:arial,helvetica,sans-serif;font-size:large;text-decoration:none;background-color:#336699;color:#FFFFFF;font-weight:bold}
+.errortitle{font-family:arial,helvetica,sans-serif;font-size:medium;text-decoration:none;background-color:#46403B;color:white;font-weight:bold}
+.errortext{font-size:medium;font-family:arial,helvetica,sans-serif;color:black}
+.listlinkdisable{background-color:#cccccc;font-family:arial,helvetica,sans-serif;color:#999999;font-weight:bold}
+.heavytext{font-family:arial,helvetica,sans-serif;color:#999999;font-weight:bold}
+.notetext{background-color:#cccccc;font-family:arial,helvetica,sans-serif;color:#666666;font-weight:bold}
+.listlink{background-color:#cccccc;font-family:arial,helvetica,sans-serif;color:#000000;text-decoration:underline;font-weight:bold}
+.titletextbig{font-family:arial,helvetica,sans-serif;font-size:large;color:black;font-weight:bold}
+.titletextmedium{font-family:arial,helvetica,sans-serif;font-size:medium;color:black;font-weight:bold}
+.tablepageheading{position:absolute;left:128px;top:103px;right:-1px;z-index:2;}
+.tabledatebar{position:absolute;left:131px;top:160px;right:-1px}
+.tabledatebar2{position:absolute;left:131px;top:148px;right:-1px;z-index:1;}
+.tablepageheadingHideNavBar{position:absolute;left:13px;top:103px;right:-1px}
+.tabledatebarHideNavBar{position:absolute;left:13px;top:160px;right:-1px}
+.tabledatebar2HideNavBar{position:absolute;left:13px;top:148px;right:-1px}
+
+	.nonavdiv{position:absolute;left:103px;top:160px;width:675px}
+
+.nav{font-size:small;font-family:arial,helvetica,sans-serif;text-decoration:none;font-weight:normal}
+.navfoot{font-family:arial,helvetica,sans-serif;text-decoration:none;position:relative;top:-2px}
+.hlink{color:#000000;text-decoration:underline;font-weight:normal}
+.pageend{font-size:small;font-family:courier new, courier;page-break-after:always;}
+.payaccept{font-family:arial,helvetica,sans-serif;background-color:#009900;color:white;font-weight:bold;text-decoration:none}
+.payreject{font-family:arial,helvetica,sans-serif;background-color:#FF0000;color:white;font-weight:bold;text-decoration:none}
+.paystopped{font-family:arial,helvetica,sans-serif;background-color:#FF0000;color:white;font-weight:bold;text-decoration:none}
+.paysend{font-family:arial,helvetica,sans-serif;background-color:#0099FF;color:white;font-weight:bold;text-decoration:none}
+.paypartialaccept{font-family:arial,helvetica,sans-serif;background-color:#99CC99;color:white;font-weight:bold;text-decoration:none}
+.paypartialreject{font-family:arial,helvetica,sans-serif;background-color:#CC9999;color:white;font-weight:bold;text-decoration:none}
+.payprocessing{font-family:arial,helvetica,sans-serif;background-color:#FF9933;color:white;font-weight:bold;text-decoration:none}
+.payerror	{font-family:arial,helvetica,sans-serif;background-color:#FF00CC;color:white;font-weight:bold;text-decoration:none;}
+.payfurtheraction	{font-family:arial,helvetica,sans-serif;background-color:#CCCC00;color:white;font-weight:bold;text-decoration:none;}
+.paycancelled	{font-family:arial,helvetica,sans-serif;background-color:#333366;color:white;font-weight:bold;text-decoration:none;}
+.paysubmittedawaiting	{font-family:arial,helvetica,sans-serif;background-color:#33CCCC;color:white;font-weight:bold;text-decoration:none;}
+.headertext{font-family:arial,helvetica,sans-serif;font-size:small;color:white;font-weight:bold;background-color:#46403B;}
+.headertext_y{font-family:arial,helvetica,sans-serif;font-size:small;color:black;font-weight:bold;background-color:#FFCC66;}
+.headertext2{font-family:arial,helvetica,sans-serif;font-size:small;color:black;font-weight:bold;background-color:#CCCCCC;}
+.Welcometext3{font-family:arial,helvetica,sans-serif;font-weight:bold;font-size: 16pt}
+.Nft{FONT-FAMILY: Arial, Helvetica, Sans-Serif;FONT-SIZE: 11px;TEXT-DECORATION: none}
+.WNft{FONT-FAMILY: Arial, Helvetica, Sans-Serif;COLOR: #ffffff;FONT-SIZE: 11px;TEXT-DECORATION: none}
+.MMft{COLOR: #ffffff;FONT-FAMILY: Arial, Helvetica, Sans-Serif;FONT-SIZE: 13px;FONT-WEIGHT: bold}
+.actionrequired{font-family:arial,helvetica,sans-serif;background-color:#CCCC00;color:white;font-weight:bold;text-decoration:none}
+.Gtft{COLOR: #000000;FONT-FAMILY: Arial, Helvetica, Sans-Serif;FONT-SIZE: 12px;text-decoration: none}
+.WGTft{COLOR: #ffffff;FONT-FAMILY: Arial, Helvetica, Sans-Serif;FONT-SIZE: 12px;text-decoration: none}
+.spanswer{font-family:arial,helvetica,sans-serif;background-color:white;color:#336699}
+.ebppheadblue{font-family:arial,helvetica,sans-serif;background-color:#46403B;color:white}
+.ebppview{font-family:arial,helvetica,sans-serif;background-color:#CCCC00;color:white;font-weight:bold;text-decoration:none;}
+.ebppreplace{font-family:arial,helvetica,sans-serif;background-color:#33CCCC;color:white;font-weight:bold;text-decoration:none;}
+.ebppviewreplace{font-family:arial,helvetica,sans-serif;background-color:#FF9933;color:white;font-weight:bold;text-decoration:none}
+.billerwidth{width:250px}
+.billerwidth1{width:258px}
+.bulletcolor{color:#209520;font-weight:normal}
+@media print {.hideImageForPrint{display:none;}}
+.printbanner {font-size: 12px;
+                vertical-align: middle;
+                width: 545px;
+                height: 20px;
+                color: #ffffff;
+                font-family: Arial, Verdana;
+                text-align: center;
+                background-color: #46403B;}
+.dtimehidden {font-size: 2px; font-family: Arial, Verdana; visibility: hidden}  
+.centerimage{float: left; position: relative; top: 5px; left: 2px}               
+-->
+</style><meta http-equiv="expires" content="60"></head>
+<body bgcolor="#ffffff">
+<!--WBC-Banner template=none--><!--/WBC-Banner-->
+<br>
+<table align="center" border="0" width="80%">
+	<tbody><tr>
+			<td align="center">
+				<table class="printbanner" align="center" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="hideImageForPrint" align="center" valign="middle"><img src="Internet%20Banking%20-%20Bill%20Payment%20Receipt_files/star_printer_R654.gif" alt="" style="vertical-align: middle; text-align: left;" align="middle" border="0">Choose the <b>Print</b> button in your browser to print this electronic receipt, then click <a href="https://online.westpac.com.au/wtib/asp/bpay/bsd_bpgetdetails.asp" style="color: #ffffff; font-family: Arial">here</a></td></tr></tbody></table>
+			</td>
+	</tr>
+</tbody></table>
+<br>
+<table align="left" border="0" cellpadding="5" cellspacing="0" width="90%"><tbody><tr><td><!--WTTESTUID='10151619800171463E1405945682437'--><img alt="Westpac" src="Internet%20Banking%20-%20Bill%20Payment%20Receipt_files/sl_westpacaustraliasfirstbank.gif"></td><td align="right" width="*">Westpac Banking Corporation<br>ABN&nbsp;33&nbsp;007&nbsp;457&nbsp;141</td></tr></tbody></table>
+<br clear="all">
+<table align="center" border="0" cellpadding="5" cellspacing="0" width="80%">
+	<tbody><tr>
+		<td class="blacklabel" colspan="4" align="left" nowrap="nowrap">Electronic BPAY Payment Receipt</td>
+	</tr>
+	<tr>
+		<td class="blacklabel" colspan="4" align="left" nowrap="nowrap"><b>Payment From</b> &nbsp;&nbsp;Westpac Choice 785029</td>
+	</tr>
+	<tr>
+		<td class="blacklabel" colspan="4" align="left" nowrap="nowrap">Payment To</td>
+	</tr>
+	<tr>
+		<td colspan="4">
+			<table summary="This table displays electronic BPAY Payment Receipt for printing " border="0" cellpadding="0" cellspacing="0" width="100%">
+				<tbody><tr>
+					<th align="left" nowrap="nowrap" width="35%">Biller Name</th>
+					<th align="left" nowrap="nowrap">&nbsp;Biller Code</th>
+					
+						<th align="left" nowrap="nowrap">&nbsp;Bill Nickname</th>
+					
+					<th align="left" nowrap="nowrap">&nbsp;Reference</th>
+					<th align="right" nowrap="nowrap" width="*">&nbsp;Amount</th>
+				</tr>
+				<tr>
+					
+						<td colspan="5"><hr align="left" size="1" width="100%"></td>
+					
+				</tr>
+				<tr>
+					<td align="left" width="35%">SRO LAND TAX</td>
+					<td align="left" nowrap="nowrap">&nbsp;5249</td>
+					
+						<td align="left" nowrap="nowrap">&nbsp;ClydeNthLandTax
+					
+					</td><td align="left" nowrap="nowrap">&nbsp;82998302</td>
+					<td align="right" nowrap="nowrap" width="*">&nbsp;$719.00</td>
+				</tr>
+				<tr>
+					
+						<td colspan="5"><hr align="left" size="1" width="100%"></td>
+					
+				</tr>
+			</tbody></table>
+		</td>
+	</tr>
+	<tr>
+		<td class="blacklabel" align="left" nowrap="nowrap" width="10%">Transaction Receipt No.</td>
+		<td>6499935</td>
+		
+			<td colspan="2">&nbsp;</td>
+		
+	</tr>
+	<tr>
+		<td class="blacklabel" align="left" nowrap="nowrap" width="10%">To be paid on</td>
+		<td colspan="3">21 July 2014</td>
+	</tr>
+	<tr>
+		<td class="blacklabel" align="left" nowrap="nowrap" width="10%">Date submitted</td>
+		<td colspan="3">21 July 2014</td>
+	</tr>
+	<tr>
+		<td class="blacklabel" align="left" nowrap="nowrap" width="10%">Time submitted</td>
+		<td colspan="3">22:27 AEST&nbsp;</td>
+	</tr>
+	<tr>
+		<td colspan="4" class="blacklabel">Note:&nbsp;<span class="textsmall">If sufficient cleared funds are not available the day before the BPAY payment is due, it may not be able to be processed.</span></td>
+	</tr>
+	
+	<tr>
+		<th align="left" nowrap="nowrap" width="10%">&nbsp;</th><td colspan="3">&nbsp;</td>
+	</tr>
+</tbody></table>
+<br>
+<br>
+
+
+
+
+</body></html>
