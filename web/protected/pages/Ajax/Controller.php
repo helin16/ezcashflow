@@ -89,8 +89,10 @@ class Controller extends TService
     	$active = isset($params['active']) ? intval($params['active']) : null;
     	$accTypeIds = isset($params['accTypeIds']) ? (is_string($params['accTypeIds']) ? explode(',', trim($params['accTypeIds'])) : $params['accTypeIds']) : array();
 
-    	$where = array('organizationId = ?');
-    	$param = array(Core::getOrganization()->getId());
+    	$where = array();
+    	$param = array();
+//     	$where = array('organizationId = ?');
+//     	$param = array(Core::getOrganization()->getId());
     	if(trim($searchTxt) !== '') {
 	    	$where[] = '(name like :searchTxt or accountNo like :searchTxt)';
 	    	$param['searchTxt'] = '%' . trim($searchTxt) . '%';
