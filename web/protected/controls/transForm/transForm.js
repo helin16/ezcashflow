@@ -168,7 +168,7 @@ TransFormJs.prototype = {
                             callback: function(value, validator, $field) {
                                 // Get the selected options
                                 tmp.options = validator.getFieldElements('from_acc_id').val();
-                                return (tmp.options != null && tmp.options.length === 1);
+                                return (tmp.options != null && tmp.options.length > 0);
                             }
                         }
                     }
@@ -180,7 +180,7 @@ TransFormJs.prototype = {
                             callback: function(value, validator, $field) {
                                 // Get the selected options
                                 tmp.options = validator.getFieldElements('to_acc_id').val();
-                                return (tmp.options != null && tmp.options.length === 1);
+                                return (tmp.options != null && tmp.options.length > 0);
                             }
                         }
 	        		}
@@ -323,6 +323,7 @@ TransFormJs.prototype = {
 		jQuery('#' + selectBox.id).select2({
 			 minimumInputLength: 3,
 			 multiple: false,
+			 allowClear: true,
 			 ajax: {
 				 delay: 250
 				 ,url: '/ajax/getAccounts'

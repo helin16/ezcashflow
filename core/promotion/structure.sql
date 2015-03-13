@@ -4,7 +4,7 @@ CREATE TABLE `accountentry` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 	`name` varchar(100) NOT NULL DEFAULT '',
 	`isSumAcc` bool NOT NULL DEFAULT 0,
-	`accountNo` int(10) unsigned NOT NULL DEFAULT 0,
+	`accountNo` int(20) unsigned NOT NULL DEFAULT 0,
 	`typeId` int(10) unsigned NOT NULL DEFAULT 0,
 	`organizationId` int(10) unsigned NOT NULL DEFAULT 0,
 	`initValue` double(10,4) NOT NULL DEFAULT 0,

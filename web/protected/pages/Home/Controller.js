@@ -30,7 +30,9 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 					tmp.sumValue = row.data[item.key];
 					tmp.newRow.insert({'bottom': new Element(tmp.tag, {'title': row.title + ': ' + tmp.popoverText}).update(
 						new Element('span', {'class': (row.title !== 'Profit' ? '' : (tmp.sumValue < 0 ? 'text-danger' : '')) })
-							.update(tmp.me.getCurrency(tmp.sumValue))
+							.update(!row.typeId ? tmp.me.getCurrency(tmp.sumValue) :
+								new Element('a', {'href': '/transactions.html?typeId=' + row.typeId + '&localFromDate=' + item.value.from.local().format('YYYY-MM-DDTHH:mm:ss') + '&localToDate=' + item.value.to.local().format('YYYY-MM-DDTHH:mm:ss')}).update(tmp.me.getCurrency(tmp.sumValue))
+							)
 					) });
 				}
 			});
@@ -47,26 +49,11 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		tmp.me = this;
 		tmp.now = new Date();
 		tmp.dateRange = {};
-
-		tmp.beginOfToday = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate());
-		tmp.endOfToday = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate(), 23, 59, 59);
-		tmp.dateRange.today = {'from': tmp.beginOfToday, 'to': tmp.endOfToday};
-
-		tmp.beginOfWeek = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate() - tmp.now.getDay() + (tmp.now.getDay() == 0 ? -6:1));
-		tmp.endOfWeek = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), tmp.now.getDate() + 7 - tmp.now.getDay(), 23, 59, 59);
-		tmp.dateRange.week = {'from': tmp.beginOfWeek, 'to': tmp.endOfWeek};
-
-		tmp.beginOfMonth = new Date(tmp.now.getFullYear(), tmp.now.getMonth(), 1);
-		tmp.endOfMonth = new Date(tmp.now.getFullYear(), tmp.now.getMonth() + 1, 0, 23, 59, 59);
-		tmp.dateRange.month = {'from': tmp.beginOfMonth, 'to': tmp.endOfMonth};
-
-		tmp.beginOfYear = new Date(tmp.now.getFullYear(), 0, 1);
-		tmp.endOfYear = new Date(tmp.now.getFullYear(), 11, 31, 23, 59, 59);
-		tmp.dateRange.year = {'from': tmp.beginOfYear, 'to': tmp.endOfYear};
-
-		tmp.beginOfAll = new Date(tmp.now.getFullYear() - 10, 0, 1);
-		tmp.endOfAll = new Date(tmp.now.getFullYear(), 11, 31, 23, 59, 59);
-		tmp.dateRange.total = {'from': tmp.beginOfAll, 'to': tmp.endOfAll};
+		tmp.dateRange.today = {'from': moment(tmp.now).startOf('day'), 'to': moment(tmp.now).endOf('day')};
+		tmp.dateRange.week = {'from': moment(tmp.now).startOf('week'), 'to': moment(tmp.now).endOf('week')};
+		tmp.dateRange.month = {'from': moment(tmp.now).startOf('month'), 'to': moment(tmp.now).endOf('month')};
+		tmp.dateRange.year = {'from': moment(tmp.now).startOf('year'), 'to': moment(tmp.now).endOf('year')};
+		tmp.dateRange.total = {'from': moment(tmp.now).subtract(10, 'year'), 'to': moment(tmp.now)};
 		return tmp.dateRange;
 	}
 	/**
@@ -104,8 +91,8 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 						tmp.expenses[item.key] = item.value.expense;
 						tmp.profits[item.key] = item.value.income * 1 - (item.value.expense * 1);
 					});
-					tmp.tbody.insert({'bottom': tmp.me._getOverviewRow({'title': 'Income', 'dateRange': tmp.dateRange, 'data': tmp.incomes}) })
-						.insert({'bottom': tmp.me._getOverviewRow({'title': 'Expense', 'dateRange': tmp.dateRange, 'data': tmp.expenses}) })
+					tmp.tbody.insert({'bottom': tmp.me._getOverviewRow({'title': 'Income', 'dateRange': tmp.dateRange, 'data': tmp.incomes, 'typeId': 3}) })
+						.insert({'bottom': tmp.me._getOverviewRow({'title': 'Expense', 'dateRange': tmp.dateRange, 'data': tmp.expenses, 'typeId': 4}) })
 						.insert({'bottom': tmp.me._getOverviewRow({'title': 'Profit', 'dateRange': tmp.dateRange, 'data': tmp.profits}) });
 					if(!tmp._resultDiv.hasClassName('table-responsive'))
 						tmp._resultDiv.addClassName('table-responsive').removeClassName('panel-body');

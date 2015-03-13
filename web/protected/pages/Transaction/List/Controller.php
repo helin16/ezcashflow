@@ -28,18 +28,31 @@ class Controller extends BackEndPageAbstract
 		$js .= '.setHTMLID("search-btn", "search-btn")';
 		$js .= '.setHTMLID("item-count", "item-count")';
 		$js .= '.setCallbackId("getTransactions", "' . $this->getTransactionsBtn->getUniqueID() . '")';
+		$js .= '.setAccountTypes(' . json_encode(array_map(create_function('$a', 'return $a->getJson();'), AccountType::getAll())) . ')';
 		$preSetData = array();
-		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate'])) {
-			$accounts = array();
-			$accountIds = explode(',', $_REQUEST['accountids']);
-			$accountIds = array_filter($accountIds);
-			if(count($accountIds) > 0)
-				$accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($accountIds), '?')) . ')', $accountIds);
-			$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
+		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate']) || isset($_REQUEST['typeId'])) {
+			if(isset($_REQUEST['accountids'])) {
+				$accounts = array();
+				$accountIds = explode(',', $_REQUEST['accountids']);
+				$accountIds = array_filter($accountIds);
+				if(count($accountIds) > 0)
+					$accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($accountIds), '?')) . ')', $accountIds);
+				$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
+			}
+			if(isset($_REQUEST['localFromDate'])) {
+				$localFromDate = new UDate(trim($_REQUEST['localFromDate']));
+				$preSetData['localFromDate'] = $localFromDate->format('d/M/Y h:i A');
+			}
+			if(isset($_REQUEST['localToDate'])) {
+				$localToDate = new UDate(trim($_REQUEST['localToDate']));
+				$preSetData['localToDate'] = $localToDate->format('d/M/Y h:i A');
+			}
+			if(isset($_REQUEST['typeId'])) {
+				$preSetData['typeId'] = trim($_REQUEST['typeId']);
+			}
 		}
-		if(count($preSetData) > 0) {
+		if(count($preSetData) > 0)
 			$js .= '._setPreData(' . json_encode($preSetData). ')';
-		}
 		$js .= '.init()';
 		$js .= ';';
 		if(count($preSetData) > 0) {
@@ -77,6 +90,10 @@ class Controller extends BackEndPageAbstract
 			if(isset($param->CallbackParameter->searchCriteria->logDate_to) && ($dateTo = trim($param->CallbackParameter->searchCriteria->logDate_to)) !== '') {
 				$where[] = 'logDate <= ?';
 				$params[] = trim(new UDate($dateTo));
+			}
+			if(isset($param->CallbackParameter->searchCriteria->accountTypeId) && ($accountTypeId = trim($param->CallbackParameter->searchCriteria->accountTypeId)) !== '') {
+				$where[] = 'accountEntryId in (select id from accountentry where typeId = ?)';
+				$params[] = trim($accountTypeId);
 			}
 
 			$transactions = $stats = array();

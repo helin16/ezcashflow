@@ -122,6 +122,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		jQuery('#' + selectBox.id).select2({
 			 minimumInputLength: 3,
 			 multiple: true,
+			 allowClear: true,
 			 ajax: {
 				 delay: 250
 				 ,url: '/ajax/getAccounts'
@@ -199,6 +200,12 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			});
 		return tmp.me;
 	}
+	,setAccountTypes: function(types) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.me._accTypes = types;
+		return tmp.me;
+	}
 	/**
 	 * Setting the preset data
 	 */
@@ -206,6 +213,19 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._preSetData = (preSetData || []);
+		return tmp.me;
+	}
+	,_initTypeSelection: function(selBox) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.selectedType = tmp.me._preSetData && tmp.me._preSetData.typeId ? tmp.me._preSetData.typeId : '';
+		tmp.me._accTypes.each(function(type) {
+			$(selBox).insert({'bottom': new Element('option', {'value': type.id, 'selected': tmp.selectedType === type.id}).update(type.name) });
+		});
+		tmp.me._signRandID(selBox);
+		jQuery('#' + selBox.id).select2({
+			allowClear: true
+		});
 		return tmp.me;
 	}
 	/**
@@ -218,8 +238,16 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			tmp.me._collectSearchCriteria()
 				._getTransactions(this, 1);
 		});
+		tmp.searchPanel = $(tmp.me.getHTMLID('search-panel-div'));
+		if(tmp.me._preSetData) {
+			if(tmp.me._preSetData.localFromDate)
+				tmp.searchPanel.down('[search-panel="logDate_from"]').setValue(tmp.me._preSetData.localFromDate);
+			if(tmp.me._preSetData.localToDate)
+				tmp.searchPanel.down('[search-panel="logDate_to"]').setValue(tmp.me._preSetData.localToDate);
+		}
 		tmp.me._initDatePicker()
-			._initSelect2($(tmp.me.getHTMLID('search-panel-div')).down('[search-panel="accountsIds"]'));
+			._initSelect2(tmp.searchPanel.down('[search-panel="accountsIds"]'))
+			._initTypeSelection(tmp.searchPanel.down('[search-panel="accountTypeId"]'));
 		return tmp.me;
 	}
 });

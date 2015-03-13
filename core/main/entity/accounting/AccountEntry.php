@@ -9,6 +9,7 @@
 class AccountEntry extends BaseEntityAbstract
 {
 	const PATH_SEPARATOR = ',';
+	const ACCOUNT_NO_LEVEL_DIGIS = 2;
     /**
      * The username
      *
@@ -323,10 +324,18 @@ class AccountEntry extends BaseEntityAbstract
     	} else {
 	    	if($this->getParent() instanceof AccountEntry) {
 	    		if(intval($this->getParent()->getIsSumAcc()) === 0)
-	    			throw new EntityException('You can ONLY create an account under a summary account.');
+	    			throw new EntityException('You can ONLY create an account under a summary account, but Account(' . implode(' / ', $this->getParent()->getBreadCrumbs()) . ') is NOT.');
 	    		$this->setRoot($this->getParent()->getRoot())
 	    			->setType($this->getParent()->getType())
 	    			->setOrganization($this->getParent()->getOrganization());
+	    	}
+	    	if(trim($this->getAccountNo()) === '') {
+	    		if($this->getParent() instanceof AccountEntry) {
+	    			$count = self::countByCriteria('parentId = ?', array($this->getParent()->getId()));
+	    			$this->setAccountNo($this->getParent()->getAccountNo() . str_pad($count + 1, self::ACCOUNT_NO_LEVEL_DIGIS, '0', STR_PAD_LEFT));
+	    		} else {
+	    			$this->setAccountNo($this->getType()->getId());
+	    		}
 	    	}
     	}
     	$where ='accountNo = ? and organizationId = ?';
@@ -357,8 +366,10 @@ class AccountEntry extends BaseEntityAbstract
     			->save();
     	}
     	if(trim($this->getPath()) === '') {
-    		$path = (trim($this->getParent()->getPath()) . self::PATH_SEPARATOR . trim($this->getId()));
-    		self::updateByCriteria('path = ?', 'id = ?', array($path, $this->getId()));
+    		$paths = $this->getParent()->getPaths();
+    		$paths[] =  trim($this->getId());
+    		$this->setPath(implode(self::PATH_SEPARATOR, $paths))
+    			->save();
     	}
     }
     /**
@@ -426,7 +437,7 @@ class AccountEntry extends BaseEntityAbstract
     	DaoMap::begin($this, 'acc_entry');
     	DaoMap::setStringType('name', 'varchar', 100);
     	DaoMap::setBoolType('isSumAcc');
-    	DaoMap::setIntType('accountNo', 'int', 10);
+    	DaoMap::setIntType('accountNo', 'int', 20);
     	DaoMap::setManyToOne('type', 'AccountType', 'acc_entry_type');
     	DaoMap::setManyToOne('organization', "Organization", 'acc_entry_org');
     	DaoMap::setIntType('initValue', 'double', '10,4', false);
