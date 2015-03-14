@@ -43,17 +43,17 @@ FrontPageJs.prototype = {
 		return this.callbackIds[key];
 	}
 
-	,setHTMLID: function($key, $value) {
+	,setHTMLID: function(key, value) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.me._htmlIDs[$key]  = $value;
+		tmp.me._htmlIDs[key]  = value;
 		return tmp.me;
 	}
 
-	,getHTMLID: function($key) {
+	,getHTMLID: function(key) {
 		var tmp = {};
 		tmp.me = this;
-		return tmp.me._htmlIDs[$key];
+		return tmp.me._htmlIDs[key];
 	}
 
 	//posting an ajax request
