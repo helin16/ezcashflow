@@ -209,7 +209,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 	/**
 	 * Setting the preset data
 	 */
-	,_setPreData(preSetData) {
+	,_setPreData: function(preSetData) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._preSetData = (preSetData || []);
