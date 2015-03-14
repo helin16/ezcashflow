@@ -22,7 +22,6 @@ class Controller extends BackEndPageAbstract
 	protected function _getEndJs()
 	{
 		$js = parent::_getEndJs();
-		$js .= 'try{';
 		$js .= 'pageJs';
 		$js .= '.setHTMLID("result-list-div", "result-wrapper")';
 		$js .= '.setHTMLID("search-panel-div", "search-wrapper")';
@@ -59,7 +58,6 @@ class Controller extends BackEndPageAbstract
 		if(count($preSetData) > 0) {
 			$js .= '$("search-btn").click()';
 		}
-		$js .= '} catch(e){console.error(e);}';
 		return $js;
 	}
 	/**

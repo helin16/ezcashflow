@@ -92,7 +92,7 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 		})
 		return tmp.me;
 	}
-	,_refreshParentWindow(item) {
+	,_refreshParentWindow: function(item) {
 		var tmp = {};
 		tmp.me = this;
 		if(window.parent && window.parent.pageJs && window.parent.pageJs._showAccounts) {
