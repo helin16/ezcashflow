@@ -228,7 +228,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 						.insert({'bottom': new Element('a', {'href': 'javascript:void(0);'}).update('Earn') })
 					})
 					.insert({'bottom': new Element('li', {'class': 'trans-type-switcher'})
-						.store('data', {'fromAccTypeIds': [1, 2], 'toAccTypeIds': [1, 2]})
+						.store('data', {'fromAccTypeIds': [1, 2, 3, 4], 'toAccTypeIds': [1, 2, 3, 4]})
 						.insert({'bottom': new Element('a', {'href': 'javascript:void(0);'}).update('Transfer') })
 					})
 				})
