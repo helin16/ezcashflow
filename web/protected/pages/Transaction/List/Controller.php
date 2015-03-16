@@ -28,6 +28,7 @@ class Controller extends BackEndPageAbstract
 		$js .= '.setHTMLID("search-btn", "search-btn")';
 		$js .= '.setHTMLID("item-count", "item-count")';
 		$js .= '.setCallbackId("getTransactions", "' . $this->getTransactionsBtn->getUniqueID() . '")';
+		$js .= '.setCallbackId("delTrans", "' . $this->delTransBtn->getUniqueID() . '")';
 		$js .= '.setAccountTypes(' . json_encode(array_map(create_function('$a', 'return $a->getJson();'), AccountType::getAll())) . ')';
 		$preSetData = array();
 		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate']) || isset($_REQUEST['typeId'])) {
@@ -102,6 +103,30 @@ class Controller extends BackEndPageAbstract
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {
+			$errors [] = $ex->getMessage ();
+		}
+		$param->ResponseData = StringUtilsAbstract::getJson ( $results, $errors );
+	}
+	/**
+	 * del Trans
+	 *
+	 * @param unknown $sender
+	 * @param unknown $param
+	 */
+	public function delTrans($sender, $param)
+	{
+		$results = $errors = array ();
+		try {
+			Dao::beginTransaction();
+
+			if(!isset($param->CallbackParameter->id) || !($trans = Transaction::get(trim($param->CallbackParameter->id))) instanceof Transaction)
+				throw new Exception('System Error: can NOT find the transaction that you are trying to delete.');
+			$trans->setActive(false)
+				->save();
+			$results ['item'] = $trans->getJson();
+			Dao::commitTransaction();
+		} catch ( Exception $ex ) {
+			Dao::rollbackTransaction();
 			$errors [] = $ex->getMessage ();
 		}
 		$param->ResponseData = StringUtilsAbstract::getJson ( $results, $errors );

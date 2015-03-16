@@ -2,6 +2,7 @@
 	<com:Application.controls.select2.select2 />
 	<com:Application.controls.bootstrapDateTimePicker.bootstrapDateTimePicker />
 	<com:TCallback ID="getTransactionsBtn" onCallback="Page.getTransactions" />
+	<com:TCallback ID="delTransBtn" onCallback="Page.delTrans" />
 	<div class="container" >
 		<div id="search-wrapper" class="panel panel-default search-panel">
 			<div class="panel-heading">
