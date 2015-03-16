@@ -11,17 +11,19 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 	,_getTransactionRow : function(row) {
 		var tmp = {};
 		tmp.me = this;
+		console.debug(row);
 		tmp.newRow = new Element('a', {'href': 'javascript: void(0);', 'class' : 'list-group-item', 'title': (row.id ? 'Description: ' + row.description : '')})
 			.store('data', row)
 			.insert({'bottom': new Element('div', {'class': 'row'})
 				.insert({'bottom': new Element('div', {'class': 'col-xs-4 col-sm-2'}).update(!row.id ? 'Date' : tmp.me.loadUTCTime(row.logDate).toLocaleString() ) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-6 col-sm-4'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 hidden-sm hidden-xs'}).update(!row.id ? 'By' : (row.logBy && row.logBy.person ? row.logBy.person.fullName : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-6 col-sm-5'})
 					.update(!row.id ? 'Account' : row.accountEntry.breadCrumbs.join(' / '))
 				})
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Credit' : ((row.credit && !row.credit.blank()) ? tmp.me.getCurrency(row.credit) : '')) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Debit' : ((row.debit && !row.debit.blank()) ? tmp.me.getCurrency(row.debit) : '')) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Balance' : ((row.balance && !row.balance.blank()) ? tmp.me.getCurrency(row.balance) : '')) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 visible-sm visible-xs text-right'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Credit' : ((row.credit && !row.credit.blank()) ? tmp.me.getCurrency(row.credit) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Debit' : ((row.debit && !row.debit.blank()) ? tmp.me.getCurrency(row.debit) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Balance' : ((row.balance && !row.balance.blank()) ? tmp.me.getCurrency(row.balance) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 visible-sm visible-xs text-right'})
 					.addClassName((row.id && row.value < 0) ? 'text-danger' : '')
 					.update(
 							!row.id ? 'Value' : ((row.value < 0 ? '-' : '+') + tmp.me.getCurrency(Math.abs(row.value)))

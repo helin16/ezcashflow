@@ -14,13 +14,13 @@
 				</span>
 			</div>
 			<div class="panel-body">
-				<div class="col-sm-6">
+				<div class="col-md-6">
 					<div class="form-group">
 						<label>Accounts:</label>
 						<input search-panel="accountsIds" class="form-control input-sm" placeholder="AccountEntry"/>
 					</div>
 				</div>
-				<div class="col-sm-2">
+				<div class="col-md-2">
 					<div class="form-group">
 						<label>Account Type:</label>
 						<select search-panel="accountTypeId" class="form-control input-sm">
@@ -28,7 +28,7 @@
 						</select>
 					</div>
 				</div>
-				<div class="col-sm-4">
+				<div class="col-md-4">
 					<div class="form-group">
 						<label>Dates:</label>
 						<div>
