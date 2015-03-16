@@ -25,21 +25,21 @@
 			<!-- Accounts:: list -->
 			<url ServiceParameter="Account.List.Controller" pattern="accounts.html" />
 			<!-- Accounts:: new -->
-			<url ServiceParameter="Account.Details.Controller" pattern="accounts/{id}.html" parameters.id="new"/>
-			<!-- Accounts:: edit -->
-			<url ServiceParameter="Account.Details.Controller" pattern="accounts/{id}.html" parameters.id="\d+"/>
+			<url ServiceParameter="Account.Details.Controller" pattern="accounts/{id}.html" parameters.id="new|\d+"/>
 
 			<!-- Transactions:: list -->
 			<url ServiceParameter="Transaction.List.Controller" pattern="transactions.html" />
+
+			<!-- User:: list -->
+			<url ServiceParameter="User.List.Controller" pattern="users.html" />
+			<!-- User:: details -->
+			<url ServiceParameter="User.Details.Controller" pattern="users/{id}.html" parameters.id="new|\d+"/>
 
 			<!-- ajax service -->
 			<url ServiceId="ajax" ServiceParameter="" pattern="ajax/{method}" parameters.method="\w+"  />
 
 			<!-- asset service -->
 			<url ServiceId="asset" ServiceParameter="" pattern="asset/{method}" parameters.method="\w+"  />
-
-			<!-- rest service -->
-			<url ServiceId="rest" ServiceParameter="" pattern="app/{version}/" parameters.method="\w+|\d+|\.+"  />
 		</module>
 
 		<module id="globalization" class="TGlobalization">
@@ -57,8 +57,12 @@
 			</modules>
 		</service>
 
-		<service id="ajax" class="Application.pages.Ajax.Controller"></service>
+		<service id="ajax" class="Application.pages.Ajax.Controller">
+			<modules>
+			  <module id="auth" class="Application.classes.WebUser.AuthManager" UserManager="users" AuthExpire="3600"/>
+			  <module id="users" class="Application.classes.WebUser.WebUserManager"/>
+			</modules>
+		</service>
 		<service id="asset" class="Application.pages.Asset.Controller"></service>
-		<service id="rest" class="Application.pages.Rest.Controller"></service>
 	</services>
 </application>

@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the Accounts::Details page
+ * This is the User::Details page
  *
  * @package    Web
  * @subpackage Controller
@@ -31,17 +31,13 @@ class Controller extends DetailsPageAbstract
 
 		if(!isset($this->Request['id']) || ($id = trim($this->Request['id'])) === '')
 			return $entity;
-		if($id === 'new' && (isset($_REQUEST['parentId']) && ($parent = AccountEntry::get($_REQUEST['parentId'])) || isset($_REQUEST['typeId']) && ($type = AccountType::get($_REQUEST['typeId'])))) {
-			$entity = new AccountEntry();
-			if($parent instanceof AccountEntry)
-				$entity->setParent($parent)->setType($parent->getType());
-			else if($type instanceof AccountType)
-				$entity->setType($type);
-			else
-				$entity = null;
+
+		if($id === 'new') {
+			$entity = new UserAccount();
+			$entity->setPerson(new Person());
 		}
 		else
-			$entity = AccountEntry::get($id);
+			$entity = UserAccount::get($id);
 		$this->_entity = $entity;
 		return $entity;
 	}
