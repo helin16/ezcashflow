@@ -78,7 +78,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				.insert({'bottom': new Element('div', {'class': 'col-xs-4 col-sm-2 col-md-2'}).update(!row.id ? 'Date' : tmp.me.loadUTCTime(row.logDate).toLocaleString() ) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-2hidden-sm hidden-xs'}).update(!row.id ? 'By' : (row.logBy && row.logBy.person ? row.logBy.person.fullName : (row.createdBy && row.createdBy.person ? row.createdBy.person.fullName : '') )) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-5 col-sm-6 col-md-4'})
-					.update(!row.id ? 'Account' : row.accountEntry.breadCrumbs.join(' / '))
+					.update(!row.id ? 'Account' : new Element('a', {'href': '/transactions.html?accountids=' + row.accountEntry.id}).update(row.accountEntry.breadCrumbs.join(' / ')))
 				})
 				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-1 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Credit' : ((row.credit && !row.credit.blank()) ? tmp.me.getCurrency(row.credit) : '')) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-1 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Debit' : ((row.debit && !row.debit.blank()) ? tmp.me.getCurrency(row.debit) : '')) })
