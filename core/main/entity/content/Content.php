@@ -13,7 +13,7 @@ class Content extends BaseEntityAbstract
      *
      * @var string
      */
-    private $content;
+    private $content = '';
     /**
      * Getter for content
      *
@@ -86,11 +86,14 @@ class Content extends BaseEntityAbstract
      *
      * @return Content
      */
-    public static function create($content)
+    public static function create($contentFilePath)
     {
     	$class = get_called_class();
     	$item = new $class();
-    	return $item->setContent($content)->save();
+    	$item = $item->save();
+    	$stmt = Dao::connect()->prepare('update content set content = Load_FILE("' . $contentFilePath . '") where id = ?');
+    	$stmt->execute(array($item->getId()));
+    	return $item;
     }
 }
 ?>
