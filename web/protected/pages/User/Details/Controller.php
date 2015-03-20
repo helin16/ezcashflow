@@ -35,7 +35,8 @@ class Controller extends DetailsPageAbstract
 		if($id === 'new') {
 			$entity = new UserAccount();
 			$entity->setPerson(new Person());
-		}
+		} else if ($id === 'me')
+			$entity = Core::getUser();
 		else
 			$entity = UserAccount::get($id);
 		$this->_entity = $entity;
@@ -54,41 +55,35 @@ class Controller extends DetailsPageAbstract
 		$results = $errors = array();
 		try {
 			Dao::beginTransaction();
-			if(!isset($params->CallbackParameter->typeId) || !($type = AccountType::get(trim($params->CallbackParameter->typeId))) instanceof AccountType)
-				throw new Exception('No typeId provided.');
-			if(!isset($params->CallbackParameter->name) || ($name = trim($params->CallbackParameter->name)) === '')
-				throw new Exception('No name provided.');
-			if(!isset($params->CallbackParameter->accountNo) || ($accountNo = trim($params->CallbackParameter->accountNo)) === '')
-				throw new Exception('No accountNo provided.');
-			$isSumAcc = false;
-			if(isset($params->CallbackParameter->isSumAcc))
-				$isSumAcc = intval($params->CallbackParameter->isSumAcc) === 1 ? true : false;
-			$parent = null;
-			if(isset($params->CallbackParameter->parentId) && !($parent = AccountEntry::get(trim($params->CallbackParameter->parentId))) instanceof AccountEntry)
-				throw new Exception('Invalid parent account provided.');
-			$initValue = 0;
-			if(isset($params->CallbackParameter->initValue) && !is_numeric($initValue = trim($params->CallbackParameter->initValue)))
-				throw new Exception('Invalid initial value provided.');
-			$description = '';
-			if(isset($params->CallbackParameter->description))
-				$description = trim($params->CallbackParameter->description);
+			if(!isset($params->CallbackParameter->firstName) || ($firstName = trim($params->CallbackParameter->firstName)) === '')
+				throw new Exception('FirstName is required.');
+			if(!isset($params->CallbackParameter->lastName) || ($lastName = trim($params->CallbackParameter->lastName)) === '')
+				throw new Exception('LastName is required.');
+			if(!isset($params->CallbackParameter->email) || ($email = trim($params->CallbackParameter->email)) === '')
+				throw new Exception('Email is required.');
 
-			if(isset($params->CallbackParameter->accId)) {
-				$accountId = trim($params->CallbackParameter->accId);
-				if(!($account = AccountEntry::get($accountId)) instanceof AccountEntry)
-					throw new Exception('Invalid Account: ' . $accountId);
-				$account->setDescription($description)
-					->setAccountNo($accountNo)
-					->setIsSumAcc($isSumAcc)
-					->setName($name)
-					->setInitValue($initValue)
-					->save();
+			if(isset($params->CallbackParameter->userId)) {
+				if(!($userAccount = UserAccount::get($params->CallbackParameter->userId)) instanceof UserAccount)
+					throw new Exception('System Error: invalid user id');
+				if($userAccount->getPerson() instanceof Person)
+					$userAccount->getPerson()
+						->setFirstName($firstName)
+						->setLastName($lastName)
+						->setEmail($email)
+						->save();
+				if(isset($params->CallbackParameter->password) && ($password = trim($params->CallbackParameter->password)) !== '') {
+					if(!isset($params->CallbackParameter->confirmPassword) || $password !== trim($params->CallbackParameter->confirmPassword))
+						throw new Exception('Confirm password is NOT matched with password!');
+					$userAccount = UserAccount::updateUser($userAccount, $email, $password, false);
+				}
+			} else {
+				if(!isset($params->CallbackParameter->password) || ($password = trim($params->CallbackParameter->password)) === '')
+					throw new Exception('Password Required.');
+				if(!isset($params->CallbackParameter->confirmPassword) || $password !== trim($params->CallbackParameter->confirmPassword))
+					throw new Exception('Confirm password is NOT matched with password!');
+				$userAccount = UserAccount::create($email, $password, Person::create($firstName, $lastName, $email), false);
 			}
-			else if($parent instanceof AccountEntry)
-				$account = AccountEntry::create(Core::getOrganization(), $parent, $name, $isSumAcc, $initValue, $description, $accountNo);
-			else
-				$account = AccountEntry::createRootAccount(Core::getOrganization(), $name, $type, $isSumAcc, $initValue, $description, $accountNo);
-			$results['item'] = $account->getJson();
+			$results['item'] = $userAccount->getJson();
 			Dao::commitTransaction();
 
 		} catch(Exception $ex) {

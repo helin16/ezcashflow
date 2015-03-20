@@ -10,13 +10,13 @@ class UserAccount extends ConfirmEntityAbstract
 {
     /**
      * The id of the GUEST account
-     * 
+     *
      * @var int
      */
     const ID_GUEST_ACCOUNT = 1;
     /**
      * The id of the system account
-     * 
+     *
      * @var int
      */
     const ID_SYSTEM_ACCOUNT = 42;
@@ -34,7 +34,7 @@ class UserAccount extends ConfirmEntityAbstract
     private $password;
     /**
      * the person of the user account
-     * 
+     *
      * @var Person
      */
     protected $person;
@@ -43,7 +43,7 @@ class UserAccount extends ConfirmEntityAbstract
    	 *
    	 * @return string
    	 */
-   	public function getUsername() 
+   	public function getUsername()
    	{
    	    return $this->username;
    	}
@@ -54,7 +54,7 @@ class UserAccount extends ConfirmEntityAbstract
    	 *
    	 * @return UserAccount
    	 */
-   	public function setUsername($value) 
+   	public function setUsername($value)
    	{
    	    $this->username = $value;
    	    return $this;
@@ -154,7 +154,7 @@ class UserAccount extends ConfirmEntityAbstract
         DaoMap::setStringType('password', 'varchar', 40);
         DaoMap::setManyToOne('person', 'Person');
         parent::__loadDaoMap();
-        
+
         DaoMap::createIndex('username');
         DaoMap::createIndex('password');
         DaoMap::commit();
@@ -179,9 +179,9 @@ class UserAccount extends ConfirmEntityAbstract
     }
     /**
      * encrypt password
-     * 
+     *
      * @param string $password
-     * 
+     *
      * @return string
      */
     public static function encryptPass($password)
@@ -190,18 +190,18 @@ class UserAccount extends ConfirmEntityAbstract
     }
     /**
      * Creating a new useraccount
-     * 
+     *
      * @param unknown $username
      * @param unknown $password
      * @param Person  person
-     * 
+     *
      * @return UserAccount
      */
-    public static function create($username, $password, Person $person, $encryptPass = true)
+    public static function create($username, $password, Person $person, $encryptedPass = true)
     {
     	$userAccount = new UserAccount();
     	return $userAccount->setUserName($username)
-    		->setPassword($password, !$encryptPass)
+    		->setPassword($password, !$encryptedPass)
     		->setPerson($person)
     		->save()
     		->needToConfirm('UserAccount Created')
@@ -216,10 +216,10 @@ class UserAccount extends ConfirmEntityAbstract
      *
      * @return Ambigous <BaseEntity, BaseEntityAbstract>
      */
-    public static function updateUser(UserAccount &$userAccount, $username, $password, $encryptPass = true)
+    public static function updateUser(UserAccount &$userAccount, $username, $password, $encryptedPass = true)
     {
     	return $userAccount->setUserName($username)
-    		->setPassword($password, !$encryptPass)
+    		->setPassword($password, !$encryptedPass)
     		->save()
     		->addLog(Log::TYPE_SYS, 'UserAccount updated with (username=' . $username . ') with person(id=' . $userAccount->getPerson()->getId() . ')' );
     }

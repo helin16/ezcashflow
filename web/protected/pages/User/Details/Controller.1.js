@@ -67,7 +67,7 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 		});
 		//editing
 		if(tmp.me._entity.id && !tmp.me._entity.id.blank()) {
-			tmp.data.accId = tmp.me._entity.id;
+			tmp.data.userId = tmp.me._entity.id;
 		}
 
 		tmp.loadingDiv = tmp.me._getLoadingDiv().addClassName("panel-body");
@@ -84,9 +84,10 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 						.insert({'bottom': new Element('h4', {'class': 'text-success'})
 							.insert({'bottom': new Element('i', {'class': 'fa fa-check-circle fa-6'})})
 						})
-						.insert({'bottom': new Element('strong', {'class': 'text-success'}).update('"' + tmp.result.item.name + '" saved successfully.')})
+						.insert({'bottom': new Element('strong', {'class': 'text-success'}).update('"' + tmp.result.item.person.fullName + '" saved successfully.')})
 					);
-					tmp.me._refreshParentWindow(tmp.result.item);
+					window.location = document.URL;
+					tmp.me._refreshParentWindow();
 				} catch(e) {
 					tmp.me.showModalBox('<strong class="text-danger">Error</strong>', e);
 				}
@@ -100,14 +101,12 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 		})
 		return tmp.me;
 	}
-	,_refreshParentWindow: function(item) {
+	,_refreshParentWindow: function() {
 		var tmp = {};
 		tmp.me = this;
-//		if(window.parent && window.parent.pageJs && window.parent.pageJs._showAccounts) {
-//			window.parent.pageJs._showAccounts(item.type, function() {
-//				window.parent.pageJs._closeAccDetailsPanel();
-//			});
-//		}
+		if(window.parent && window.parent.pageJs && window.parent.pageJs.hideModalBox) {
+			window.parent.pageJs.hideModalBox();
+		}
 		return tmp.me;
 	}
 	,_initForm: function() {

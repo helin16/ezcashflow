@@ -22,7 +22,7 @@
 							<span class="caret"></span>
 						</a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="#"><i class="glyphicon glyphicon-cog"></i> Change Details</a></li>
+							<li><a href="/users/me.html"><i class="glyphicon glyphicon-cog"></i> Change Details</a></li>
 							<li><a href="/logout.html"><i class="glyphicon glyphicon-log-out"></i> LogOut</a></li>
 						</ul>
 					</li>

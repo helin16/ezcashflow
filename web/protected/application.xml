@@ -33,7 +33,7 @@
 			<!-- User:: list -->
 			<url ServiceParameter="User.List.Controller" pattern="users.html" />
 			<!-- User:: details -->
-			<url ServiceParameter="User.Details.Controller" pattern="users/{id}.html" parameters.id="new|\d+"/>
+			<url ServiceParameter="User.Details.Controller" pattern="users/{id}.html" parameters.id="new|me|\d+"/>
 
 			<!-- ajax service -->
 			<url ServiceId="ajax" ServiceParameter="" pattern="ajax/{method}" parameters.method="\w+"  />
