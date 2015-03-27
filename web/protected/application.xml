@@ -30,6 +30,11 @@
 			<!-- Transactions:: list -->
 			<url ServiceParameter="Transaction.List.Controller" pattern="transactions.html" />
 
+			<!-- Property:: list -->
+			<url ServiceParameter="Property.List.Controller" pattern="properties.html" />
+			<!-- Property:: details/new -->
+			<url ServiceParameter="Property.Details.Controller" pattern="properties/{id}.html" parameters.id="new|\d+" />
+
 			<!-- User:: list -->
 			<url ServiceParameter="User.List.Controller" pattern="users.html" />
 			<!-- User:: details -->
