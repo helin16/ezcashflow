@@ -76,7 +76,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			.store('data', row)
 			.insert({'bottom': new Element('div', {'class': 'row'})
 				.insert({'bottom': new Element('div', {'class': 'col-xs-4 col-sm-2 col-md-2'}).update(!row.id ? 'Date' : tmp.me.loadUTCTime(row.logDate).toLocaleString() ) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-2hidden-sm hidden-xs'}).update(!row.id ? 'By' : (row.logBy && row.logBy.person ? row.logBy.person.fullName : (row.createdBy && row.createdBy.person ? row.createdBy.person.fullName : '') )) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-2 hidden-sm hidden-xs'}).update(!row.id ? 'By' : (row.logBy && row.logBy.person ? row.logBy.person.fullName : (row.createdBy && row.createdBy.person ? row.createdBy.person.fullName : '') )) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-5 col-sm-6 col-md-4'})
 					.update(!row.id ? 'Account' : new Element('a', {'href': '/transactions.html?accountids=' + row.accountEntry.id}).update(row.accountEntry.breadCrumbs.join(' / ')))
 				})
