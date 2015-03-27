@@ -280,7 +280,7 @@ class Transaction extends BaseEntityAbstract
   public function getValue()
   {
     if(!$this->getAccountEntry() instanceof AccountEntry || !$this->getAccountEntry()->getType() instanceof AccountType)
-      return null;
+      	return null;
     $value = ($this->getCredit() === null ? $this->getDebit() : $this->getCredit());
     $type = $this->getType();
     if($this->getType() === self::TYPE_CREDIT) { //credit

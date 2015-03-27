@@ -104,7 +104,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		tmp.newRow = new Element('a', {'href': 'javascript: void(0);', 'class' : 'list-group-item item-row', 'title': (row.id ? 'Description: ' + row.description : ''), 'item-id': row.id ? row.id : '' })
 			.store('data', row)
 			.insert({'bottom': new Element('div', {'class': 'row'})
-				.insert({'bottom': new Element('div', {'class': 'col-xs-8 col-sm-2 col-md-6'}).update(!row.id ? 'Property' :
+				.insert({'bottom': new Element('div', {'class': 'col-xs-8 col-sm-2 col-md-5'}).update(!row.id ? 'Property' :
 					new Element('a', {'href': 'javascript: void(0)'}).update(row.name)
 						.observe('click', function(event){
 							tmp.me.openEditPage(row);
@@ -120,13 +120,11 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Expense' : row.expenseAcc && row.expenseAcc.id ?
 						new Element('abbr', {'title': row.expenseAcc.breadCrumbs.join(' / ')}).update(tmp.me.getCurrency(row.expenseAcc.sumValue) ) : ''
 				) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-3 col-sm-1 col-md-1 '}).update(!row.id ? 'Profit' :
-					(tmp.profit === '' ? '' :
-						( tmp.profit < 0 ?
-							'<strong class="text-danger">' + tmp.me.getCurrency(tmp.profit) + '<strong>' :
-							'<strong class="text-success">' + tmp.me.getCurrency(tmp.profit) + '<strong>'
-						)
-					)
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-1 '}).update(!row.id ? 'Profit' :
+					(tmp.profit === '' ? '' : '<strong class="' + (tmp.profit < 0 ? "text-danger" : "text-success") + '">' + tmp.me.getCurrency(tmp.profit) + '<strong>')
+				) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-sm-1 col-md-1 hidden-sm '}).update(!row.id ? '%' :
+					(tmp.profit === '' ? '' : '<strong class="' + (tmp.profit < 0 ? "text-danger" : "text-success") + '">' + Math.round(tmp.profit * 100 / row.boughtPrice) + '%<strong>')
 				) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-md-1 col-md-1 text-right'})
 					.insert({'bottom': !row.id ? '' : new Element('div', {'class': 'btn-group'})
@@ -144,13 +142,35 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 						})
 					})
 				})
-			});
+			})
+			.insert({'bottom': !row.id ? '' : new Element('div', {'class': 'row'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-8 col-sm-2 col-md-5'}) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-4 col-sm-10 col-md-6 performance-list-panel'})
+					.store('PropertyPerformanceListPanelJs', tmp.PropertyPerformanceListPanelJs = new PropertyPerformanceListPanelJs(tmp.me, row))
+					.update(tmp.PropertyPerformanceListPanelJs.getPanel())
+				})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-md-1 col-md-1 text-right'}) })
+			})
+			;
 		if(row.attachments && row.attachments.size() > 0) {
 			tmp.attachmentRow = new Element('div', {'class': ''});
 			row.attachments.each(function(attachment) {
 				tmp.attachmentRow.insert({'bottom': new Element('a', {'class': 'btn btn-success btn-xs', 'target': '_BLANK', 'href': '/asset/get?id=' + attachment.asset.skey}).setStyle('margin-right: 3px').update(attachment.asset.filename) });
 			})
 			tmp.newRow.insert({'bottom': tmp.attachmentRow });
+		}
+		if(row.id) {
+			tmp.newRow.observe('click', function() {
+				tmp.btn = $(this);
+				if(!tmp.btn.hasClassName('loadedPerformancePanel')) {
+					tmp.btn.addClassName('loadedPerformancePanel')
+						.down('.performance-list-panel')
+						.retrieve('PropertyPerformanceListPanelJs')
+						.render();
+				} else {
+					tmp.btn.down('.performance-list-panel').toggle();
+				}
+			})
 		}
 		return tmp.newRow;
 	}

@@ -31,7 +31,7 @@ class Controller extends BackEndPageAbstract
 		$js .= '.setCallbackId("delTrans", "' . $this->delTransBtn->getUniqueID() . '")';
 		$js .= '.setAccountTypes(' . json_encode(array_map(create_function('$a', 'return $a->getJson();'), AccountType::getAll())) . ')';
 		$preSetData = array();
-		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate']) || isset($_REQUEST['typeId'])) {
+		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate']) || isset($_REQUEST['typeId']) || isset($_REQUEST['lookDownAccId'])) {
 			if(isset($_REQUEST['accountids'])) {
 				$accounts = array();
 				$accountIds = explode(',', $_REQUEST['accountids']);
@@ -39,6 +39,11 @@ class Controller extends BackEndPageAbstract
 				if(count($accountIds) > 0)
 					$accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($accountIds), '?')) . ')', $accountIds);
 				$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
+			} else if ($_REQUEST['lookDownAccId']) {
+				if(!($lookDownAcc = AccountEntry::get($_REQUEST['lookDownAccId'])) instanceof AccountEntry)
+					throw new Exception('Invalid look down account id:' . $_REQUEST['lookDownAccId']);
+				$accounts = array($lookDownAcc);
+				$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), array_merge($accounts, $lookDownAcc->getChildren(true)));
 			}
 			if(isset($_REQUEST['localFromDate'])) {
 				$localFromDate = new UDate(trim($_REQUEST['localFromDate']));

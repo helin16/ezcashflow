@@ -411,6 +411,49 @@ class AccountEntry extends BaseEntityAbstract
     	self::addCache($key, $sum);
 		return $sum;
     }
+    /**
+     * Getting the round balance for a period of time
+     *
+     * @param UDate $start
+     * @param UDate $end
+     * @param bool  $resetCache
+     *
+     * @return number
+     */
+    public function getPeriodRuningBalance(UDate $start, UDate $end, $inclChildren = false, $resetCache = false)
+    {
+    	if(trim($this->getId()) === '')
+    		return 0;
+    	$key = md5('PeriodRuningBalance_' . $this->getId() . trim($start) . trim($end) . trim($inclChildren));
+    	if(self::cacheExsits($key) === true && $resetCache !== true)
+    		return self::getCache($key);
+
+    	Transaction::getQuery()
+    		->eagerLoad('Transaction.accountEntry',
+    			'inner join',
+    			'trans_acc',
+    			'trans_acc.id = trans.accountEntryId and trans.active = 1 and trans_acc.active = 1 and ' . ($inclChildren === true ? 'trans_acc.path like "' . $this->getPath() . '%"' : 'trans_acc.id = ' . $this->getId()));
+    	$value = 0;
+    	foreach(Transaction::getAll() as $trans)
+    		$value += $trans->getValue();
+    	self::addCache($key, $value);
+    	return $value;
+    }
+    /**
+     * Getting all the children for an account entry
+     *
+     * @param bool $allChildren
+     * @param bool $resetCache
+     *
+     * @return array
+     */
+    public function getChildren($allChildren = false, $resetCache = false)
+    {
+    	$where = array('id != :accId');
+    	$params = array('accId' => $this->getId(), 'path' => trim($this->getPath()));
+    	$where[] = ($allChildren === true ? 'path like :path' : 'parentId = :accId');
+    	return AccountEntry::getAllByCriteria(implode(' AND ', $where), $params);
+    }
 	/**
      * (non-PHPdoc)
      * @see BaseEntityAbstract::getJson()
