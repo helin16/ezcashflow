@@ -50,7 +50,7 @@ PropertyPerformanceListPanelJs.prototype = {
 		tmp.expense = row.expense === '' ? '' :
 			new Element('a', {'target': '_BLANK', 'href': '/transactions.html?lookDownAccId=' + tmp.me._property.expenseAcc.id + tmp.timeString}).update( tmp.me._pageJs.getCurrency(row.expense) );
 		tmp.profit = row.income === '' || row.expense === '' ? '' : tmp.me._pageJs.getCurrency(row.income - row.expense);
-		tmp.profitPercentage = tmp.profit === '' ? '' : (tmp.me._property.boughtPrice > 0 ? (tmp.me._pageJs.getValueFromCurrency(tmp.profit) * 100 / tmp.me._property.boughtPrice) + '%' : '')
+		tmp.profitPercentage = tmp.profit === '' ? '' : (tmp.me._property.boughtPrice > 0 ? Math.round(tmp.me._pageJs.getValueFromCurrency(tmp.profit) * 100 / tmp.me._property.boughtPrice) + '%' : '')
 		tmp.newDiv = new Element('a', {'class': 'list-group-item', 'href': 'javascript: void(0);'})
 			.setStyle("margin: 0; padding: 0;")
 			.store(row)
