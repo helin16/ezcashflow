@@ -434,7 +434,7 @@ class AccountEntry extends BaseEntityAbstract
     			'trans_acc',
     			'trans_acc.id = trans.accountEntryId and trans.active = 1 and trans_acc.active = 1 and ' . ($inclChildren === true ? 'trans_acc.path like "' . $this->getPath() . '%"' : 'trans_acc.id = ' . $this->getId()));
     	$value = 0;
-    	foreach(Transaction::getAll() as $trans)
+    	foreach(Transaction::getAllByCriteria('logDate >= ? and logDate <= ?', array(trim($start), trim($end))) as $trans)
     		$value += $trans->getValue();
     	self::addCache($key, $value);
     	return $value;
