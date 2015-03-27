@@ -79,7 +79,7 @@ class Controller extends TService
 	    		throw new Exception('System Error: file not exsits:' . $filePath);
 	    	$results['file'] = array('path' => $filePath, 'name' => $filename);
     	} catch (Exception $ex) {
-    		$errors[] = $ex->getMessage();
+    		$errors[] = $ex->getMessage() . print_r($response, true);
     	}
     	$this->getResponse()->flush();
     	$this->getResponse()->appendHeader('Content-Type: application/json');
