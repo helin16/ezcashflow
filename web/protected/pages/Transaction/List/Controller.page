@@ -7,7 +7,7 @@
 		<div id="search-wrapper" class="panel panel-default search-panel">
 			<div class="panel-heading">
 				<label style="margin: 0px; padding: 0"> Show Search Criteria?
-					<input type="checkbox" checked onclick="$(this).up('.panel').down('.panel-body').toggle();"/>
+					<input class='show-search-criteria-checkbox' type="checkbox" checked onclick="$(this).up('.panel').down('.panel-body').toggle();"/>
 				</label>
 				<span id="search-btn" class="btn btn-primary pull-right btn-xs" data-loading-text="<span class='fa fa-spinner fa-spin'></span>">
 					<span class="glyphicon glyphicon-search"></span>

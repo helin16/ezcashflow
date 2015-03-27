@@ -314,6 +314,8 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				tmp.searchPanel.down('[search-panel="logDate_from"]').setValue(tmp.me._preSetData.localFromDate);
 			if(tmp.me._preSetData.localToDate)
 				tmp.searchPanel.down('[search-panel="logDate_to"]').setValue(tmp.me._preSetData.localToDate);
+			tmp.searchPanel.down('.panel-body').hide();
+			tmp.searchPanel.down('.show-search-criteria-checkbox').checked = false;
 		}
 		tmp.me._initDatePicker()
 			._initSelect2(tmp.searchPanel.down('[search-panel="accountsIds"]'))
