@@ -110,7 +110,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 							tmp.me.openEditPage(row);
 						})
 				) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Bought' : tmp.me.getCurrency(row.boughtValue) ) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Bought' : tmp.me.getCurrency(row.boughtPrice) ) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Setup' : row.setupAcc && row.setupAcc.id ?
 						new Element('abbr', {'title': row.setupAcc.breadCrumbs.join(' / ')}).update(tmp.me.getCurrency(row.setupAcc.sumValue)) : ''
 				) })
