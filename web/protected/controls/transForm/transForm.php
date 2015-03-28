@@ -7,11 +7,21 @@ class transForm extends TTemplateControl
 	 */
 	public function onLoad($param)
 	{
+		parent::onInit($param);
 		if(!$this->getPage()->IsPostBack || !$this->getPage()->IsCallback)
 		{
 			$clientScript = $this->getPage()->getClientScript();
 			$clientScript->registerPradoScript('ajax');
-			$clientScript->registerScriptFile('transForm.js', $this->publishAsset(get_class($this) . '.js'));
+			$className = get_class($this);
+			$scriptArray = FrontEndPageAbstract::getLastestJS($className);
+			foreach($scriptArray as $key => $value) {
+				if(($value = trim($value)) !== '') {
+					if($key === 'js')
+						$this->getPage()->getClientScript()->registerScriptFile($className . 'Js', $this->publishAsset($value));
+					else if($key === 'css')
+						$this->getPage()->getClientScript()->registerStyleSheetFile($className . 'Css', $this->publishAsset($value));
+				}
+			}
 			$clientScript->registerBeginScript('transForm.init.js', 'TransFormJs.searchCallbackId="' . $this->searchAccountsBtn->getUniqueID() . '";TransFormJs.saveTransCallbackId="' . $this->saveTransBtn->getUniqueID() . '";');
 		}
 	}
