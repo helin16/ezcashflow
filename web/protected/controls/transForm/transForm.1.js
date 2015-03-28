@@ -354,7 +354,7 @@ TransFormJs.prototype = {
 				tmp.option = element.text;
 				if(!element.data)
 					return tmp.option;
-				return '<div><span class="pull-left">' + tmp.option + '</span><span class="badge pull-right">' + tmp.me.getCurrency(element.data.sumValue) + '</span></div>';
+				return '<div><span class="pull-left">' + tmp.option + '</span><span class="badge pull-right">' + tmp.me._pageJs.getCurrency(element.data.sumValue) + '</span></div>';
 			}
 			,formatResult : function(result, label, query, escapeMarkup) {
 				tmp.markup = [];
