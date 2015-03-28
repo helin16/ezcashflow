@@ -16,16 +16,13 @@ class Controller extends TService
     public function run()
     {
     	$results = $errors = array();
-        try
-        {
+        try {
             $method = '_' . ((isset($this->Request['method']) && trim($this->Request['method']) !== '') ? trim($this->Request['method']) : '');
             if(!method_exists($this, $method))
                 throw new Exception('No such a method: ' . $method . '!');
 
             $results = $this->$method($_REQUEST);
-        }
-        catch (Exception $ex)
-        {
+        } catch (Exception $ex) {
         	$errors = $ex->getMessage() . $ex->getTraceAsString();
         }
         $this->getResponse()->flush();
@@ -89,10 +86,8 @@ class Controller extends TService
     	$active = isset($params['active']) ? intval($params['active']) : null;
     	$accTypeIds = isset($params['accTypeIds']) ? (is_string($params['accTypeIds']) ? explode(',', trim($params['accTypeIds'])) : $params['accTypeIds']) : array();
 
-    	$where = array();
-    	$param = array();
-//     	$where = array('organizationId = ?');
-//     	$param = array(Core::getOrganization()->getId());
+    	$where = array('organizationId = :orgId');
+    	$param = array('orgId' => Core::getOrganization()->getId());
     	if(trim($searchTxt) !== '') {
 	    	$where[] = '(name like :searchTxt or accountNo like :searchTxt)';
 	    	$param['searchTxt'] = '%' . trim($searchTxt) . '%';

@@ -89,6 +89,18 @@ class Attachment extends BaseEntityAbstract
 	}
 	/**
 	 * (non-PHPdoc)
+	 * @see BaseEntityAbstract::postSave()
+	 */
+	public function postSave()
+	{
+		if(intval($this->getActive()) === 0) {
+			if(self::countByCriteria('assetId = ? and active = 0', array($this->getAsset()->getId())) <= 0) {
+				Asset::removeAssets(array($this->getAsset()->getSkey()));
+			}
+		}
+	}
+	/**
+	 * (non-PHPdoc)
 	 * @see BaseEntityAbstract::getJson()
 	 */
 	public function getJson($extra = '', $reset = false)

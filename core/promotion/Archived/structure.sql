@@ -120,7 +120,7 @@ CREATE TABLE `attachment` (
 DROP TABLE IF EXISTS `content`;
 CREATE TABLE `content` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-	`content` longtext NOT NULL ,
+	`content` LONGBLOB NOT NULL ,
 	`active` bool NOT NULL DEFAULT 1,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`createdById` int(10) unsigned NOT NULL DEFAULT 0,

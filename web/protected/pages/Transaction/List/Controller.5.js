@@ -6,26 +6,96 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 	_pageSize : 30
 	,_searchCriteria : null
 	/**
+	 * Ajax: delete the transaction
+	 */
+	,_submitDelete: function (btn, data) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.data = data;
+		tmp.me.postAjax(tmp.me.getCallbackId('delTrans'), {'id': tmp.data.id}, {
+			'onLoading': function() {
+				jQuery('.trans-item-row[trans-group-id="' + tmp.data.groupId + '"]').hide();
+			}
+			,'onSuccess': function(sender, param) {
+				try {
+					tmp.result = tmp.me.getResp(param, false, true);
+					if(!tmp.result|| !tmp.result.item || !tmp.result.item.groupId)
+						return;
+					jQuery('.trans-item-row[trans-group-id="' + tmp.result.item.groupId + '"]').remove();
+					tmp.me.hideModalBox();
+				} catch (e) {
+					tmp.modalContentDiv = $(btn).up('.modal-content');
+					tmp.modalContentDiv.down('.modal-title').update('<h4 class="text-danger">Failed. Error:</h4>');
+					tmp.modalContentDiv.down('.modal-body').update(e);
+				}
+			}
+			,'onComplete': function() {
+				jQuery('.trans-item-row[trans-group-id="' + tmp.data.groupId + '"]').show();
+			}
+		})
+		return tmp.me;
+	}
+	/**
+	 * showing the confirmation panel for deletion
+	 */
+	,_showConfirmDeletion: function(btn) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.row = $(btn).up('.trans-item-row');
+		tmp.data = tmp.row.retrieve('data');
+		tmp.newDiv = new Element('div')
+			.insert({'bottom': new Element('div', {'class': 'text-danger'})
+				.insert({'bottom': new Element('div').update('You are about to DELETE this transaction with value: <strong>' + tmp.me.getCurrency(Math.abs(tmp.data.value)) + '</strong> ?')  })
+				.insert({'bottom': new Element('div').update( new Element('p').update('All the related transactions will be deleted too.') ) })
+				.insert({'bottom': new Element('div').update( new Element('p').update('Are You sure you want to continue?') ) })
+			})
+			.insert({'bottom': new Element('div')
+				.insert({'bottom': new Element('span', {'class': 'btn btn-default'})
+					.update('NO, Cancel this')
+					.observe('click', function(){
+						tmp.me.hideModalBox();
+					})
+				})
+				.insert({'bottom': new Element('span', {'class': 'btn btn-danger pull-right'})
+					.update('YES, Delete it')
+					.observe('click', function(){
+						tmp.me._submitDelete(this, tmp.data);
+					})
+				})
+			});
+		tmp.me.showModalBox('<h4 class="text-danger" style="margin:0px;">Confirm</h4>', tmp.newDiv);
+		return tmp.me;
+	}
+	/**
 	 * Getting the transaction row
 	 */
 	,_getTransactionRow : function(row) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.newRow = new Element('a', {'href': 'javascript: void(0);', 'class' : 'list-group-item', 'title': (row.id ? 'Description: ' + row.description : '')})
+		tmp.newRow = new Element('a', {'href': 'javascript: void(0);', 'class' : 'list-group-item trans-item-row', 'title': (row.id ? 'Description: ' + row.description : ''), 'trans-group-id': (!row.id ? '' : row.groupId)})
 			.store('data', row)
 			.insert({'bottom': new Element('div', {'class': 'row'})
-				.insert({'bottom': new Element('div', {'class': 'col-xs-4 col-sm-2'}).update(!row.id ? 'Date' : tmp.me.loadUTCTime(row.logDate).toLocaleString() ) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-6 col-sm-4'})
-					.update(!row.id ? 'Account' : row.accountEntry.breadCrumbs.join(' / '))
+				.insert({'bottom': new Element('div', {'class': 'col-xs-4 col-sm-2 col-md-2'}).update(!row.id ? 'Date' : tmp.me.loadUTCTime(row.logDate).toLocaleString() ) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-2 hidden-sm hidden-xs'}).update(!row.id ? 'By' : (row.logBy && row.logBy.person ? row.logBy.person.fullName : (row.createdBy && row.createdBy.person ? row.createdBy.person.fullName : '') )) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-5 col-sm-6 col-md-4'})
+					.update(!row.id ? 'Account' : new Element('a', {'href': '/transactions.html?accountids=' + row.accountEntry.id}).update(row.accountEntry.breadCrumbs.join(' / ')))
 				})
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Credit' : ((row.credit && !row.credit.blank()) ? tmp.me.getCurrency(row.credit) : '')) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Debit' : ((row.debit && !row.debit.blank()) ? tmp.me.getCurrency(row.debit) : '')) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Balance' : ((row.balance && !row.balance.blank()) ? tmp.me.getCurrency(row.balance) : '')) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 visible-sm visible-xs text-right'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-1 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Credit' : ((row.credit && !row.credit.blank()) ? tmp.me.getCurrency(row.credit) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-1 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Debit' : ((row.debit && !row.debit.blank()) ? tmp.me.getCurrency(row.debit) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-1 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Balance' : ((row.balance && !row.balance.blank()) ? tmp.me.getCurrency(row.balance) : '')) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-1 visible-sm visible-xs text-right'})
 					.addClassName((row.id && row.value < 0) ? 'text-danger' : '')
 					.update(
 							!row.id ? 'Value' : ((row.value < 0 ? '-' : '+') + tmp.me.getCurrency(Math.abs(row.value)))
 					)
+				})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-md-1 col-md-1 text-right'})
+					.insert({'bottom': !row.id ? '' : new Element('span', {'class': 'btn btn-danger btn-xs'})
+						.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-remove'}) })
+						.observe('click', function(event){
+							tmp.me._showConfirmDeletion(this);
+						})
+					})
 				})
 			});
 		if(row.attachments && row.attachments.size() > 0) {
@@ -209,7 +279,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 	/**
 	 * Setting the preset data
 	 */
-	,_setPreData(preSetData) {
+	,_setPreData: function(preSetData) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._preSetData = (preSetData || []);
@@ -244,6 +314,8 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				tmp.searchPanel.down('[search-panel="logDate_from"]').setValue(tmp.me._preSetData.localFromDate);
 			if(tmp.me._preSetData.localToDate)
 				tmp.searchPanel.down('[search-panel="logDate_to"]').setValue(tmp.me._preSetData.localToDate);
+			tmp.searchPanel.down('.panel-body').hide();
+			tmp.searchPanel.down('.show-search-criteria-checkbox').checked = false;
 		}
 		tmp.me._initDatePicker()
 			._initSelect2(tmp.searchPanel.down('[search-panel="accountsIds"]'))

@@ -31,7 +31,6 @@ class Controller extends DetailsPageAbstract
 
 		if(!isset($this->Request['id']) || ($id = trim($this->Request['id'])) === '')
 			return $entity;
-
 		if($id === 'new' && (isset($_REQUEST['parentId']) && ($parent = AccountEntry::get($_REQUEST['parentId'])) || isset($_REQUEST['typeId']) && ($type = AccountType::get($_REQUEST['typeId'])))) {
 			$entity = new AccountEntry();
 			if($parent instanceof AccountEntry)

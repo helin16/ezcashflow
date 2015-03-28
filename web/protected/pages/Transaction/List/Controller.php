@@ -28,9 +28,10 @@ class Controller extends BackEndPageAbstract
 		$js .= '.setHTMLID("search-btn", "search-btn")';
 		$js .= '.setHTMLID("item-count", "item-count")';
 		$js .= '.setCallbackId("getTransactions", "' . $this->getTransactionsBtn->getUniqueID() . '")';
+		$js .= '.setCallbackId("delTrans", "' . $this->delTransBtn->getUniqueID() . '")';
 		$js .= '.setAccountTypes(' . json_encode(array_map(create_function('$a', 'return $a->getJson();'), AccountType::getAll())) . ')';
 		$preSetData = array();
-		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate']) || isset($_REQUEST['typeId'])) {
+		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate']) || isset($_REQUEST['typeId']) || isset($_REQUEST['lookDownAccId'])) {
 			if(isset($_REQUEST['accountids'])) {
 				$accounts = array();
 				$accountIds = explode(',', $_REQUEST['accountids']);
@@ -38,6 +39,11 @@ class Controller extends BackEndPageAbstract
 				if(count($accountIds) > 0)
 					$accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($accountIds), '?')) . ')', $accountIds);
 				$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
+			} else if ($_REQUEST['lookDownAccId']) {
+				if(!($lookDownAcc = AccountEntry::get($_REQUEST['lookDownAccId'])) instanceof AccountEntry)
+					throw new Exception('Invalid look down account id:' . $_REQUEST['lookDownAccId']);
+				$accounts = array($lookDownAcc);
+				$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), array_merge($accounts, $lookDownAcc->getChildren(true)));
 			}
 			if(isset($_REQUEST['localFromDate'])) {
 				$localFromDate = new UDate(trim($_REQUEST['localFromDate']));
@@ -102,6 +108,30 @@ class Controller extends BackEndPageAbstract
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {
+			$errors [] = $ex->getMessage ();
+		}
+		$param->ResponseData = StringUtilsAbstract::getJson ( $results, $errors );
+	}
+	/**
+	 * del Trans
+	 *
+	 * @param unknown $sender
+	 * @param unknown $param
+	 */
+	public function delTrans($sender, $param)
+	{
+		$results = $errors = array ();
+		try {
+			Dao::beginTransaction();
+
+			if(!isset($param->CallbackParameter->id) || !($trans = Transaction::get(trim($param->CallbackParameter->id))) instanceof Transaction)
+				throw new Exception('System Error: can NOT find the transaction that you are trying to delete.');
+			$trans->setActive(false)
+				->save();
+			$results ['item'] = $trans->getJson();
+			Dao::commitTransaction();
+		} catch ( Exception $ex ) {
+			Dao::rollbackTransaction();
 			$errors [] = $ex->getMessage ();
 		}
 		$param->ResponseData = StringUtilsAbstract::getJson ( $results, $errors );

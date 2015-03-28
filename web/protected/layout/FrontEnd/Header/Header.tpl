@@ -16,7 +16,16 @@
 					<li class="<%= $this->isActive('accountentry.list') === true ? 'active' : '' %>"><a href="/accounts.html">Accounts</a></li>
 					<li class="<%= $this->isActive('transaction.list') === true ? 'active' : '' %>"><a href="/transactions.html">Transactions</a></li>
 					<li class="<%= $this->isActive('property.list') === true ? 'active' : '' %>"><a href="/properties.html">Properties</a></li>
-					<li><a href="/logout.html">Logout</a></li>
+					<li class="dropdown">
+						<a href="javascript: void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+							<%= Core::getUser()->getPerson()->getFullName() %>
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="/users/me.html"><i class="glyphicon glyphicon-cog"></i> Change Details</a></li>
+							<li><a href="/logout.html"><i class="glyphicon glyphicon-log-out"></i> LogOut</a></li>
+						</ul>
+					</li>
 				</ul>
 			</div>
 		</div>

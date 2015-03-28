@@ -143,10 +143,17 @@ class Asset extends EncryptedEntityAbstract
 		if(!is_string($dataOrFile) && (!is_file($dataOrFile)))
 			throw new CoreException(__CLASS__ . '::' . __FUNCTION__ . '() will ONLY take string to save!');
 		$class = get_called_class();
+		if(is_file($dataOrFile)) {
+			$filePath = trim($dataOrFile);
+		} else {
+			if(is_dir($dir = '/tmp/' . md5(new UDate() . Core::getUser()->getId() . rand(0, PHP_INT_MAX)) . '/'))
+				mkdir($dir);
+			file_put_contents(($filePath =  $dir . $filename), $dataOrFile);
+		}
 		$asset = new $class();
 		$asset->setFilename($filename)
 			->setMimeType(StringUtilsAbstract::getMimeType($filename))
-			->setContent(Content::create(is_file($dataOrFile) ? file_get_contents($dataOrFile) : $dataOrFile))
+			->setContent(Content::create($filePath))
 			->save();
 		return $asset;
 	}

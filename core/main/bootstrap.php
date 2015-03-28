@@ -1,7 +1,7 @@
 <?php
 /**
  * Boostrapper for the Core module
- * 
+ *
  * @package Core
  * @author  lhe
  */
@@ -9,9 +9,9 @@ abstract class SystemCoreAbstract
 {
     /**
      * autoloading function
-     * 
+     *
      * @param string $className The class that we are trying to autoloading
-     * 
+     *
      * @return boolean Whether we loaded the class
      */
 	public static function autoload($className)
@@ -23,6 +23,7 @@ abstract class SystemCoreAbstract
 			$base . '/entity/',
 			$base . '/entity/accounting/',
 			$base . '/entity/content/',
+			$base . '/entity/property/',
 			$base . '/entity/system/',
 			$base . '/entity/tag/',
 			$base . '/exception/',

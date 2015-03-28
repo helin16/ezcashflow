@@ -66,14 +66,14 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.newDiv = new Element('tr', {'class': (acc.id ? 'treegrid-' + acc.id : 'header') + (acc.isSumAcc === true ? ' active' : '')  })
 			.store('data', acc)
 			.insert({'bottom': new Element(tmp.tag).update(new Element('abbr', {'title': acc.description}).update(acc.name)) })
-			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1'}).update(acc.accountNo) })
-			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1'}).update(!acc.id ? acc.isSumAcc :
+			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1 col-sm-1'}).update(acc.accountNo) })
+			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1 col-sm-1 hidden-sm hidden-xs'}).update(!acc.id ? acc.isSumAcc :
 				(acc.isSumAcc === true ? new Element('span', {'class': 'text-success'}).update(new Element('span', {'title': acc.name.toUpperCase() + ' is a summary account', 'class': 'glyphicon glyphicon-ok'})) : '')
 			) })
-			.insert({'bottom': new Element(tmp.tag, {'title': 'Opening Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.initValue) : acc.initValue) })
-			.insert({'bottom': new Element(tmp.tag, {'title': 'Running Balance', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.runingValue) : acc.runingValue) })
-			.insert({'bottom': new Element(tmp.tag, {'title': 'Total Value', 'class': 'col-xs-1'}).update(acc.id ? tmp.me.getCurrency(acc.sumValue) : acc.sumValue) })
-			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1 text-right'}).update(!acc.id ? '' :
+			.insert({'bottom': new Element(tmp.tag, {'title': 'Opening Balance', 'class': 'col-xs-1 col-sm-1 hidden-sm hidden-xs'}).update(acc.id ? tmp.me.getCurrency(acc.initValue) : acc.initValue) })
+			.insert({'bottom': new Element(tmp.tag, {'title': 'Running Balance', 'class': 'col-xs-1 col-sm-1 hidden-sm hidden-xs'}).update(acc.id ? tmp.me.getCurrency(acc.runingValue) : acc.runingValue) })
+			.insert({'bottom': new Element(tmp.tag, {'title': 'Total Value', 'class': 'col-xs-1 col-sm-1'}).update(acc.id ? tmp.me.getCurrency(acc.sumValue) : acc.sumValue) })
+			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-2 col-sm-1 text-right'}).update(!acc.id ? '' :
 				new Element('span', {'class': 'btn-group btn-group-xs visible-lg visible-md visible-sm visible-xs'})
 					.insert({'bottom': new Element('span', {'class': 'btn btn-success', 'title': 'Add an new account under: ' + acc.name, 'disabled': !acc.isSumAcc})
 						.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-plus'}) })

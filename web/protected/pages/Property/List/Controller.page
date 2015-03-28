@@ -1,0 +1,16 @@
+<com:TContent ID="MainContent">
+	<com:Application.controls.fancyBox.FancyBox />
+	<com:Application.controls.PropertyPerformanceListPanel.PropertyPerformanceListPanel />
+	<com:TCallback ID="getItemsBtn" onCallback="Page.getItems" />
+	<com:TCallback ID="delItemsBtn" onCallback="Page.delItems" />
+	<div class="container" >
+		<div class="panel panel-default" style="display: none;">
+			<div class="panel-heading">
+				Found <strong id="item-count">0</strong> Properties:
+				<div class="btn btn-xs btn-success pull-right" title="Create a new property" onclick="pageJs.openEditPage();"><i class="glyphicon glyphicon-plus"></i><span class="hidden-xs hidden-sm">Add a property</span></div>
+			</div>
+			<div id="result-wrapper"></div>
+		</div>
+	</div>
+</table>
+</com:TContent>
