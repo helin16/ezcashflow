@@ -110,20 +110,20 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 							tmp.me.openEditPage(row);
 						})
 				) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Bought' : tmp.me.getCurrency(row.boughtPrice) ) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Setup' : row.setupAcc && row.setupAcc.id ?
+				.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Bought' : tmp.me.getCurrency(row.boughtPrice) ) })
+				.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Setup' : row.setupAcc && row.setupAcc.id ?
 						new Element('abbr', {'title': row.setupAcc.breadCrumbs.join(' / ')}).update(tmp.me.getCurrency(row.setupAcc.sumValue)) : ''
 				) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Income' : row.incomeAcc && row.incomeAcc.id ?
+				.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Income' : row.incomeAcc && row.incomeAcc.id ?
 						new Element('abbr', {'title': row.incomeAcc.breadCrumbs.join(' / ')}).update(tmp.me.getCurrency(row.incomeAcc.sumValue)) : ''
 				) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Expense' : row.expenseAcc && row.expenseAcc.id ?
+				.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(!row.id ? 'Expense' : row.expenseAcc && row.expenseAcc.id ?
 						new Element('abbr', {'title': row.expenseAcc.breadCrumbs.join(' / ')}).update(tmp.me.getCurrency(row.expenseAcc.sumValue) ) : ''
 				) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-1 '}).update(!row.id ? 'Profit' :
+				.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 col-sm-1 col-md-1 '}).update(!row.id ? 'Profit' :
 					(tmp.profit === '' ? '' : '<strong class="' + (tmp.profit < 0 ? "text-danger" : "text-success") + '">' + tmp.me.getCurrency(tmp.profit) + '<strong>')
 				) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-sm-1 col-md-1 hidden-sm '}).update(!row.id ? '%' :
+				.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-1 col-sm-1 col-md-1 hidden-sm '}).update(!row.id ? '%' :
 					(tmp.profit === '' ? '' : '<strong class="' + (tmp.profit < 0 ? "text-danger" : "text-success") + '">' + Math.round(tmp.profit * 100 / row.boughtPrice) + '%<strong>')
 				) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-md-1 col-md-1 text-right'})
@@ -160,17 +160,19 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			tmp.newRow.insert({'bottom': tmp.attachmentRow });
 		}
 		if(row.id) {
-			tmp.newRow.observe('click', function() {
-				tmp.btn = $(this);
-				if(!tmp.btn.hasClassName('loadedPerformancePanel')) {
-					tmp.btn.addClassName('loadedPerformancePanel')
-						.down('.performance-list-panel')
-						.retrieve('PropertyPerformanceListPanelJs')
-						.render();
-				} else {
-					tmp.btn.down('.performance-list-panel').toggle();
-				}
-			})
+			tmp.newRow.getElementsBySelector('.show-list-btn').each(function(el) {
+				el.observe('click', function() {
+					tmp.btn = $(this);
+					if(!tmp.btn.hasClassName('loadedPerformancePanel')) {
+						tmp.btn.addClassName('loadedPerformancePanel')
+							.down('.performance-list-panel')
+							.retrieve('PropertyPerformanceListPanelJs')
+							.render();
+					} else {
+						tmp.btn.down('.performance-list-panel').toggle();
+					}
+				})
+			});
 		}
 		return tmp.newRow;
 	}
