@@ -39,7 +39,7 @@ class Controller extends BackEndPageAbstract
 				if(count($accountIds) > 0)
 					$accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($accountIds), '?')) . ')', $accountIds);
 				$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
-			} else if ($_REQUEST['lookDownAccId']) {
+			} else if (isset($_REQUEST['lookDownAccId'])) {
 				if(!($lookDownAcc = AccountEntry::get($_REQUEST['lookDownAccId'])) instanceof AccountEntry)
 					throw new Exception('Invalid look down account id:' . $_REQUEST['lookDownAccId']);
 				$accounts = array($lookDownAcc);
