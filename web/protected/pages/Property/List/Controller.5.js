@@ -163,13 +163,14 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			tmp.newRow.getElementsBySelector('.show-list-btn').each(function(el) {
 				el.observe('click', function() {
 					tmp.btn = $(this);
-					if(!tmp.btn.hasClassName('loadedPerformancePanel')) {
-						tmp.btn.addClassName('loadedPerformancePanel')
+					tmp.listPanel = tmp.btn.up('.item-row');
+					if(!tmp.listPanel.hasClassName('loadedPerformancePanel')) {
+						tmp.listPanel.addClassName('loadedPerformancePanel')
 							.down('.performance-list-panel')
 							.retrieve('PropertyPerformanceListPanelJs')
 							.render();
 					} else {
-						tmp.btn.down('.performance-list-panel').toggle();
+						tmp.listPanel.down('.performance-list-panel').toggle();
 					}
 				})
 			});
