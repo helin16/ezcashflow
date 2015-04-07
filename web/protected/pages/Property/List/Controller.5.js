@@ -249,7 +249,6 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			,'onComplete' : function() {
 				tmp._loadingDiv.remove();
 			}
-
 		});
 		return tmp.me;
 	}

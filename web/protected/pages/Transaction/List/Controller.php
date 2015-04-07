@@ -104,7 +104,7 @@ class Controller extends BackEndPageAbstract
 
 			$transactions = $stats = array();
 			if(count($where) > 0)
-				$transactions = Transaction::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('trans.id' => 'desc'), $stats );
+				$transactions = Transaction::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('trans.logDate' => 'desc'), $stats );
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {
