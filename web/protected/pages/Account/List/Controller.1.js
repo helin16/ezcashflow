@@ -65,6 +65,7 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 		tmp.tag = acc.id ? 'td' : 'th';
 		tmp.newDiv = new Element('tr', {'class': (acc.id ? 'treegrid-' + acc.id : 'header') + (acc.isSumAcc === true ? ' active' : '')  })
 			.store('data', acc)
+			.setStyle(acc.isSumAcc === true ? 'font-weight: bold; font-style: italic;' : '')
 			.insert({'bottom': new Element(tmp.tag).update(new Element('abbr', {'title': acc.description}).update(acc.name)) })
 			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1 col-sm-1'}).update(acc.accountNo) })
 			.insert({'bottom': new Element(tmp.tag, {'class': 'col-xs-1 col-sm-1 hidden-sm hidden-xs'}).update(!acc.id ? acc.isSumAcc :

@@ -405,9 +405,6 @@ class AccountEntry extends BaseEntityAbstract
     	if(self::cacheExsits($key) === true && $resetCache !== true)
     		return self::getCache($key);
     	$value = $this->getPeriodRuningBalance(Udate::zeroDate(), UDate::maxDate(), true, $resetCache);
-    	$childrenAccounts = $this->getChildren(true, $resetCache);
-    	foreach($childrenAccounts as $acc)
-    		$value += $acc->getRuningBalance($resetCache);
     	self::addCache($key, $value);
     	return $value;
     }
@@ -425,7 +422,7 @@ class AccountEntry extends BaseEntityAbstract
     	$sum = $this->getInitValue() + $this->getRuningBalance($resetCache);
     	$childrenAccounts = $this->getChildren(true, $resetCache);
     	foreach($childrenAccounts as $acc)
-    		$sum += $acc->getSumValue($resetCache);
+    		$sum += $acc->getInitValue();
     	self::addCache($key, $sum);
 		return $sum;
     }
@@ -446,7 +443,7 @@ class AccountEntry extends BaseEntityAbstract
     	if(self::cacheExsits($key) === true && $resetCache !== true)
     		return self::getCache($key);
 		$sql = 'select sum(trans.value) `value` from transaction trans
-				inner join accountentry acc on (acc.id = trans.accountEntryId and acc.active = 1 and trans.active = 1 and ' . ($inclChildren === true ? 'acc.path like "' . $this->getPath() . '%"' : 'trans_acc.id = ' . $this->getId()) . ' and acc.organizationId = ' . Core::getOrganization()->getId() . ')
+				inner join accountentry acc on (acc.id = trans.accountEntryId and acc.active = 1 and trans.active = 1 and ' . ($inclChildren === true ? 'acc.path like "' . $this->getPath() . '%"' : 'acc.id = ' . $this->getId()) . ' and acc.organizationId = ' . Core::getOrganization()->getId() . ')
 				where trans.logDate >= ? and trans.logDate <= ?';
     	$result = Dao::getResultsNative($sql, array(trim($start), trim($end)), PDO::FETCH_ASSOC);
     	$value = count($result) > 0 ? $result[0]['value'] : 0;
