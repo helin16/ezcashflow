@@ -255,18 +255,40 @@ class AccountEntry extends BaseEntityAbstract
      *
      * @return array
      */
-    public function getBreadCrumbs()
+    public function getBreadCrumbs($resetCache = false)
     {
-    	$parentIds = array_filter($this->getPaths());
-    	if(count($parentIds) === 0 || count($accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($parentIds), '?')) . ')', $parentIds, false)) === 0)
-    		return array();
-		$map = array();
+    	$accounts = $this->getParents(true, $resetCache);
+    	$names = array();
 		foreach($accounts as $account)
-			$map[$account->getId()] = $account->getName();
-		$names = array();
-		foreach($parentIds as $id)
-			$names[] = $map[$id];
+			$names[] = $account->getName();
 		return $names;
+    }
+    /**
+     * Getting all the parents
+     *
+     * @return array
+     */
+    public function getParents($incSelf = false, $resetCache = false)
+    {
+    	$key = md5('Parents_' . ($incSelf === true ? '1' : '0') . '_' . $this->getId());
+    	if(self::cacheExsits($key) === true && $resetCache !== true)
+    		return self::getCache($key);
+
+    	$parentIds = $this->getPaths();
+    	if($incSelf === false)
+    		$parentIds = array_filter($parentIds, create_function('$a', 'return trim($a) !== "" && $a !== ' . $this->getId() . ';'));
+    	else
+    		$parentIds = array_filter($parentIds);
+    	if(count($parentIds) === 0)
+    		$value = array();
+    	$map = array();
+    	foreach(self::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($parentIds), '?')) . ')', $parentIds, false) as $account)
+    		$map[$account->getId()] = $account;
+    	$value = array();
+    	foreach($parentIds as $id)
+    		$value[] = $map[$id];
+    	self::addCache($key, $value);
+    	return $value;
     }
     /**
      * Getter for isSumAcc
@@ -379,16 +401,15 @@ class AccountEntry extends BaseEntityAbstract
      */
     public function getRuningBalance($resetCache = false)
     {
-    	if(trim($this->getId()) === '')
-    		return 0;
     	$key = md5('RuningBalance_' . $this->getId());
     	if(self::cacheExsits($key) === true && $resetCache !== true)
     		return self::getCache($key);
-
-    	$lastTrans = Transaction::getAllByCriteria('accountEntryId = ?', array($this->getId()), true, 1, 1, array('trans.id' => 'desc'));
-    	$balance = (count($lastTrans) === 0 ? 0 : $lastTrans[0]->getBalance());
-    	self::addCache($key, $balance);
-    	return $balance;
+    	$value = $this->getPeriodRuningBalance(Udate::zeroDate(), UDate::maxDate(), true, $resetCache);
+    	$childrenAccounts = $this->getChildren(true, $resetCache);
+    	foreach($childrenAccounts as $acc)
+    		$value += $acc->getRuningBalance($resetCache);
+    	self::addCache($key, $value);
+    	return $value;
     }
     /**
      * The running balance
@@ -397,17 +418,14 @@ class AccountEntry extends BaseEntityAbstract
      */
     public function getSumValue($resetCache = false)
     {
-    	$sum = $this->getInitValue();
-    	if(trim($this->getId()) === '')
-    		return $sum;
     	$key = md5('SumValue_' . $this->getId());
     	if(self::cacheExsits($key) === true && $resetCache !== true)
     		return self::getCache($key);
 
-    	$sum += $this->getRuningBalance($resetCache);
-    	$childrenAccounts = self::getAllByCriteria('parentId = ?', array($this->getId()));
+    	$sum = $this->getInitValue() + $this->getRuningBalance($resetCache);
+    	$childrenAccounts = $this->getChildren(true, $resetCache);
     	foreach($childrenAccounts as $acc)
-    		$sum += $acc->getSumValue();
+    		$sum += $acc->getSumValue($resetCache);
     	self::addCache($key, $sum);
 		return $sum;
     }
@@ -427,15 +445,11 @@ class AccountEntry extends BaseEntityAbstract
     	$key = md5('PeriodRuningBalance_' . $this->getId() . trim($start) . trim($end) . trim($inclChildren));
     	if(self::cacheExsits($key) === true && $resetCache !== true)
     		return self::getCache($key);
-
-    	Transaction::getQuery()
-    		->eagerLoad('Transaction.accountEntry',
-    			'inner join',
-    			'trans_acc',
-    			'trans_acc.id = trans.accountEntryId and trans.active = 1 and trans_acc.active = 1 and ' . ($inclChildren === true ? 'trans_acc.path like "' . $this->getPath() . '%"' : 'trans_acc.id = ' . $this->getId()));
-    	$value = 0;
-    	foreach(Transaction::getAllByCriteria('logDate >= ? and logDate <= ?', array(trim($start), trim($end))) as $trans)
-    		$value += $trans->getValue();
+		$sql = 'select sum(trans.value) `value` from transaction trans
+				inner join accountentry acc on (acc.id = trans.accountEntryId and acc.active = 1 and trans.active = 1 and ' . ($inclChildren === true ? 'acc.path like "' . $this->getPath() . '%"' : 'trans_acc.id = ' . $this->getId()) . ' and acc.organizationId = ' . Core::getOrganization()->getId() . ')
+				where trans.logDate >= ? and trans.logDate <= ?';
+    	$result = Dao::getResultsNative($sql, array(trim($start), trim($end)), PDO::FETCH_ASSOC);
+    	$value = count($result) > 0 ? $result[0]['value'] : 0;
     	self::addCache($key, $value);
     	return $value;
     }
@@ -449,10 +463,19 @@ class AccountEntry extends BaseEntityAbstract
      */
     public function getChildren($allChildren = false, $resetCache = false)
     {
-    	$where = array('id != :accId');
-    	$params = array('accId' => $this->getId(), 'path' => trim($this->getPath()));
-    	$where[] = ($allChildren === true ? 'path like :path' : 'parentId = :accId');
-    	return AccountEntry::getAllByCriteria(implode(' AND ', $where), $params);
+    	$key = md5('Children_' . ($allChildren === true ? '1' : '0') . '_' . trim($this->getId()));
+    	if(self::cacheExsits($key) === true && $resetCache !== true)
+    		return self::getCache($key);
+
+    	$where = 'parentId = ?';
+    	$params = array($this->getId());
+    	if($allChildren === true) {
+    		$where = 'path like ?';
+    		$params = array(trim($this->getPath()) . ',%');
+    	}
+    	$value = self::getAllByCriteria($where, $params);
+    	self::addCache($key, $value);
+    	return $value;
     }
 	/**
      * (non-PHPdoc)
