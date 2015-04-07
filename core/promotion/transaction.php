@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../main/bootstrap.php';
-
+Core::setUser(UserAccount::get(UserAccount::ID_SYSTEM_ACCOUNT));
 foreach(Transaction::getAll(false) as $transtion)
 {
 	try{
