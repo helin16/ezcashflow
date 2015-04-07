@@ -281,12 +281,14 @@ class AccountEntry extends BaseEntityAbstract
     		$parentIds = array_filter($parentIds);
     	if(count($parentIds) === 0)
     		$value = array();
-    	$map = array();
-    	foreach(self::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($parentIds), '?')) . ')', $parentIds, false) as $account)
-    		$map[$account->getId()] = $account;
-    	$value = array();
-    	foreach($parentIds as $id)
-    		$value[] = $map[$id];
+    	else {
+	    	$map = array();
+	    	foreach(self::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($parentIds), '?')) . ')', $parentIds, false) as $account)
+	    		$map[$account->getId()] = $account;
+	    	$value = array();
+	    	foreach($parentIds as $id)
+	    		$value[] = $map[$id];
+    	}
     	self::addCache($key, $value);
     	return $value;
     }
