@@ -10,7 +10,7 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
 		tmp.newDiv = new Element('div', {'id': 'save-panel', 'class': 'save-panel'});
 		return tmp.newDiv;
 	}
-	,_setFromNToAcc(from, to) {
+	,_setFromNToAcc: function(from, to) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.me._acc.from = from;
