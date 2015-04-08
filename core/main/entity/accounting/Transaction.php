@@ -342,21 +342,80 @@ class Transaction extends BaseEntityAbstract
 	/**
 	 * Creating a Transaction
 	 *
-	 * @param AccountEntry $acc
-	 * @param UDate        $logDate
-	 * @param double       $credit
-	 * @param double       $debit
+	 * @param AccountEntry $fromAcc
+	 * @param AccountEntry $toAcc
+	 * @param number       $value
 	 * @param string       $description
 	 * @param UserAccount  $logBy
 	 *
-	 * @return Transaction
+	 * @param array $assets
+	 *
+	 * @return Ambigous <BaseEntityAbstract, GenericDAO>
 	 */
-	public static function create(AccountEntry $acc, UDate $logDate = null, $credit = null, $debit = null, $description = '', UserAccount $logBy = null)
+	public static function transactions(AccountEntry $fromAcc, AccountEntry $toAcc, $value, $description = '', UDate $logDate = null, UserAccount $logBy = null, array $assets = array())
 	{
-		$item = new Transaction ();
-		if ($logBy instanceof UserAccount)
-			$item->setLogBy ( $logBy );
-		return $item->setAccountEntry ( $acc )->setCredit ( $credit )->setDebit ( $debit )->setLogDate ( $logDate )->setDescription ( $description )->save ();
+		$groupId = StringUtilsAbstract::getRandKey(__CLASS__);
+		$creditItem = new Transaction();
+		$debitItem = new Transaction();
+		if (!$logBy instanceof UserAccount){
+			$creditItem->setLogBy ( Core::getUser() );
+			$debitItem->setLogBy ( Core::getUser() );
+		}
+		$creditItem->setAccountEntry ( $fromAcc )->setCredit ( $value )->setLogDate ( $logDate )->setDescription ( $description )->setGroupId($groupId)->save ();
+		$debitItem->setAccountEntry ( $toAcc )->setDebit( $value )->setLogDate ( $logDate )->setDescription ( $description )->setGroupId($groupId)->save ();
+		foreach($assets as $asset) {
+			if(!$asset instanceof Asset)
+				continue;
+			$creditItem->addAttachment($asset);
+			$debitItem->addAttachment($asset);
+		}
+		return array($creditItem, $debitItem);
+	}
+	/**
+	 * Getting the pair of transactions
+	 *
+	 * @param string $groupId The group id
+	 *
+	 * @return Ambigous <Ambigous, multitype:, multitype:BaseEntityAbstract >
+	 */
+	public static function getTransGroup($groupId)
+	{
+		return self::getAllByCriteria('groupId = ?', array(trim($groupId)), true, 1, 2, array('trans.debit' => 'asc'));
+	}
+	/**
+	 * Updating the transactions
+	 *
+	 * @param string       $groupId
+	 * @param AccountEntry $fromAcc
+	 * @param AccountEntry $toAcc
+	 * @param unknown      $value
+	 * @param string       $description
+	 * @param UDate        $logDate
+	 * @param UserAccount  $logBy
+	 * @param array        $assets
+	 *
+	 * @return array
+	 */
+	public static function updateTrans($groupId, AccountEntry $fromAcc, AccountEntry $toAcc, $value, $description = '', UDate $logDate = null, UserAccount $logBy = null, array $assets = array())
+	{
+		list($creditItem, $debitItem) = self::getTransGroup($groupId);
+		if (!$logBy instanceof UserAccount){
+			$creditItem->setLogBy ( Core::getUser() );
+			$debitItem->setLogBy ( Core::getUser() );
+		}
+		$creditItem->setAccountEntry ( $fromAcc )->setCredit ( $value )->setLogDate ( $logDate )->setDescription ( $description )->save ();
+		$debitItem->setAccountEntry ( $toAcc )->setDebit( $value )->setLogDate ( $logDate )->setDescription ( $description )->save ();
+		if(count($assets) > 0) {
+			$creditItem->clearAttachments();
+			$debitItem->clearAttachments();
+			foreach($assets as $asset) {
+				if(!$asset instanceof Asset || intval($asset->getActive()) !== 1)
+					continue;
+				$creditItem->addAttachment($asset);
+				$debitItem->addAttachment($asset);
+			}
+		}
+		return array($creditItem, $debitItem);
 	}
 }
 

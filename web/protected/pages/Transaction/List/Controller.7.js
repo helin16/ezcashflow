@@ -66,18 +66,34 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		tmp.me.showModalBox('<h4 class="text-danger" style="margin:0px;">Confirm</h4>', tmp.newDiv);
 		return tmp.me;
 	}
+	,openEditPage: function(row) {
+		var tmp = {};
+		tmp.me = this;
+		if(!row.id)
+			return tmp.me;
+		jQuery.fancybox({
+			'autoScale'     : false,
+			'autoDimensions': false,
+			'fitToView'     : false,
+			'autoSize'      : false,
+			'width'         : '90%',
+			'type'			: 'iframe',
+			'href'			: '/transactions/' + row.id + '.html?blanklayout=1'
+ 		});
+		return tmp.me;
+	}
 	/**
 	 * Getting the transaction row
 	 */
 	,_getTransactionRow : function(row) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.newRow = new Element('a', {'href': 'javascript: void(0);', 'class' : 'list-group-item trans-item-row', 'title': (row.id ? 'Description: ' + row.description : ''), 'trans-group-id': (!row.id ? '' : row.groupId)})
+		tmp.newRow = new Element('a', {'href': 'javascript: void(0);', 'class' : 'list-group-item trans-item-row', 'title': (row.id ? 'Description: ' + row.description : ''), 'trans-group-id': (!row.id ? '' : row.groupId), 'trans-item': (!row.id ? '' : row.id)})
 			.store('data', row)
 			.insert({'bottom': new Element('div', {'class': 'row'})
-				.insert({'bottom': new Element('div', {'class': 'col-xs-4 col-sm-2 col-md-2'}).update(!row.id ? 'Date' : tmp.me.loadUTCTime(row.logDate).toLocaleString() ) })
+				.insert({'bottom': new Element('div', {'class': 'col-xs-4 col-sm-2 col-md-2'}).update(!row.id ? 'Date' : moment(tmp.me.loadUTCTime(row.logDate)).format('LLL') ) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-2 col-md-2 hidden-sm hidden-xs'}).update(!row.id ? 'By' : (row.logBy && row.logBy.person ? row.logBy.person.fullName : (row.createdBy && row.createdBy.person ? row.createdBy.person.fullName : '') )) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-5 col-sm-6 col-md-5'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-5 col-sm-6 col-md-4'})
 					.update(!row.id ? 'Account' : new Element('a', {'href': '/transactions.html?accountids=' + row.accountEntry.id}).update(row.accountEntry.breadCrumbs.join(' / ')))
 				})
 				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-1 hidden-sm hidden-xs text-right'}).update(!row.id ? 'Credit' : ((row.credit && !row.credit.blank()) ? tmp.me.getCurrency(row.credit) : '')) })
@@ -88,11 +104,19 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 							!row.id ? 'Value' : ((row.value < 0 ? '-' : '+') + tmp.me.getCurrency(Math.abs(row.value)))
 					)
 				})
-				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-md-1 col-md-1 text-right'})
-					.insert({'bottom': !row.id ? '' : new Element('span', {'class': 'btn btn-danger btn-xs'})
-						.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-remove'}) })
-						.observe('click', function(event){
-							tmp.me._showConfirmDeletion(this);
+				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-sm-2 col-md-2 text-right'})
+					.insert({'bottom': !row.id ? '' : new Element('div', {'class': 'btn btn-group'})
+						.insert({'bottom': new Element('span', {'class': 'btn btn-default btn-xs'})
+							.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-pencil'}) })
+							.observe('click', function() {
+								tmp.me.openEditPage(row);
+							})
+						})
+						.insert({'bottom': new Element('span', {'class': 'btn btn-danger btn-xs'})
+							.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-remove'}) })
+							.observe('click', function(event){
+								tmp.me._showConfirmDeletion(this);
+							})
 						})
 					})
 				})
@@ -105,6 +129,19 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			tmp.newRow.insert({'bottom': tmp.attachmentRow });
 		}
 		return tmp.newRow;
+	}
+	/**
+	 * Updating Transaction row
+	 */
+	,updateTransRow: function(transaction) {
+		var tmp = {};
+		tmp.me = this;
+		if(!transaction.id)
+			return tmp.me;
+		$(tmp.me.getHTMLID('result-list-div')).getElementsBySelector('.trans-item-row[trans-item=' + transaction.id + ']').each(function(row) {
+			row.replace(tmp.me._getTransactionRow(transaction));
+		});
+		return tmp.me;
 	}
 	/**
 	 * getting the Transactions

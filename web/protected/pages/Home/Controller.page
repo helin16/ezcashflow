@@ -1,4 +1,5 @@
 <com:TContent ID="MainContent">
+	<com:Application.controls.fancyBox.FancyBox />
 	<com:Application.controls.transForm.transForm />
 	<com:TCallback ID="getSummaryBtn" onCallback="getSummary" />
 	<com:TCallback ID="getLatestTransBtn" onCallback="getLatestTrans" />

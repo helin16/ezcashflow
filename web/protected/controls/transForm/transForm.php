@@ -41,22 +41,36 @@ class transForm extends TTemplateControl
 				throw new Exception('Can NOT make a transaction between the same account!');
 			if(!isset($params->CallbackParameter->amount) || !($amount = trim($params->CallbackParameter->amount)) === '')
 				throw new Exception('The amount is invalid!');
+			if(!is_numeric($amount = StringUtilsAbstract::getValueFromCurrency($amount)))
+				throw new Exception('The amount is invalid:' . $amount);
 			$comments = "";
 			if(isset($params->CallbackParameter->comments) )
 				$comments = trim($params->CallbackParameter->comments);
-			$transactions = array(
-				Transaction::create($fromAcc, $logDate, $amount, null, $comments),
-				Transaction::create($toAcc, $logDate, null, $amount, $comments)
-			);
+
 			//if there is attachments
+			$assets = array();
 			if(isset($params->CallbackParameter->files) && count($files = $params->CallbackParameter->files)  > 0) {
 				foreach($files as $file) {
-					$asset = Asset::registerAsset($file->file->name, $file->file->path);
-					foreach($transactions as $transaction) {
-						$transaction->addAttachment($asset);
+					if(isset($file->id)) {
+						if(!($attachment = Attachment::get($file->id)) instanceof Attachment)
+							throw new Exception('Invalid attachment: ID=' . $file->id);
+						if(isset($file->active) && intval($file->active) === 0)
+							$attachment->setActive(false)->save();
+						else
+							$assets[]  = $attachment->getAsset();
+					} else {
+						$assets[] = Asset::registerAsset($file->file->name, $file->file->path);
 					}
 				}
 			}
+
+			if(isset($params->CallbackParameter->groupId) && ($groupId = trim($params->CallbackParameter->groupId)) !== '')
+				$transactions = Transaction::updateTrans($groupId, $fromAcc, $toAcc, $amount, $comments, $logDate, Core::getUser(), $assets);
+			else
+				$transactions = Transaction::transactions($fromAcc, $toAcc, $amount, $comments, $logDate, Core::getUser(), $assets);
+
+			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $transactions);
+
 			Dao::commitTransaction();
 		} catch(Exception $ex) {
 			Dao::rollbackTransaction();

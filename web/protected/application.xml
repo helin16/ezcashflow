@@ -29,6 +29,8 @@
 
 			<!-- Transactions:: list -->
 			<url ServiceParameter="Transaction.List.Controller" pattern="transactions.html" />
+			<!-- Transactions:: details -->
+			<url ServiceParameter="Transaction.Details.Controller" pattern="transactions/{id}.html" parameters.id="\d+"/>
 
 			<!-- Property:: list -->
 			<url ServiceParameter="Property.List.Controller" pattern="properties.html" />

@@ -191,9 +191,9 @@ class Attachment extends BaseEntityAbstract
 	public static function rmFromEntity(BaseEntityAbstract $entity, $assetOrAssetId)
 	{
 		if($assetOrAssetId === null)
-			self::updateByCriteria('active = 0', 'entityId = ? and entityName = ?', array($entity->getId(), get_class($entity)));
+			self::deleteByCriteria('entityId = ? and entityName = ?', array($entity->getId(), get_class($entity)));
 		else if(($asset = self::_getAsset($assetOrAssetId)) instanceof Asset)
-			self::updateByCriteria('active = 0', 'entityId = ? and entityName = ? and assetId = ?', array($entity->getId(), get_class($entity), $asset->getId()));
+			self::deleteByCriteria('entityId = ? and entityName = ? and assetId = ?', array($entity->getId(), get_class($entity), $asset->getId()));
 		return $entity;
 	}
 	/**

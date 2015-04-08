@@ -132,6 +132,52 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 			});
 		return tmp.newDiv;
 	}
+	,openEditPage: function(row) {
+		var tmp = {};
+		tmp.me = this;
+		if(!row.id)
+			return tmp.me;
+		jQuery.fancybox({
+			'autoScale'     : false,
+			'autoDimensions': false,
+			'fitToView'     : false,
+			'autoSize'      : false,
+			'width'         : '90%',
+			'type'			: 'iframe',
+			'href'			: '/transactions/' + row.id + '.html?blanklayout=1'
+ 		});
+		return tmp.me;
+	}
+	,_getTransListItem: function (item) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.newDiv = new Element('a', {'class': 'list-group-item trans-item', 'href': 'javascript: void(0)', 'trans-item': item.id})
+			.store('data', item)
+			.insert({'bottom': new Element('strong', {'class': 'list-group-item-heading'}).update(item.accountEntry.breadCrumbs.join(' / ')) })
+			.insert({'bottom': new Element('div', {'class': 'badge'}).update(tmp.me.getCurrency(item.value)) })
+			.insert({'bottom': new Element('div', {'class': 'list-group-item-text row'})
+				.insert({'bottom': new Element('div', {'class': 'col-sm-5'}).update( new Element('small').update(new Element('span').update(moment(tmp.me.loadUTCTime(item.logDate)).format('LL')) ) ) })
+				.insert({'bottom': new Element('div', {'class': 'col-sm-7'}).update(new Element('small').update(new Element('em').update(item.description))) })
+			})
+			.observe('click', function() {
+				tmp.me.openEditPage(item);
+			})
+		return tmp.newDiv;
+	}
+	/**
+	 * Updating Transaction row
+	 */
+	,updateTransRow: function(transaction) {
+		var tmp = {};
+		tmp.me = this;
+		if(!transaction.id)
+			return tmp.me;
+		$(tmp.me._ressultPanelId).down('.lastest-trans-div').getElementsBySelector('.trans-item[trans-item=' + transaction.id + ']').each(function(row) {
+			row.replace(tmp.me._getTransListItem(transaction));
+		});
+		$(tmp.me._ressultPanelId).down('.overview-summary-div').retrieve('event:load')();
+		return tmp.me;
+	}
 	/**
 	 * Ajax: Getting the lastest trans from server end
 	 *
@@ -159,16 +205,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 					if(tmp._resultDiv.hasClassName('panel-body'))
 						tmp._resultDiv.removeClassName('panel-body').addClassName('list-group');
 					tmp.result.items.each(function(item) {
-						tmp.localeTime = tmp.me.loadUTCTime(item.logDate);
-						tmp._resultDiv.insert({'bottom': new Element('a', {'class': 'list-group-item', 'href': 'javascript: void(0)'})
-							.store('data', item)
-							.insert({'bottom': new Element('strong', {'class': 'list-group-item-heading'}).update(item.accountEntry.breadCrumbs.join(' / ')) })
-							.insert({'bottom': new Element('div', {'class': 'badge'}).update(tmp.me.getCurrency(item.value)) })
-							.insert({'bottom': new Element('div', {'class': 'list-group-item-text row'})
-								.insert({'bottom': new Element('div', {'class': 'col-sm-5'}).update( new Element('small').update(new Element('span').update(tmp.localeTime.toDateString()) ) ) })
-								.insert({'bottom': new Element('div', {'class': 'col-sm-7'}).update(new Element('small').update(new Element('em').update(item.description))) })
-							})
-						});
+						tmp._resultDiv.insert({'bottom': tmp.me._getTransListItem(item) });
 					});
 
 				} catch (e) {

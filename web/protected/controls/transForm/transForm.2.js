@@ -32,6 +32,22 @@ TransFormJs.prototype = {
 			.insert({'bottom': control })
 		return tmp.newDiv;
 	}
+	,_setTransaction: function(_trans) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.me._trans = _trans;
+		return tmp.me;
+	}
+	,_refreshParentWindow: function(transactions) {
+		var tmp = {};
+		tmp.me = this;
+		if(transactions.size() > 0 && window.parent && window.parent.pageJs && window.parent.pageJs.updateTransRow) {
+			transactions.each(function(transaction) {
+				window.parent.pageJs.updateTransRow(transaction);
+			});
+		}
+		return tmp.me;
+	}
 	,_saveTrans: function(btn) {
 		var tmp = {};
 		tmp.me = this;
@@ -43,7 +59,9 @@ TransFormJs.prototype = {
 			if(tmp.fieldName === 'files') {
 				tmp.data['files'].push(item.retrieve('data'));
 			} else if (tmp.fieldName === 'logDate') {
-				tmp.data['logDate'] = jQuery('#' + $(item).up('.date').id).data('DateTimePicker').date().utc().format();
+				tmp.dateBox = $(item);
+				tmp.me._pageJs._signRandID(tmp.dateBox);
+				tmp.data['logDate'] = jQuery('#' + tmp.dateBox.id).data('DateTimePicker').date().utc().format();
 			}
 			else
 				tmp.data[tmp.fieldName] = $F(item);
@@ -57,12 +75,13 @@ TransFormJs.prototype = {
 			,'onSuccess': function(sender, param) {
 				try {
 					tmp.result = tmp.me._pageJs.getResp(param, false, true);
-					if(!tmp.result)
+					if(!tmp.result || !tmp.result.items || tmp.result.items.size() !== 2)
 						return;
+					tmp.me.resetForm();
+					tmp.me._refreshParentWindow(tmp.result.items);
+					jQuery('#' + tmp.inputPanel.id + ' .msg-div').html(tmp.me._pageJs.getAlertBox('Saved Successfully!', '').addClassName('alert-success'));
 					if(typeof(tmp.me._saveSuccFunc) === 'function')
 						tmp.me._saveSuccFunc(tmp.result);
-					tmp.me.resetForm();
-					jQuery('#' + tmp.inputPanel.id + ' .msg-div').html(tmp.me._pageJs.getAlertBox('Saved Successfully!', '').addClassName('alert-success'));
 				} catch (e) {
 					jQuery('#' + tmp.inputPanel.id + ' .msg-div').html(tmp.me._pageJs.getAlertBox('Error: ', e).addClassName('alert-danger'));
 				}
@@ -83,7 +102,7 @@ TransFormJs.prototype = {
 							.insert({'bottom': new Element('span', {'class': 'input-group-addon'})
 								.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-calendar'}) })
 							})
-							.insert({'bottom': new Element('input', {'type': 'text', 'class': 'form-control', 'input-panel': 'logDate', 'placeholder': 'DD/MM/YYYY HH:MM:SS', 'name': 'log_date'})
+							.insert({'bottom': new Element('input', {'type': 'text', 'class': 'form-control', 'input-panel': 'logDate', 'placeholder': 'DD/MM/YYYY HH:MM:SS', 'name': 'log_date' })
 								.observe('click', function() {
 									$(this).up('.date').down('.input-group-addon').click();
 								})
@@ -134,10 +153,12 @@ TransFormJs.prototype = {
 		jQuery(tmp.me._jQueryFormSelector).data('bootstrapValidator').resetForm(true);
 		tmp.me._initSelect2(tmp._inputPane.down('[input-panel="fromAccId"]'), 'from')
 			._initSelect2(tmp._inputPane.down('[input-panel="toAccId"]'), 'to');
-		tmp._inputPane.down('[input-panel="logDate"]').up('.date').retrieve('event:load')();
 		tmp._inputPane.down('.file-uploader-results').update('');
 		tmp._inputPane.down('.file-uploading-results').update('');
 		tmp._inputPane.down('.msg-div').update('');
+		tmp.logDateBox = tmp._inputPane.down('[input-panel="logDate"]');
+		if(tmp.logDateBox)
+			tmp.logDateBox.setValue(tmp.logDateBox.retrieve('originalDate'));
 		return tmp.me;
 	}
 	,_initValidator: function(_inputPane) {
@@ -233,6 +254,52 @@ TransFormJs.prototype = {
         ;
 		return tmp.me;
 	}
+	,_getFileDiv: function(attachment) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.fileName = attachment.id && attachment.asset ? attachment.asset.filename : attachment.file.name;
+		tmp.newDiv = new Element('div', {'class': 'btn-group file-btn', 'input-panel': 'files'})
+	    	.store('data', attachment)
+			.setStyle('margin-right: 4px; margin-bottom: 4px;')
+	    	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'}).update(tmp.fileName) })
+	    	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'})
+	        	.insert({'bottom': new Element('span', {'class': 'text-danger'})
+	        		.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-remove'}) })
+	        	})
+	        	.observe('click', function(){
+	        		tmp.thisBtn = this;
+	        		tmp.fileBtn = $(this).up('.file-btn');
+	        		tmp.fileBtnData = tmp.fileBtn.retrieve('data');
+	        		tmp.confirmDiv = new Element('div')
+	        			.insert({'bottom': new Element('p').update('Are you sure you want to delete this file: <strong>' + tmp.fileName + '</strong>?') })
+		        		.insert({'bottom': new Element('div')
+			        		.insert({'bottom': new Element('span', {'class': 'btn btn-danger'})
+			        			.update('YES')
+			        			.observe('click', function(){
+			        				tmp.fileBtn = $(tmp.thisBtn).up('.file-btn');
+			        				tmp.fileBtnData = tmp.fileBtn.retrieve('data');
+			        				if(tmp.fileBtnData.id) {
+			        					tmp.fileBtnData.active = false;
+			        					tmp.fileBtn.store('data', tmp.fileBtnData).hide();
+			        				} else {
+			        					tmp.fileBtn.remove();
+			        				}
+			        				tmp.me._pageJs.hideModalBox();
+			        			})
+			        		})
+			        		.insert({'bottom': new Element('span', {'class': 'btn btn-default pull-right'})
+			        			.update('NO')
+			        			.observe('click', function(){
+			        				tmp.me._pageJs.hideModalBox();
+			        			})
+			        		})
+		        		})
+	        		;
+	        		tmp.me._pageJs.showModalBox('Confirm Deletion:', tmp.confirmDiv, true);
+	        	})
+	    	});
+		return tmp.newDiv;
+	}
 
 	,_initFileUploader: function (layout) {
 		var tmp = {};
@@ -271,39 +338,7 @@ TransFormJs.prototype = {
 	        	tmp.result = data.result.resultData;
 	        	if(!tmp.result || !tmp.result.file || !tmp.result.file.name)
 	        		return;
-	        	tmp.resultPanel.insert({'bottom': new Element('div', {'class': 'btn-group file-btn', 'input-panel': 'files'})
-		        	.store('data', tmp.result)
-	        		.setStyle('margin-right: 4px; margin-bottom: 4px;')
-		        	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'}).update(tmp.result.file.name) })
-		        	.insert({'bottom': new Element('div', {'class': 'btn btn-info btn-sm'})
-			        	.insert({'bottom': new Element('span', {'class': 'text-danger'})
-			        		.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-remove'}) })
-			        	})
-			        	.observe('click', function(){
-			        		tmp.fileBtn = $(this).up('.file-btn');
-			        		tmp.fileBtnData = tmp.fileBtn.retrieve('data');
-			        		tmp.confirmDiv = new Element('div')
-			        			.insert({'bottom': new Element('p').update('Are you sure you want to delete this file: <strong>' + tmp.fileBtnData.file.name + '</strong>?') })
-				        		.insert({'bottom': new Element('div')
-					        		.insert({'bottom': new Element('span', {'class': 'btn btn-danger'})
-					        			.update('YES')
-					        			.observe('click', function(){
-					        				tmp.fileBtn.remove();
-					        				tmp.me._pageJs.hideModalBox();
-					        			})
-					        		})
-					        		.insert({'bottom': new Element('span', {'class': 'btn btn-default pull-right'})
-					        			.update('NO')
-					        			.observe('click', function(){
-					        				tmp.me._pageJs.hideModalBox();
-					        			})
-					        		})
-				        		})
-			        		;
-			        		tmp.me._pageJs.showModalBox('Confirm Deletion:', tmp.confirmDiv, true);
-			        	})
-		        	})
-	        	});
+	        	tmp.resultPanel.insert({'bottom': tmp.me._getFileDiv(tmp.result)	});
 	        },
 	        progress: function (e, data) {
 	        	tmp.percentage = parseInt(data.loaded / data.total * 100, 10) + '%';
@@ -368,6 +403,10 @@ TransFormJs.prototype = {
 				return '<div><a href="javascript: void(0);" target="_BLANK" onclick="window.open(' + "'/accounts.html'" + ');">No Accounts Found, create one?</a></div>';
 			}
 		});
+		tmp.preSelectedAcc = selectBox.retrieve('preSelectedAcc');
+		if(tmp.preSelectedAcc && tmp.preSelectedAcc.id) {
+			jQuery('#' + selectBox.id).select2('data', {'id': tmp.preSelectedAcc.id, 'text': tmp.preSelectedAcc.breadCrumbs.join(' / '), 'data': tmp.preSelectedAcc}, true);
+		}
 		return tmp.me;
 	}
 	,_initDatePicker: function(inputBox) {
@@ -379,26 +418,32 @@ TransFormJs.prototype = {
 		});
 		return tmp.me;
 	}
-	,render: function(_inputPanel) {
+	,render: function(_inputPanel, _trans) {
 		var tmp = {};
 		tmp.me = this;
-		tmp.me._inputPanel = _inputPanel;
-		$(tmp.me._inputPanel).update(tmp._inputPane = tmp.me._getInputPanel());
+		tmp.me._setTransaction(_trans);
+		$(tmp.me._inputPanel = _inputPanel).update(tmp._inputPane = tmp.me._getInputPanel());
+		tmp.logDate = moment(new Date()).format('DD/MMM/YYYY HH:mm A');
+		tmp.fromAcc = tmp.toAcc = {};
+		if(tmp.me._trans && tmp.me._trans.id) {
+			tmp.logDate = moment(tmp.me._pageJs.loadUTCTime(tmp.me._trans.logDate)).format('DD/MMM/YYYY HH:mm A');
+			tmp.fromAcc = tmp.me._trans.accounts.from;
+			tmp.toAcc = tmp.me._trans.accounts.to;
+			tmp._inputPane.down('[input-panel="amount"]').setValue(tmp.me._pageJs.getCurrency(Math.abs(tmp.me._trans.value)));
+			tmp._inputPane.down('[input-panel="comments"]').setValue(tmp.me._trans.description);
+			tmp._inputPane.insert({'bottom': new Element('input', {'type': 'hidden', 'value': tmp.me._trans.groupId, 'input-panel': 'groupId'})});
+			if(tmp.me._trans.attachments && tmp.me._trans.attachments.size() > 0) {
+				tmp.me._trans.attachments.each(function(attachment) {
+					tmp._inputPane.down('.file-uploader-results').insert({'bottom': tmp.me._getFileDiv(attachment) });
+				});
+			}
+		}
 		tmp.me
-			._initDatePicker(tmp.logDateDiv = tmp._inputPane.down('[input-panel="logDate"]')
-				.up('.date')
-				.store('event:load', function() {
-					tmp.me._pageJs._signRandID(tmp.logDateDiv);
-					jQuery('#' + tmp.logDateDiv.id).data('DateTimePicker').date(new Date());
-				})
-			)
+			._initDatePicker(tmp._inputPane.down('[input-panel="logDate"]').store('originalDate', tmp.logDate).setValue(tmp.logDate))
 			._initFileUploader(tmp._inputPane)
-			._initSelect2(tmp._inputPane.down('[input-panel="fromAccId"]'), 'from')
-			._initSelect2(tmp._inputPane.down('[input-panel="toAccId"]'), 'to')
+			._initSelect2(tmp._inputPane.down('[input-panel="fromAccId"]').store('preSelectedAcc', tmp.fromAcc), 'from')
+			._initSelect2(tmp._inputPane.down('[input-panel="toAccId"]').store('preSelectedAcc', tmp.toAcc), 'to')
 			._initValidator(tmp._inputPane);
-		jQuery(window).load(function(){
-			tmp.logDateDiv.retrieve('event:load')();
-		});
 		return tmp.me;
 	}
 };
