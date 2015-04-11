@@ -103,11 +103,9 @@ class Controller extends BackEndPageAbstract
 				$params[] = trim($accountTypeId);
 			}
 
-			Dao::$debug = true;
 			$transactions = $stats = array();
 			if(count($where) > 0)
 				$transactions = Transaction::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('trans.logDate' => 'desc'), $stats );
-			Dao::$debug = false;
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {

@@ -48,7 +48,8 @@ class Controller extends BackEndPageAbstract
 				$pageSize = isset($param->CallbackParameter->pagination->pageSize) ? trim($param->CallbackParameter->pagination->pageSize) : $pageSize;
 			}
 
-			$where = $params = array();
+			$where = array('organizationId = ?');
+			$params = array(trim(Core::getOrganization()->getId()));
 			$items = $stats = array();
 			if(count($where) > 0)
 				$items = Property::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('prop.name' => 'asc'), $stats);
