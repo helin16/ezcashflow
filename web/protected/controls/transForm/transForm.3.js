@@ -364,7 +364,7 @@ TransFormJs.prototype = {
 				 ,url: '/ajax/getAccounts'
 		         ,type: 'POST'
 	        	 ,data: function (params) {
-	        		 return {"searchTxt": params, 'accTypeIds': tmp.me._accTypeIds[type]};
+	        		 return {"searchTxt": params, 'accTypeIds': tmp.me._accTypeIds[type], 'isSumAcc': 0};
 	        	 }
 				 ,results: function(data, page, query) {
 					 tmp.resultMap = {};
