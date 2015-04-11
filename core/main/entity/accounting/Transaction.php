@@ -65,6 +65,12 @@ class Transaction extends BaseEntityAbstract
 	 */
 	private static $_groupId = '';
 	/**
+	 * The organization
+	 * 
+	 * @var Organization
+	 */
+	protected $organization;
+	/**
 	 * Getter for accountEntry
 	 *
 	 * @return AccountEntry
@@ -245,6 +251,28 @@ class Transaction extends BaseEntityAbstract
 		return $this;
 	}
 	/**
+	 * Getting organization
+	 *
+	 * @return Organization
+	 */
+	public function getOrganization()
+	{
+		$this->loadManyToOne('organization');
+		return $this->organization;
+	}
+	/**
+	 * Setter for the value
+	 *
+	 * @param Organization $organization
+	 *
+	 * @return Organization
+	 */
+	public function setOrganization(Organization $value)
+	{
+		$this->organization = $value;
+		return $this;
+	}
+	/**
 	 * Getting the signed value from debit and credit for an account entry
 	 *
 	 * @return NULL number
@@ -325,6 +353,7 @@ class Transaction extends BaseEntityAbstract
 	 */
 	public function __loadDaoMap() {
 		DaoMap::begin ( $this, 'trans' );
+		DaoMap::setManyToOne ( 'organization', 'Organization', 'trans_org' );
 		DaoMap::setStringType ( 'groupId', 'varchar', 32 );
 		DaoMap::setDateType ( 'logDate' );
 		DaoMap::setManyToOne ( 'logBy', 'UserAccount', 'trans_logby', true );
@@ -342,6 +371,7 @@ class Transaction extends BaseEntityAbstract
 	/**
 	 * Creating a Transaction
 	 *
+	 * @param Organization $organization
 	 * @param AccountEntry $fromAcc
 	 * @param AccountEntry $toAcc
 	 * @param number       $value
@@ -352,7 +382,7 @@ class Transaction extends BaseEntityAbstract
 	 *
 	 * @return Ambigous <BaseEntityAbstract, GenericDAO>
 	 */
-	public static function transactions(AccountEntry $fromAcc, AccountEntry $toAcc, $value, $description = '', UDate $logDate = null, UserAccount $logBy = null, array $assets = array())
+	public static function transactions(Organization $organization, AccountEntry $fromAcc, AccountEntry $toAcc, $value, $description = '', UDate $logDate = null, UserAccount $logBy = null, array $assets = array())
 	{
 		$groupId = StringUtilsAbstract::getRandKey(__CLASS__);
 		$creditItem = new Transaction();
@@ -361,8 +391,8 @@ class Transaction extends BaseEntityAbstract
 			$creditItem->setLogBy ( Core::getUser() );
 			$debitItem->setLogBy ( Core::getUser() );
 		}
-		$creditItem->setAccountEntry ( $fromAcc )->setCredit ( $value )->setLogDate ( $logDate )->setDescription ( $description )->setGroupId($groupId)->save ();
-		$debitItem->setAccountEntry ( $toAcc )->setDebit( $value )->setLogDate ( $logDate )->setDescription ( $description )->setGroupId($groupId)->save ();
+		$creditItem->setOrganization($organization)->setAccountEntry ( $fromAcc )->setCredit ( $value )->setLogDate ( $logDate )->setDescription ( $description )->setGroupId($groupId)->save ();
+		$debitItem->setOrganization($organization)->setAccountEntry ( $toAcc )->setDebit( $value )->setLogDate ( $logDate )->setDescription ( $description )->setGroupId($groupId)->save ();
 		foreach($assets as $asset) {
 			if(!$asset instanceof Asset)
 				continue;

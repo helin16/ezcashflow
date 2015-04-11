@@ -83,7 +83,8 @@ class Controller extends BackEndPageAbstract
 				$pageSize = isset($param->CallbackParameter->pagination->pageSize) ? trim($param->CallbackParameter->pagination->pageSize) : $pageSize;
 			}
 
-			$where = $params = array();
+			$where = array('organizationId = ?');
+			$params = array(trim(Core::getOrganization()->getId()));
 			if(isset($param->CallbackParameter->searchCriteria->accountsIds) && trim($param->CallbackParameter->searchCriteria->accountsIds) !== '') {
 				$accountIds = explode(',', $param->CallbackParameter->searchCriteria->accountsIds);
 				$where[] = 'accountEntryId in (' . implode(',', array_fill(0, count($accountIds), '?')) . ')';
@@ -102,9 +103,11 @@ class Controller extends BackEndPageAbstract
 				$params[] = trim($accountTypeId);
 			}
 
+			Dao::$debug = true;
 			$transactions = $stats = array();
 			if(count($where) > 0)
 				$transactions = Transaction::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('trans.logDate' => 'desc'), $stats );
+			Dao::$debug = false;
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {

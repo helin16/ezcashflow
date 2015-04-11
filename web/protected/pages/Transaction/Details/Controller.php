@@ -23,7 +23,11 @@ class Controller extends DetailsPageAbstract
 	protected function _getEndJs()
 	{
 		$js = parent::_getEndJs();
-		if($this->_entity instanceof Transaction){
+		if($this->_entity instanceof Transaction) {
+			if($this->_entity->getOrganization()->getId() !== Core::getOrganization()->getId()){
+				$js .= "pageJs.errWhenFirstLoad();";
+				return $js;
+			}
 			$transactions = Transaction::getAllByCriteria('groupId = ?', array(trim($this->_entity->getGroupId())), true, 1, 2, array('trans.debit' => 'asc'));
 			$fromAcc = $transactions[0]->getAccountEntry()->getJson();
 			$toAcc = $transactions[1]->getAccountEntry()->getJson();

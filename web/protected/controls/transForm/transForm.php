@@ -63,18 +63,17 @@ class transForm extends TTemplateControl
 					}
 				}
 			}
-
 			if(isset($params->CallbackParameter->groupId) && ($groupId = trim($params->CallbackParameter->groupId)) !== '')
 				$transactions = Transaction::updateTrans($groupId, $fromAcc, $toAcc, $amount, $comments, $logDate, Core::getUser(), $assets);
 			else
-				$transactions = Transaction::transactions($fromAcc, $toAcc, $amount, $comments, $logDate, Core::getUser(), $assets);
+				$transactions = Transaction::transactions(Core::getOrganization(), $fromAcc, $toAcc, $amount, $comments, $logDate, Core::getUser(), $assets);
 
 			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $transactions);
 
 			Dao::commitTransaction();
 		} catch(Exception $ex) {
 			Dao::rollbackTransaction();
-			$errors[] = $ex->getMessage();
+			$errors[] = $ex->getMessage() . $ex->getTraceAsString();
 		}
 		$params->ResponseData = StringUtilsAbstract::getJson($results, $errors);
 	}

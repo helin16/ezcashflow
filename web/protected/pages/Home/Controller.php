@@ -39,9 +39,7 @@ class Controller extends BackEndPageAbstract
 	{
 		$results = $errors = array ();
 		try {
-			$transactions = Transaction::getAll ( true, 1, 10, array (
-					'trans.id' => 'desc'
-			) );
+			$transactions = Transaction::getAllByCriteria ('trans.organizationId = ?', array(Core::getOrganization()->getId()), true, 1, 10, array ('trans.id' => 'desc') );
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 		} catch ( Exception $ex ) {
 			$errors [] = $ex->getMessage ();
@@ -51,8 +49,9 @@ class Controller extends BackEndPageAbstract
 	private function _getTransSum(AccountType $type, UDate $fromUTC, UDate $toUTC)
 	{
 		Transaction::getQuery ()->eagerLoad ( 'Transaction.accountEntry', 'inner join', 'trans_acc', 'trans_acc.id = trans.accountEntryId and trans_acc.typeId = ?' );
-		$transactions = Transaction::getAllByCriteria ( 'trans.created >=? and trans.created <= ?', array (
+		$transactions = Transaction::getAllByCriteria ( 'trans.organizationId = ? and trans.created >=? and trans.created <= ?', array (
 				$type->getId (),
+				Core::getOrganization()->getId(),
 				trim ( $fromUTC ),
 				trim ( $toUTC )
 		) );

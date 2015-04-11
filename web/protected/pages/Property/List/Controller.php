@@ -13,7 +13,7 @@ class Controller extends BackEndPageAbstract
 	 *
 	 * @var string
 	 */
-	protected $_menuItem = 'transaction.list';
+	protected $_menuItem = 'property.list';
 	/**
 	 * Getting The end javascript
 	 *
