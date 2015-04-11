@@ -177,7 +177,7 @@ abstract class FrontEndPageAbstract extends TPage
 	public function getAppName()
 	{
 		$array = Core::getAppMetaInfo();
-		return isset($array['name']) ? trim($array['name']) : '';
+		return Core::getOrganization() instanceof Organization ? Core::getOrganization()->getName() : (isset($array['name']) ? trim($array['name']) : '');
 	}
 	/**
 	 * Getting the application log
