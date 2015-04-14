@@ -19,7 +19,7 @@ abstract class MessageSender
 				self::_logMsg("    SUCCESS sending message(ID=" . $message->getId() . ').', __CLASS__, __FUNCTION__);
 			} catch(Exception $ex) {
 				Dao::rollbackTransaction();
-				$message->setStatus(Message::STATUS_FAILED)
+				$message->setSendType(Message::SENT_TYPE_FAILED)
 					->save();
 				self::_logMsg("    ERROR sending message(ID=" . $message->getId() . ': ' . $ex->getMessage(), __CLASS__, __FUNCTION__);
 				self::_logMsg("    ERROR sending message(ID=" . $message->getId() . ': ' . $ex->getTraceAsString(), __CLASS__, __FUNCTION__);
