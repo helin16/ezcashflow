@@ -55,7 +55,7 @@ class LoginController extends FrontEndPageAbstract
             Core::setUser(UserAccount::get(UserAccount::ID_GUEST_ACCOUNT));
             
             $appInfo = Core::getAppMetaInfo();
-            Message::create(Core::getUser()->getPerson(), $person, 
+            Message::create(Core::getUser()->getPerson(), $userAccounts[0]->getPerson(), 
             	($subject = 'Resetting your ' . $appInfo['name'] . ' password.') , 
             		'<h3>' . $subject . '</h3>'
             		.'<div>'
