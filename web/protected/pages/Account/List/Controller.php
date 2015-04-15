@@ -24,6 +24,7 @@ class Controller extends BackEndPageAbstract
 		$js = parent::_getEndJs();
 		$types = array_map(create_function('$a', 'return $a->getJson();'), AccountType::getAll());
 		$js .= 'pageJs.setCallbackId("getAccounts", "' . $this->getAccountsBtn->getUniqueID() . '")';
+		$js .= '.setCallbackId("deleteAccount", "' . $this->deleteAccountBtn->getUniqueID() . '")';
 		$js .= '.init("page-wrapper", ' . json_encode($types);
 		if(isset($_REQUEST['typeid']) && ($firstShowAccType = AccountType::get($_REQUEST['typeid'])) instanceof AccountType)
 			$js .= ', ' . json_encode($firstShowAccType->getJson());
@@ -38,6 +39,20 @@ class Controller extends BackEndPageAbstract
 				throw new Exception('No typeId provided.');
 			$accounts = AccountEntry::getAllByCriteria('typeId = ? and organizationId = ?', array($typeId, Core::getOrganization()->getId()), true, null, DaoQuery::DEFAUTL_PAGE_SIZE, array('acc_entry.path' => 'asc'));
 			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
+		} catch(Exception $ex) {
+			$errors[] = $ex->getMessage();
+		}
+		$params->ResponseData = StringUtilsAbstract::getJson($results, $errors);
+	}
+	public function deleteAccount($sender, $params)
+	{
+		$results = $errors = array();
+		try {
+			if(!isset($params->CallbackParameter->accId) || !($account = AccountEntry::get(trim($params->CallbackParameter->accId))) instanceof AccountEntry)
+				throw new Exception('Invalid Account to delete');
+			$account->setActive(false)
+				->save();
+			$results['item'] = $account->getJson();
 		} catch(Exception $ex) {
 			$errors[] = $ex->getMessage();
 		}

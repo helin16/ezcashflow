@@ -2,6 +2,7 @@
 	<com:Application.controls.bootstrapTreeGrid.bootstrapTreeGrid />
 	<com:Application.controls.fancyBox.FancyBox />
 	<com:TCallback ID="getAccountsBtn" onCallback="Page.getAccounts" />
+	<com:TCallback ID="deleteAccountBtn" onCallback="Page.deleteAccount" />
 	<div class="container" id="page-wrapper"></div>
 </table>
 </com:TContent>

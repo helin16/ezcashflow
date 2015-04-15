@@ -472,7 +472,7 @@ class AccountEntry extends BaseEntityAbstract
     		$where = 'path like ?';
     		$params = array(trim($this->getPath()) . ',%');
     	}
-    	$value = self::getAllByCriteria($where, $params);
+    	$value = self::getAllByCriteria('(' . $where . ') AND id != ' . $this->getId(), $params);
     	self::addCache($key, $value);
     	return $value;
     }
@@ -480,9 +480,9 @@ class AccountEntry extends BaseEntityAbstract
      * (non-PHPdoc)
      * @see BaseEntityAbstract::getJson()
      */
-    public function getJson($extra = '', $reset = false)
+    public function getJson($extra = array(), $reset = false)
     {
-    	$array = array();
+    	$array = $extra;
     	if(!$this->isJsonLoaded($reset))
     	{
     		$array['breadCrumbs'] = $this->getBreadCrumbs();
@@ -490,6 +490,8 @@ class AccountEntry extends BaseEntityAbstract
     		$array['type'] = $this->getType() instanceof AccountType ? $this->getType()->getJson() : null;
     		$array['runingValue'] = $this->getRuningBalance($reset);
     		$array['sumValue'] = $this->getSumValue($reset);
+    		$array['childrenCount'] = self::countByCriteria('active = 1 and path like ?', array(trim($this->getPath()) . ',%'));
+    		$array['transactionCount'] = Transaction::countByCriteria('active = 1 and accountEntryId = ?', array($this->getId()));
     	}
     	return parent::getJson($array, $reset);
     }

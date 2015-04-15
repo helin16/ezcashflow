@@ -59,11 +59,76 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 			});
 		return tmp.newDiv;
 	}
+	/**
+	 * Ajax: delete account
+	 */
+	,_deleteAcc: function(btn, acc) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.confirmDiv = $(btn).up('.confirm-panel');
+		tmp.loadDiv = tmp.me._getLoadingDiv();
+		tmp.me.postAjax(tmp.me.getCallbackId('deleteAccount'), {'accId': acc.id}, {
+			'onLoading': function() {
+				tmp.confirmDiv
+					.insert({'after': tmp.loadDiv})
+					.hide();
+				tmp.confirmDiv.down('.msg-wrapper').update('');
+			}
+			,'onSuccess': function(sender, param) {
+				try {
+					tmp.result = tmp.me.getResp(param, false, true);
+					if(!tmp.result || !tmp.result.item || !tmp.result.item.id)
+						return;
+					tmp.me._showAccounts(acc.type);
+					tmp.me.hideModalBox();
+				} catch (e) {
+					tmp.confirmDiv.show()
+						.down('.msg-wrapper').update(tmp.me.getAlertBox('Error: ', e).addClassName('alert-danger'));
+				}
+			}
+			,'onComplete': function() {
+				if($(btn) && $(btn).up('.confirm-panel'))
+					$(btn).up('.confirm-panel').show();
+				tmp.loadDiv.remove();
+			}
+ 		});
+		return tmp.me;
+	}
+	,_showConfirmDeletePanel: function (acc) {
+		var tmp = {};
+		tmp.me = this;
+		tmp.newDiv = new Element('div', {'class': 'confirm-panel'})
+			.insert({'bottom': new Element('h4').update('You are about to delete this account: ' + acc.breadCrumbs.join(' / '))})
+			.insert({'bottom': new Element('div')
+				.insert({'bottom': new Element('ul')
+					.insert({'bottom': new Element('li').update(' You will NOT be able to see this account any more')})
+					.insert({'bottom': new Element('li').update(' You will NOT be able to log a transaction against it any more.')})
+					.insert({'bottom': new Element('li').update(' This action can NOT be reversed.')})
+				})
+			})
+			.insert({'bottom': new Element('div').update(new Element('strong').update('Are you sure to continue?')) })
+			.insert({'bottom': new Element('div', {'class': 'msg-wrapper'})})
+			.insert({'bottom': new Element('div')
+				.insert({'bottom': new Element('div', {'class': 'btn btn-default'})
+					.update('NO, cancel this')
+					.observe('click', function() {
+						tmp.me.hideModalBox();
+					})
+				})
+				.insert({'bottom': new Element('div', {'class': 'btn btn-danger pull-right'}).update('YES, Delete it')
+					.observe('click', function() {
+						tmp.me._deleteAcc(this, acc);
+					})
+				})
+			});
+		tmp.me.showModalBox('<strong>Deletion Confirmation:</strong>', tmp.newDiv);
+		return tmp.me;
+	}
 	,_getAccountRow: function (acc) {
 		var tmp = {};
 		tmp.me = this;
 		tmp.tag = acc.id ? 'td' : 'th';
-		tmp.newDiv = new Element('tr', {'class': (acc.id ? 'treegrid-' + acc.id : 'header') + (acc.isSumAcc === true ? ' active' : '')  })
+		tmp.newDiv = new Element('tr', {'class': 'item-row ' + (acc.id ? 'treegrid-' + acc.id : 'header') + (acc.isSumAcc === true ? ' active' : ''), 'account-id': acc.id  })
 			.store('data', acc)
 			.setStyle(acc.isSumAcc === true ? 'font-weight: bold; font-style: italic;' : '')
 			.insert({'bottom': new Element(tmp.tag).update(new Element('abbr', {'title': acc.description}).update(acc.name)) })
@@ -80,7 +145,8 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 						.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-plus'}) })
 						.insert({'bottom': new Element('span', {'class': 'hidden-sm hidden-xs'}).update(' Add') })
 						.observe('click', function() {
-							tmp.me._openAccDetailsPanel(null, acc, null);
+							if(acc.id && acc.isSumAcc === true)
+								tmp.me._openAccDetailsPanel(null, acc, null);
 						})
 					})
 					.insert({'bottom': new Element('span', {'class': 'btn btn-success dropdown-toggle', 'data-toggle': 'dropdown'})
@@ -93,6 +159,21 @@ PageJs.prototype = Object.extend(new FrontPageJs(), {
 								.insert({'bottom': new Element('span', {'class': 'hidden-sm hidden-xs'}).update(' Edit') })
 								.observe('click', function() {
 									tmp.me._openAccDetailsPanel(acc, null, null);
+								})
+							)
+						})
+						.insert({'bottom': new Element('li', {'title': 'Delete this account: ' + acc.name})
+							.update(new Element('a', {'href': 'javascript: void(0);', 'class': 'bg-danger'})
+								.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-remove'}) })
+								.insert({'bottom': new Element('span', {'class': 'hidden-sm hidden-xs'}).update(' Delete') })
+								.observe('click', function() {
+									if(acc.childrenCount > 0) {
+										tmp.me.showModalBox('<strong>Oops:</strong>', '<h4 class="text-danger">Can NOT delete ' + acc.name + ', as there are ' + acc.childrenCount + ' children. You have to delete them first</h4>');
+									} else if(acc.transactionCount > 0) {
+										tmp.me.showModalBox('<strong>Oops:</strong>', '<h4 class="text-danger">Can NOT delete ' + acc.name + ', as there are ' + acc.transactionCount + ' Transaction(s) against this account.</h4>');
+									} else {
+										tmp.me._showConfirmDeletePanel(acc);
+									}
 								})
 							)
 						})
