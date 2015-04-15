@@ -488,10 +488,10 @@ class AccountEntry extends BaseEntityAbstract
     		$array['breadCrumbs'] = $this->getBreadCrumbs();
     		$array['parent'] = $this->getParent() instanceof AccountEntry ? $this->getParent()->getJson() : null;
     		$array['type'] = $this->getType() instanceof AccountType ? $this->getType()->getJson() : null;
-    		$array['runingValue'] = $this->getRuningBalance($reset);
-    		$array['sumValue'] = $this->getSumValue($reset);
-    		$array['childrenCount'] = self::countByCriteria('active = 1 and path like ?', array(trim($this->getPath()) . ',%'));
-    		$array['transactionCount'] = Transaction::countByCriteria('active = 1 and accountEntryId = ?', array($this->getId()));
+    		$array['runingValue'] = trim($this->getId()) === '' ? 0 : $this->getRuningBalance($reset);
+    		$array['sumValue'] = trim($this->getId()) === '' ? 0 : $this->getSumValue($reset);
+    		$array['childrenCount'] = strim($this->getId()) === '' ? 0 : elf::countByCriteria('active = 1 and path like ?', array(trim($this->getPath()) . ',%'));
+    		$array['transactionCount'] = trim($this->getId()) === '' ? 0 : Transaction::countByCriteria('active = 1 and accountEntryId = ?', array($this->getId()));
     	}
     	return parent::getJson($array, $reset);
     }
