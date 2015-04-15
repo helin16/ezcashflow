@@ -83,29 +83,39 @@ class Controller extends BackEndPageAbstract
 				$pageSize = isset($param->CallbackParameter->pagination->pageSize) ? trim($param->CallbackParameter->pagination->pageSize) : $pageSize;
 			}
 
-			$where = array('organizationId = ?');
-			$params = array(trim(Core::getOrganization()->getId()));
+			$where = array('trans.organizationId = :orgId');
+			$params = array('orgId' => trim(Core::getOrganization()->getId()));
 			if(isset($param->CallbackParameter->searchCriteria->accountsIds) && trim($param->CallbackParameter->searchCriteria->accountsIds) !== '') {
 				$accountIds = explode(',', $param->CallbackParameter->searchCriteria->accountsIds);
-				$where[] = 'accountEntryId in (' . implode(',', array_fill(0, count($accountIds), '?')) . ')';
-				$params = array_merge($params, $accountIds);
+				if(($accounts = AccountEntry::getAllByCriteria('id in (' . implode(',', array_fill(0, count($accountIds), '?')) . ')', $accountIds)) > 0) {
+					$array = array();
+					foreach($accounts as $index => $account) {
+						$key = 'path' . $index;
+						$array[] = '(trans_acc.id = ' . $account->getId() . ' or trans_acc.path like :' . $key . ')';
+						$params[$key] = trim($account->getPath() . ',%');
+					}
+					$where[] = '(' . implode(' OR ', $array) . ')';
+				}
 			}
 			if(isset($param->CallbackParameter->searchCriteria->logDate_from) && ($dateFrom = trim($param->CallbackParameter->searchCriteria->logDate_from)) !== '') {
-				$where[] = 'logDate >= ?';
-				$params[] = trim(new UDate($dateFrom));
+				$where[] = 'trans.logDate >= :fromDate';
+				$params['fromDate'] = trim(new UDate($dateFrom));
 			}
 			if(isset($param->CallbackParameter->searchCriteria->logDate_to) && ($dateTo = trim($param->CallbackParameter->searchCriteria->logDate_to)) !== '') {
-				$where[] = 'logDate <= ?';
-				$params[] = trim(new UDate($dateTo));
+				$where[] = 'trans.logDate <= :toDate';
+				$params['toDate'] = trim(new UDate($dateTo));
 			}
 			if(isset($param->CallbackParameter->searchCriteria->accountTypeId) && ($accountTypeId = trim($param->CallbackParameter->searchCriteria->accountTypeId)) !== '') {
-				$where[] = 'accountEntryId in (select id from accountentry where typeId = ?)';
-				$params[] = trim($accountTypeId);
+				$where[] = 'trans_acc.typeId = :typeId';
+				$params['typeId'] = trim($accountTypeId);
 			}
 
 			$transactions = $stats = array();
 			if(count($where) > 0)
+			{
+				Transaction::getQuery()->eagerLoad('Transaction.accountEntry', 'inner join', 'trans_acc', 'trans_acc.id = trans.accountEntryId');
 				$transactions = Transaction::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('trans.logDate' => 'desc'), $stats );
+			}
 			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
 			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {
