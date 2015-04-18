@@ -331,7 +331,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		$(tmp.me._ressultPanelId).update(tmp.layout = tmp.me._getLayout())
 			.store('transForm', new TransFormJs(tmp.me, jQueryFormSelector)
 				.setSaveSuccFunc(function() {
-					tmp.me._loadData()
+					window.location = document.URL;
 				})
 				.render(tmp.layout.down('.trans-input-panel-wrapper'))
 			)
