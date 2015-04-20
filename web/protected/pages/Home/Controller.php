@@ -49,7 +49,7 @@ class Controller extends BackEndPageAbstract
 	private function _getTransSum(AccountType $type, UDate $fromUTC, UDate $toUTC)
 	{
 		Transaction::getQuery ()->eagerLoad ( 'Transaction.accountEntry', 'inner join', 'trans_acc', 'trans_acc.id = trans.accountEntryId and trans_acc.typeId = ?' );
-		$transactions = Transaction::getAllByCriteria ( 'trans.organizationId = ? and trans.created >=? and trans.created <= ?', array (
+		$transactions = Transaction::getAllByCriteria ( 'trans.organizationId = ? and trans.logDate >=? and trans.logDate <= ?', array (
 				$type->getId (),
 				Core::getOrganization()->getId(),
 				trim ( $fromUTC ),
