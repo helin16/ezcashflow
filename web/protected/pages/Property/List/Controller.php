@@ -27,7 +27,7 @@ class Controller extends BackEndPageAbstract
 		$js .= '.setHTMLID("item-count", "item-count")';
 		$js .= '.setCallbackId("getItems", "' . $this->getItemsBtn->getUniqueID() . '")';
 		$js .= '.setCallbackId("delItems", "' . $this->delItemsBtn->getUniqueID() . '")';
-		$js .= '.init()';
+		$js .= '.init(new PropertyBuyingCheckPanel(pageJs))';
 		$js .= ';';
 		return $js;
 	}

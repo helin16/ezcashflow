@@ -153,7 +153,7 @@ PageJs.prototype = Object.extend(new DetailsPageJs(), {
                             	if(tmp.me._entity.id)
                             		return true;
                                 tmp.newPassword = jQuery('#' + tmp.me.getHTMLID('page-form')).find('[name="password"]').val();
-                                return tmp.newPassword !== '' && tmp.newPassword.length < 6;
+                                return tmp.newPassword !== '' && tmp.newPassword.length > 6;
                             }
                         }
                     }

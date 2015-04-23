@@ -17,9 +17,7 @@
 		<section id="mainbody">
 			<com:TContentPlaceHolder ID="MainContent" />
 		</section>
-		<footer id="footer">
-			<com:Application.layout.FrontEnd.Footer.Footer />
-		</footer>
+		<com:Application.layout.FrontEnd.Footer.Footer />
 	</com:TForm>
 </body>
 </html>
