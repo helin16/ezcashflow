@@ -23,6 +23,7 @@ abstract class SystemCoreAbstract
 			$base . '/entity/',
 			$base . '/entity/accounting/',
 			$base . '/entity/content/',
+			$base . '/entity/log/',
 			$base . '/entity/property/',
 			$base . '/entity/system/',
 			$base . '/entity/tag/',

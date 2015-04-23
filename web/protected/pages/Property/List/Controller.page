@@ -1,15 +1,33 @@
 <com:TContent ID="MainContent">
 	<com:Application.controls.fancyBox.FancyBox />
 	<com:Application.controls.PropertyPerformanceListPanel.PropertyPerformanceListPanel />
+	<com:Application.controls.PropertyBuyingCheckPanel.PropertyBuyingCheckPanel />
 	<com:TCallback ID="getItemsBtn" onCallback="Page.getItems" />
 	<com:TCallback ID="delItemsBtn" onCallback="Page.delItems" />
-	<div class="container" >
-		<div class="panel panel-default" style="display: none;">
-			<div class="panel-heading">
-				Found <strong id="item-count">0</strong> Properties:
-				<div class="btn btn-xs btn-success pull-right" title="Create a new property" onclick="pageJs.openEditPage();"><i class="glyphicon glyphicon-plus"></i><span class="hidden-xs hidden-sm">Add a property</span></div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<div class="panel panel-default" style="display: none;">
+					<div class="panel-heading">
+						Found <strong id="item-count">0</strong> Properties:
+						<div class="btn btn-xs btn-success pull-right" title="Create a new property" onclick="pageJs.openEditPage();"><i class="glyphicon glyphicon-plus"></i><span class="hidden-xs hidden-sm">Add a property</span></div>
+					</div>
+					<div id="result-wrapper"></div>
+				</div>
 			</div>
-			<div id="result-wrapper"></div>
+			<div class="col-md-4">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Tools:</strong>
+					</div>
+					<div class="list-group">
+						<a href="javascript: void(0)" class="list-group-item" onclick="pageJs.showBuyingCheckPanel();">
+							<strong class="list-group-item-heading">Buying Checking</strong>
+							<p class="list-group-item-text"><small>A Tool to help you making a buying decision</small></p>
+						</a>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </table>

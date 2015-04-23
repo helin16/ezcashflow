@@ -127,17 +127,31 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 					(tmp.profit === '' ? '' : '<strong class="' + (tmp.profit < 0 ? "text-danger" : "text-success") + '">' + Math.round(tmp.profit * 100 / row.boughtPrice) + '%<strong>')
 				) })
 				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-md-1 col-md-1 text-right'})
-					.insert({'bottom': !row.id ? '' : new Element('div', {'class': 'btn-group'})
-						.insert({'bottom': new Element('span', {'class': 'btn btn-default btn-xs'})
-							.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-pencil'}) })
-							.observe('click', function(event){
-								tmp.me.openEditPage(row);
-							})
+					.insert({'bottom': !row.id ? '' : new Element('div', {'class': 'btn-group btn-group-sm', 'role': 'group'})
+						.insert({'bottom': new Element('div', {'class': 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown', 'aria-expanded': 'false'})
+							.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-cog'}).setStyle('margin-right: 2px;') })
+							.insert({'bottom': new Element('span', {'class': 'caret'}) })
 						})
-						.insert({'bottom': new Element('span', {'class': 'btn btn-danger btn-xs'})
-							.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-remove'}) })
-							.observe('click', function(event){
-								tmp.me._showConfirmDeletion(this);
+						.insert({'bottom': new Element('ul', {'class': 'dropdown-menu', 'role': 'menu'})
+							.insert({'bottom': new Element('li')
+								.insert({'bottom': new Element('a', {'href': 'javascript: void(0);'})
+									.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-pencil'}) })
+									.insert({'bottom': new Element('span', {'class': 'hidden-xs hidden-sm'}).update(' Edit') })
+									.observe('click', function(event){
+										tmp.me.openEditPage(row);
+									})
+								})
+							})
+							.insert({'bottom': new Element('li')
+								.insert({'bottom': new Element('a', {'href': 'javascript: void(0);'})
+									.insert({'bottom': new Element('i', { "class": 'text-danger'})
+										.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-remove'}) })
+									})
+									.insert({'bottom': new Element('span', {'class': 'hidden-xs hidden-sm text-danger'}).update(' Delete') })
+									.observe('click', function(event){
+										tmp.me._showConfirmDeletion(this);
+									})
+								})
 							})
 						})
 					})
@@ -252,12 +266,20 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		});
 		return tmp.me;
 	}
+	,showBuyingCheckPanel: function() {
+		var tmp = {};
+		tmp.me = this;
+		if(typeof(tmp.me._propertyBuyingCheckPanel) === 'object')
+			tmp.me._propertyBuyingCheckPanel.show();
+		return tmp.me;
+	}
 	/**
 	 * initialising
 	 */
-	,init : function() {
+	,init : function(_propertyBuyingCheckPanel) {
 		var tmp = {};
 		tmp.me = this;
+		tmp.me._propertyBuyingCheckPanel = _propertyBuyingCheckPanel;
 		tmp.me._getItems();
 		return tmp.me;
 	}
