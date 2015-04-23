@@ -1,1 +1,0 @@
-ALTER TABLE `transaction` ADD `logById` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `logDate`, ADD INDEX (`logById`) ;

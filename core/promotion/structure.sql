@@ -53,19 +53,23 @@ CREATE TABLE `accounttype` (
 DROP TABLE IF EXISTS `transaction`;
 CREATE TABLE `transaction` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	`organizationId` int(10) unsigned NOT NULL DEFAULT 0,
 	`groupId` varchar(32) NOT NULL DEFAULT '',
 	`logDate` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`logById` int(10) unsigned NULL DEFAULT NULL,
 	`accountEntryId` int(10) unsigned NOT NULL DEFAULT 0,
 	`credit` double(10,4) NULL DEFAULT 0,
 	`debit` double(10,4) NULL DEFAULT 0,
 	`description` varchar(255) NOT NULL DEFAULT '',
-	`balance` double(10,4) NULL DEFAULT 0,
+	`value` double(10,4) NULL DEFAULT 0,
 	`active` bool NOT NULL DEFAULT 1,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
 	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`)
+	,INDEX (`organizationId`)
+	,INDEX (`logById`)
 	,INDEX (`accountEntryId`)
 	,INDEX (`createdById`)
 	,INDEX (`updatedById`)
@@ -120,7 +124,7 @@ CREATE TABLE `attachment` (
 DROP TABLE IF EXISTS `content`;
 CREATE TABLE `content` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-	`content` LONGBLOB NOT NULL ,
+	`content` longtext NOT NULL ,
 	`active` bool NOT NULL DEFAULT 1,
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
 	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
@@ -132,6 +136,33 @@ CREATE TABLE `content` (
 	,INDEX (`active`)
 	,INDEX (`created`)
 	,INDEX (`updated`)
+) ENGINE=innodb DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS `property`;
+CREATE TABLE `property` (
+	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	`name` varchar(200) NOT NULL DEFAULT '',
+	`description` varchar(255) NOT NULL DEFAULT '',
+	`organizationId` int(10) unsigned NOT NULL DEFAULT 0,
+	`setupAccId` int(10) unsigned NULL DEFAULT NULL,
+	`incomeAccId` int(10) unsigned NULL DEFAULT NULL,
+	`expenseAccId` int(10) unsigned NULL DEFAULT NULL,
+	`boughtPrice` double(10,4) unsigned NOT NULL DEFAULT 0,
+	`active` bool NOT NULL DEFAULT 1,
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+	`createdById` int(10) unsigned NOT NULL DEFAULT 0,
+	`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`updatedById` int(10) unsigned NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`)
+	,INDEX (`organizationId`)
+	,INDEX (`setupAccId`)
+	,INDEX (`incomeAccId`)
+	,INDEX (`expenseAccId`)
+	,INDEX (`createdById`)
+	,INDEX (`updatedById`)
+	,INDEX (`active`)
+	,INDEX (`created`)
+	,INDEX (`updated`)
+	,INDEX (`name`)
 ) ENGINE=innodb DEFAULT CHARSET=utf8;
 DROP TABLE IF EXISTS `confirmation`;
 CREATE TABLE `confirmation` (

@@ -1,1 +1,0 @@
-ALTER TABLE `content` CHANGE `content` `content` LONGBLOB NOT NULL;
