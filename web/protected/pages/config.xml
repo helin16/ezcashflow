@@ -3,7 +3,7 @@
 	<authorization>
 	    <allow pages="*"
 	              users="@" />
-	    <allow pages="Login.LoginController"
+	    <allow pages="Login.LoginController, Organization.New.Controller"
 	    		  users="*" />
 	    <deny pages="*"
 	              users="?" />

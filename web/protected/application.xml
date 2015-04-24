@@ -21,6 +21,7 @@
 		<module id="friendly-url" class="System.Web.TUrlMapping" EnableCustomUrl="true" UrlPrefix="/">
 			<url ServiceParameter="Login.LoginController" pattern="login.html" />
 			<url ServiceParameter="Logout.Controller" pattern="logout.html" />
+			<url ServiceParameter="Organization.New.Controller" pattern="newOrg.html" />
 
 			<!-- Accounts:: list -->
 			<url ServiceParameter="Account.List.Controller" pattern="accounts.html" />

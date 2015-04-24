@@ -1,0 +1,28 @@
+<com:TContent ID="MainContent">
+	<com:TCallback ID="isUsernameValidBtn" onCallback="Page.IsUsernameValid" />
+    <div class="container">
+		<br />
+	    <br />
+	    <div class="col-sm-6 col-sm-offset-3">
+	    	<com:TPanel ID="newUserPanel">
+		    	<div class="form-group">
+		    		<label class="control-label">Your Firstname:</label>
+		    		<input class="form-control" new-user="firstName" name="firstName"/>
+		    	</div>
+		    	<div class="form-group">
+		    		<label class="control-label">Your Lastname:</label>
+		    		<input class="form-control" new-user=""lastName"" name="lastName"/>
+		    	</div>
+		    	<div class="form-group">
+		    		<label class="control-label">Your email:</label>
+		    		<input class="form-control" new-user="email" name="email"/>
+		    	</div>
+		    </com:TPanel>
+	    	<div class="form-group">
+	    		<label class="control-label">New Organization/Company:</label>
+	    		<input class="form-control" new-org="name" name="org-name"/>
+	    	</div>
+    		<button class="btn btn-primary">Create</button>
+	    </div>
+    </div>
+</com:TContent>

@@ -297,7 +297,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		tmp.me = this;
 		tmp.newDiv = new Element('div', {'class': 'row'})
 			.insert({'bottom': new Element('div', {'class': 'col-md-8'})
-				.insert({'bottom': tmp.me._getOverviewPanel().addClassName('hidden-sm hidden-xs') })
+				.insert({'bottom': tmp.me._getOverviewPanel() })
 				.insert({'bottom': tmp.me._getInputPanel() })
 			})
 			.insert({'bottom': new Element('div', {'class': 'col-md-4'})
