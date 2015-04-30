@@ -1,0 +1,5 @@
+<com:TContent ID="MainContent">
+	<div id="details-page-wrapper">
+		<div id="importer_div" class="contentDiv"></div>
+	</div>
+</com:TContent>

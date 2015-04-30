@@ -27,6 +27,9 @@
 			<url ServiceParameter="Account.List.Controller" pattern="accounts.html" />
 			<!-- Accounts:: new -->
 			<url ServiceParameter="Account.Details.Controller" pattern="accounts/{id}.html" parameters.id="new|\d+"/>
+			
+			<!-- Accounts:: list -->
+			<url ServiceParameter="Import.Controller" pattern="import.html" />
 
 			<!-- Transactions:: list -->
 			<url ServiceParameter="Transaction.List.Controller" pattern="transactions.html" />
