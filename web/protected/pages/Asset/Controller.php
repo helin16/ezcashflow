@@ -26,7 +26,7 @@ class Controller extends TService
         }
         catch (Exception $ex)
         {
-        	$errors = $ex->getMessage();
+        	die($ex->getMessage());
         }
     }
     private function _get($params)

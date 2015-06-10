@@ -27,7 +27,7 @@
 			<url ServiceParameter="Account.List.Controller" pattern="accounts.html" />
 			<!-- Accounts:: new -->
 			<url ServiceParameter="Account.Details.Controller" pattern="accounts/{id}.html" parameters.id="new|\d+"/>
-			
+
 			<!-- Accounts:: list -->
 			<url ServiceParameter="Import.Controller" pattern="import.html" />
 
@@ -36,10 +36,13 @@
 			<!-- Transactions:: details -->
 			<url ServiceParameter="Transaction.Details.Controller" pattern="transactions/{id}.html" parameters.id="\d+"/>
 
-			<!-- Property:: list -->
+			<!-- Property:: ProfitNLost -->
 			<url ServiceParameter="Property.List.Controller" pattern="properties.html" />
 			<!-- Property:: details/new -->
 			<url ServiceParameter="Property.Details.Controller" pattern="properties/{id}.html" parameters.id="new|\d+" />
+
+			<!-- Reports:: list -->
+			<url ServiceParameter="Reports.ProfitNLost.Controller" pattern="reports/profitnlost.html" />
 
 			<!-- User:: list -->
 			<url ServiceParameter="User.List.Controller" pattern="users.html" />

@@ -18,6 +18,15 @@
 					<li class="<%= $this->isActive('property.list') === true ? 'active' : '' %>"><a href="/properties.html">Properties</a></li>
 					<li class="dropdown">
 						<a href="javascript: void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+							Reports
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="/reports/profitnlost.html"><i class="glyphicon glyphicon-tasks"></i> Profit N Lost</a></li>
+						</ul>
+					</li>
+					<li class="dropdown">
+						<a href="javascript: void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 							<%= Core::getUser()->getPerson()->getFullName() %>
 							<span class="caret"></span>
 						</a>
