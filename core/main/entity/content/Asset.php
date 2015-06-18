@@ -124,7 +124,10 @@ class Asset extends EncryptedEntityAbstract
 		$where = 'skey in (' . implode(', ', array_fill(0, count($skeys), '?')) . ')';
 		$params = $skeys;
 		//delete the contents
-		if(count($contentIds = array_map(create_function('$a', 'return $a->getContent()->getId();'), self::getAllByCriteria($where, $params))) > 0 )
+		$contentIds = array();
+		foreach(self::getAllByCriteria($where, $params) as $asset)
+			$contentIds[] = $asset->getContent()->getId();
+		if(count($contentIds) > 0 )
 			Content::deleteByCriteria('id in (' . implode(', ', array_fill(0, count($contentIds), '?')) . ')', $contentIds);
 		// Delete the item from the database
 		self::deleteByCriteria($where, $params);

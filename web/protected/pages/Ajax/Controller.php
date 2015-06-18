@@ -68,8 +68,11 @@ class Controller extends TService
     	$orderBy = isset($params['orderBy']) ? trim($params['orderBy']) : array();
 
     	$stats = array();
-    	$items = $entityName::getAllByCriteria($searchTxt, $searchParams, $active, $pageNo, $pageSize, $orderBy, $stats);
-    	return array('items' => array_map(create_function('$a', 'return $a->getJson();'), $items), 'pagination' => $stats);
+    	$items = array();
+    	$result = $entityName::getAllByCriteria($searchTxt, $searchParams, $active, $pageNo, $pageSize, $orderBy, $stats);
+    	foreach($result as $row)
+    		$items[] = $row->getJson();
+    	return array('items' => $items, 'pagination' => $stats);
     }
     /**
      * Getting the accounts
@@ -115,6 +118,9 @@ class Controller extends TService
     		$accounts = AccountEntry::getAllByCriteria(implode(' AND ', $where), $param, false, $pageNo, $pageSize, $orderBy, $stats);
     	else
     		$accounts = AccountEntry::getAll(false, $pageNo, $pageSize, $orderBy, $stats);
-    	return array('items' => array_map(create_function('$a', 'return $a->getJson();'), $accounts), 'pagination' => $stats);
+    	$accountJsonArr = array();
+    	foreach($accounts as $account)
+    		$accountJsonArr[] = $account->getJson();
+    	return array('items' => $accountJsonArr, 'pagination' => $stats);
     }
 }

@@ -75,9 +75,9 @@ class DaoQuery
     }
     /**
      * Setter for selectActiveOnly
-     * 
+     *
      * @param string $selectActiveOnly
-     * 
+     *
      * @return DaoQuery
      */
     public function setSelectActiveOnly($selectActiveOnly = true)
@@ -191,7 +191,7 @@ class DaoQuery
     {
         $focus = strtolower($this->_focus);
         $fAlias = DaoMap::$map[$focus]['_']['alias'];
-         
+
         $sql = 'select ';
         //get distinct
         $sql .= $this->_distinct === true ? 'distinct ' : '';
@@ -202,7 +202,10 @@ class DaoQuery
         //get from table
         $sql .= sprintf('from `%s` `%s`', $focus, $fAlias) . ' ';
         //get all joins
-        $sql .= count($this->_joins) === 0 ? '' : implode(' ', array_map(create_function('$a', 'return $a["joinType"] . " `" . $a["joinClass"] . "` `" . $a["joinAlias"] . "` on (" . $a["joinCondition"] . ")";'), $this->_joins)) . ' ';
+        $joinArray = array();
+        foreach($this->_joins as $a)
+        	$joinArray[] = $a["joinType"] . " `" . $a["joinClass"] . "` `" . $a["joinAlias"] . "` on (" . $a["joinCondition"] . ")";
+        $sql .= count($joinArray) === 0 ? '' : implode(' ', $joinArray) . ' ';
         //get whereclause
         if($this->_selectActiveOnly === true)
         	$this->where('`' . $fAlias . '`.`active` = 1');
@@ -222,7 +225,7 @@ class DaoQuery
     {
         $focus = strtolower($this->_focus);
         $fAlias = DaoMap::$map[$focus]['_']['alias'];
-         
+
         $sql = 'select count(';
         //get distinct
         $sql .= $this->_distinct === true ? 'distinct ' : '';
@@ -230,7 +233,11 @@ class DaoQuery
         //get from table
         $sql .= sprintf('from `%s` `%s`', $focus, $fAlias) . ' ';
         //get all joins
-        $sql .= count($this->_joins) === 0 ? '' : implode(' ', array_map(create_function('$a', 'return $a["joinType"] . " " . $a["joinClass"] . " " . $a["joinAlias"] . " on (" . $a["joinCondition"] . ")";'), $this->_joins)) . ' ';
+        //get all joins
+        $joinArray = array();
+        foreach($this->_joins as $a)
+        	$joinArray[] = $a["joinType"] . " " . $a["joinClass"] . " " . $a["joinAlias"] . " on (" . $a["joinCondition"] . ")";
+        $sql .= count($joinArray) === 0 ? '' : implode(' ', $joinArray) . ' ';
         //get whereclause
         if(!$this->_selectActiveOnly === true)
         	$this->where('`' . $fAlias . '`.`active` = 1');
@@ -256,14 +263,14 @@ class DaoQuery
             //entity metadata
             if (trim($field) === '_')
             continue;
-             
+
             //if this is not a relationship
             if (!isset($properties['rel']))
             {
                 $fields[] = '`' . $fAlias . '`.`' . $field . '`';
                 continue;
             }
-             
+
             //if this is a relationship
             switch ($properties['rel'])
             {
@@ -340,7 +347,7 @@ class DaoQuery
     {
         if($this->_joinLoaded($table, $alias, $condition, $type))
         return $this;
-         
+
         $table = strtolower(trim($table));
         $this->_joins[$this->_genJoinKey($table, $alias, $condition, $type)] = array(
                 'joinType' => $type,
@@ -381,7 +388,7 @@ class DaoQuery
                     else
                     $mtmJoinTable = $joinTableMap . '_' . $fClass;
                     $this->_addJoin($mtmJoinTable, $mtmJoinTable, $fAlias . '.id = ' . $mtmJoinTable . '.' . StringUtilsAbstract::lcFirst($joinClass) . 'Id', $joinType);
-                     
+
                     //join in the target table
                     $joinCondition = ($overrideCond === '' ? $fieldMap['alias'] . '.id = ' . $mtmJoinTable . '.' . StringUtilsAbstract::lcFirst($fieldMap['class']) . 'Id' : $overrideCond);
                     $this->_addJoin($joinTableMap, $fieldMap['alias'], $joinCondition, $joinType);

@@ -68,7 +68,9 @@ class transForm extends TTemplateControl
 			else
 				$transactions = Transaction::transactions(Core::getOrganization(), $fromAcc, $toAcc, $amount, $comments, $logDate, Core::getUser(), $assets);
 
-			$results['items'] = array_map(create_function('$a', 'return $a->getJson();'), $transactions);
+			$results['items'] = array();
+			foreach($transactions as $a)
+				$results['items'][] = $a->getJson();
 
 			Dao::commitTransaction();
 		} catch(Exception $ex) {

@@ -54,8 +54,10 @@ class Controller extends BackEndPageAbstract
 				$items = Property::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('prop.name' => 'asc'), $stats);
 			else
 				$items = Property::getAll(true, $pageNo, $pageSize, array ('prop.name' => 'asc'), $stats);
-			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $items );
 			$results ['pagination'] = $stats;
+			$results ['items'] = array();
+			foreach($items as $a)
+				$results ['items'][] = $a->getJson();
 		} catch ( Exception $ex ) {
 			$errors [] = $ex->getMessage ();
 		}

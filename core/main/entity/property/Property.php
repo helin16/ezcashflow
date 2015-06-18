@@ -201,7 +201,9 @@ class Property extends BaseEntityAbstract
 			$array['setupAcc'] = $this->getSetupAcc() instanceof AccountEntry ? $this->getSetupAcc()->getJson() : null;
 			$array['incomeAcc'] = $this->getIncomeAcc() instanceof AccountEntry ? $this->getIncomeAcc()->getJson() : null;
 			$array['expenseAcc'] = $this->getExpenseAcc() instanceof AccountEntry ? $this->getExpenseAcc()->getJson() : null;
-			$array['attachments'] = count($attachments = $this->getAttachments()) === 0 ? array() : array_map(create_function('$a', 'return $a->getJson();'), $attachments);
+			$array['attachments'] = array();
+			foreach($this->getAttachments() as $attachment)
+				$array['attachments'][] = $attachment->getJson();
 		}
 		return parent::getJson($array, $reset);
 	}

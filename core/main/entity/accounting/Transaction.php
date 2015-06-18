@@ -66,7 +66,7 @@ class Transaction extends BaseEntityAbstract
 	private static $_groupId = '';
 	/**
 	 * The organization
-	 * 
+	 *
 	 * @var Organization
 	 */
 	protected $organization;
@@ -339,8 +339,9 @@ class Transaction extends BaseEntityAbstract
 		if (! $this->isJsonLoaded ( $reset )) {
 			$array ['accountEntry'] = $this->getAccountEntry ()->getJson ();
 			$array ['type'] = $this->getType ();
-			$attachments = $this->getAttachments ();
-			$array ['attachments'] = count ( $attachments ) === 0 ? array () : array_map ( create_function ( '$a', 'return $a->getJson();' ), $attachments );
+			$array ['attachments'] = array();
+			foreach($this->getAttachments () as $attachment)
+				$array ['attachments'][] = $attachment->getJson();
 			$array ['logBy'] = $this->getLogBy () instanceof UserAccount ? $this->getLogBy ()->getJson () : array ();
 			$array ['createdBy'] = $this->getCreatedBy () instanceof UserAccount ? $this->getCreatedBy ()->getJson () : array ();
 		}

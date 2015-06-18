@@ -40,7 +40,9 @@ class Controller extends BackEndPageAbstract
 		$results = $errors = array ();
 		try {
 			$transactions = Transaction::getAllByCriteria ('trans.organizationId = ?', array(Core::getOrganization()->getId()), true, 1, 10, array ('trans.id' => 'desc') );
-			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
+			$results ['items'] = array();
+			foreach($transactions as $trans)
+				$results ['items'][] = $trans->getJson();
 		} catch ( Exception $ex ) {
 			$errors [] = $ex->getMessage ();
 		}

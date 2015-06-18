@@ -21,6 +21,9 @@ class Controller extends BackEndPageAbstract
 	 */
 	protected function _getEndJs()
 	{
+		$types = array();
+		foreach(AccountType::getAll() as $type)
+			$types[] = $type->getJson();
 		$js = parent::_getEndJs();
 		$js .= 'pageJs';
 		$js .= '.setHTMLID("result-list-div", "result-wrapper")';
@@ -29,7 +32,7 @@ class Controller extends BackEndPageAbstract
 		$js .= '.setHTMLID("item-count", "item-count")';
 		$js .= '.setCallbackId("getTransactions", "' . $this->getTransactionsBtn->getUniqueID() . '")';
 		$js .= '.setCallbackId("delTrans", "' . $this->delTransBtn->getUniqueID() . '")';
-		$js .= '.setAccountTypes(' . json_encode(array_map(create_function('$a', 'return $a->getJson();'), AccountType::getAll())) . ')';
+		$js .= '.setAccountTypes(' . json_encode($types) . ')';
 		$preSetData = array();
 		if(isset($_REQUEST['accountids']) || isset($_REQUEST['localFromDate']) || isset($_REQUEST['localToDate']) || isset($_REQUEST['typeId']) || isset($_REQUEST['lookDownAccId'])) {
 			if(isset($_REQUEST['accountids'])) {
@@ -38,12 +41,12 @@ class Controller extends BackEndPageAbstract
 				$accountIds = array_filter($accountIds);
 				if(count($accountIds) > 0)
 					$accounts = AccountEntry::getAllByCriteria('id in (' . implode(', ', array_fill(0, count($accountIds), '?')) . ')', $accountIds);
-				$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), $accounts);
+				$preSetData['accounts'] = AccountEntry::translateToJson($accounts);
 			} else if (isset($_REQUEST['lookDownAccId'])) {
 				if(!($lookDownAcc = AccountEntry::get($_REQUEST['lookDownAccId'])) instanceof AccountEntry)
 					throw new Exception('Invalid look down account id:' . $_REQUEST['lookDownAccId']);
 				$accounts = array($lookDownAcc);
-				$preSetData['accounts'] = array_map(create_function('$a', 'return $a->getJson();'), array_merge($accounts, $lookDownAcc->getChildren(true)));
+				$preSetData['accounts'] = AccountEntry::translateToJson(array_merge($accounts, $lookDownAcc->getChildren(true)));
 			}
 			if(isset($_REQUEST['localFromDate'])) {
 				$localFromDate = new UDate(trim($_REQUEST['localFromDate']));
@@ -116,7 +119,7 @@ class Controller extends BackEndPageAbstract
 				Transaction::getQuery()->eagerLoad('Transaction.accountEntry', 'inner join', 'trans_acc', 'trans_acc.id = trans.accountEntryId');
 				$transactions = Transaction::getAllByCriteria(implode(' AND ', $where), $params, true, $pageNo, $pageSize, array ('trans.logDate' => 'desc'), $stats );
 			}
-			$results ['items'] = array_map ( create_function ( '$a', 'return $a->getJson();' ), $transactions );
+			$results ['items'] = Transaction::translateToJson($transactions );
 			$results ['pagination'] = $stats;
 		} catch ( Exception $ex ) {
 			$errors [] = $ex->getMessage ();

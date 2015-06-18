@@ -9,13 +9,13 @@ abstract class BaseEntityAbstract
 {
 	/**
 	 * The registry of json array
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $_jsonArray = array();
 	/**
 	 * The entity level runtime cache
-	 * 
+	 *
 	 * @var array
 	 */
 	private static $_entityCache = array();
@@ -229,7 +229,7 @@ abstract class BaseEntityAbstract
         $alias = DaoMap::$map[strtolower($cls)]['_']['alias'];
         $field = strtolower(substr($thisClass, 0, 1)) . substr($thisClass, 1);
         $this->$property = Dao::findByCriteria(new DaoQuery($cls), sprintf('%s.`%sId`=?', $alias, $field), array($this->getId()));
-         
+
         return $this;
     }
     /**
@@ -265,7 +265,7 @@ abstract class BaseEntityAbstract
             else
             	throw new EntityException('Property (' . get_class($this) . '::' . $property . ') must be initialised to integer or proxy prior to lazy loading.', 1);
         }
-         
+
         // Load the DAO map for this entity
         $cls = DaoMap::$map[strtolower(get_class($this))][$property]['class'];
         if (!$this->$property instanceof BaseEntityAbstract)
@@ -292,7 +292,7 @@ abstract class BaseEntityAbstract
         $thisClass = get_class($this);
         $qry = new DaoQuery($cls);
         $qry->eagerLoad($cls . '.' . strtolower(substr($thisClass, 0, 1)) . substr($thisClass, 1) . 's');
-         
+
         // Load this end with an array of entities typed to the other end
         DaoMap::loadMap($cls);
         $alias = DaoMap::$map[strtolower($cls)]['_']['alias'];
@@ -326,7 +326,7 @@ abstract class BaseEntityAbstract
     }
     /**
      * getting the Json array from all the private memebers of the entity
-     * 
+     *
      * @param bool $reset Forcing the function to fetch data from the database again
      *
      * @return array The associative arary for json
@@ -352,7 +352,7 @@ abstract class BaseEntityAbstract
     }
     /**
      * Whether the $this->_jsonArray is loaded
-     * 
+     *
      * @return bool
      */
     protected function isJsonLoaded($reset = false)
@@ -378,12 +378,12 @@ abstract class BaseEntityAbstract
     }
     /**
      * Tagging an entity
-     * 
+     *
      * @param string $tagName The tag's name
      * @param string $type    The type of the tag
      * @param mixed  $newTag  The new generated EntityTag
-     * 
-     * @return BaseEntityAbstract 
+     *
+     * @return BaseEntityAbstract
      */
     public function addTag($tagName, $type = EntityTag::TYPE_SYS, &$newEntityTag = null)
     {
@@ -394,9 +394,9 @@ abstract class BaseEntityAbstract
     }
     /**
      * removing an tag
-     * 
+     *
      * @param string $tagName
-     * 
+     *
      * @return BaseEntityAbstract
      */
     public function removeTags($type, $tagName)
@@ -406,7 +406,7 @@ abstract class BaseEntityAbstract
     }
     /**
      * Clearing all tags for an entity
-     * 
+     *
      * @return BaseEntityAbstract
      */
     public function clearTags()
@@ -416,12 +416,12 @@ abstract class BaseEntityAbstract
     }
     /**
      * Getting all attachments
-     * 
+     *
      * @param int   $pageNo
 	 * @param int   $pageSize
 	 * @param array $orderBy
 	 * @param array $stats
-	 * 
+	 *
 	 * @return multiple:Attachment
      */
     public function getAttachments($pageNo = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array(), &$stats = array())
@@ -430,10 +430,10 @@ abstract class BaseEntityAbstract
     }
     /**
      * Attach an asset to an entity
-     * 
+     *
      * @param mixed $assetOrAssetId
      * @param mixed $newAttachment
-     * 
+     *
      * @return BaseEntityAbstract
      */
     public function addAttachment($assetOrAssetId, &$newAttachment = null)
@@ -443,9 +443,9 @@ abstract class BaseEntityAbstract
     }
     /**
      * removing an asset from Attachment
-     * 
+     *
      * @param mixed $assetOrAssetId When null, it will clear all attachments
-     * 
+     *
      * @return BaseEntityAbstract
      */
     public function rmAttachment($assetOrAssetId)
@@ -455,7 +455,7 @@ abstract class BaseEntityAbstract
     }
     /**
      * Clearing all attachments
-     * 
+     *
      * @return BaseEntityAbstract
      */
     public function clearAttachments()
@@ -474,11 +474,11 @@ abstract class BaseEntityAbstract
     }
     /**
      * Adding logs to this entity
-     * 
+     *
      * @param string $type
      * @param string $comments
      * @param string $funcName
-     * 
+     *
      * @return BaseEntityAbstract
      */
     public function addLog($type, $comments = '', $funcName = '')
@@ -488,14 +488,14 @@ abstract class BaseEntityAbstract
     }
     /**
      * Getting the logs for this entity
-     * 
+     *
      * @param string $type       The type of the logs
      * @param bool   $activeOnly
      * @param int    $pageNo
      * @param int    $pageSize
      * @param array  $orderBy
      * @param array  $stats
-     * 
+     *
      * @return Ambigous <Ambigous, multitype:, multitype:BaseEntityAbstract >
      */
     public function getLogs($type = null, $activeOnly = true, $pageNo = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array(), &$stats = array())
@@ -514,7 +514,7 @@ abstract class BaseEntityAbstract
         DaoMap::setManyToOne('createdBy', 'UserAccount');
         DaoMap::setDateType('updated', 'timestamp', false, 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
         DaoMap::setManyToOne('updatedBy', 'UserAccount');
-        
+
         DaoMap::createIndex('active');
         DaoMap::createIndex('created');
         DaoMap::createIndex('updated');
@@ -541,18 +541,18 @@ abstract class BaseEntityAbstract
     public function postSave() {}
     /**
      * Saving the current entity
-     * 
+     *
      * @return BaseEntityAbstract
      */
-    public function save() 
+    public function save()
     {
     	return FactoryAbastract::dao(get_class($this))->save($this);
     }
     /**
      * Getting the runtime cache
-     * 
-     * @param string $key The key of the cache 
-     * 
+     *
+     * @param string $key The key of the cache
+     *
      * @param mixed
      */
     protected static function getCache($key)
@@ -578,9 +578,9 @@ abstract class BaseEntityAbstract
     }
     /**
      * Check whether the key exsits in the runtime cache
-     * 
+     *
      * @param string $key The key of the cache
-     * 
+     *
      * @return boolean
      */
     protected static function cacheExsits($key)
@@ -590,9 +590,9 @@ abstract class BaseEntityAbstract
     }
     /**
      * remove the cache from runtime cache
-     * 
+     *
      * @param string $key The key of the cache
-     * 
+     *
      * @return boolean
      */
     protected static function removeCache($key)
@@ -605,13 +605,13 @@ abstract class BaseEntityAbstract
     }
     /**
      * Find all entities
-     * 
+     *
      * @param string  $activeOnly
      * @param string  $pageNo
      * @param unknown $pageSize
      * @param unknown $orderBy
      * @param array   $stats
-     * 
+     *
      * @return Ambigous <multitype:, multitype:BaseEntityAbstract >
      */
     public static function getAll($activeOnly = true, $pageNo = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array(), &$stats = array())
@@ -622,7 +622,7 @@ abstract class BaseEntityAbstract
     }
     /**
      * Find all entities with criterias
-     * 
+     *
      * @param unknown $criteria
      * @param unknown $params
      * @param string $activeOnly
@@ -630,7 +630,7 @@ abstract class BaseEntityAbstract
      * @param unknown $pageSize
      * @param unknown $orderBy
      * @param array   $stats
-     * 
+     *
      * @return Ambigous <multitype:, multitype:BaseEntityAbstract >
      */
     public static function getAllByCriteria($criteria, $params = array(), $activeOnly = true, $pageNo = null, $pageSize = DaoQuery::DEFAUTL_PAGE_SIZE, $orderBy = array(), &$stats = array())
@@ -641,9 +641,9 @@ abstract class BaseEntityAbstract
     }
     /**
      * Getting entity with an id
-     * 
+     *
      * @param int $id The id of the entity
-     * 
+     *
      * @return Ambigous <BaseEntityAbstract, NULL, SimpleXMLElement>
      */
     public static function get($id)
@@ -677,10 +677,10 @@ abstract class BaseEntityAbstract
     }
     /**
      * Count By Criteria
-     * 
+     *
      * @param string   $criteria The where clause
      * @param array    $params   The parameters
-     * 
+     *
      * @return number
      */
     public static function countByCriteria($criteria, $params = array())
@@ -689,12 +689,12 @@ abstract class BaseEntityAbstract
     }
     /**
      * replace into
-     * 
+     *
      * @param string $table   The table name
      * @param array  $columns The name of the columns
      * @param array  $values  The values that will match agains the column names
      * @param array  $params  The params
-     * 
+     *
      * @return PDOStatement
      */
     public function replaceInto($table, $columns, $values, $params = array())
@@ -703,12 +703,29 @@ abstract class BaseEntityAbstract
     }
     /**
      * Getting the DaoQuery
-     * 
+     *
      * @return DaoQuery
      */
     public static function getQuery()
     {
     	return FactoryAbastract::dao(get_called_class())->getQuery();
+    }
+    /**
+     * Translate the whole array of entities into json array
+     *
+     * @param array $entityArray
+     *
+     * @return array
+     */
+    public static function translateToJson(array $entityArray)
+    {
+    	if(count($entityArray) === 0)
+    		return array();
+
+    	$return = array();
+    	foreach ($entityArray as $entity)
+    		$return[] = $entity->getJson();
+    	return $return;
     }
 }
 
