@@ -1,6 +1,6 @@
 <com:TContent ID="MainContent">
 	<com:Application.controls.bootstrapDateTimePicker.bootstrapDateTimePicker />
-	<com:TCallback ID="getItemsBtn" onCallback="Page.getItems" />
+	<com:TCallback ID="genReportBtn" onCallback="Page.genReport" />
 	<div class="container">
 		<h3>Profit And Lost Report:</h3>
 		<div class="row">
@@ -9,7 +9,7 @@
 					<div class="form-horizontal">
 						<div class="form-group row">
 							<label class="control-label col-sm-2">From Date:</label>
-							<div class="col-sm-10 input-group  date-picker" search-field="from-date">
+							<div class="col-sm-10 input-group date-picker" search-field="fromDate">
 								<input class="form-control from-date-input" />
 								<span class="input-group-addon">
 			                        <span class="glyphicon glyphicon-calendar"></span>
@@ -18,7 +18,7 @@
 						</div>
 						<div class="form-group row">
 							<label class="control-label col-sm-2" >To Date:</label>
-							<div class="col-sm-10 input-group  date-picker" search-field="to-date">
+							<div class="col-sm-10 input-group  date-picker" search-field="toDate">
 								<input class="form-control to-date-input" />
 								<span class="input-group-addon">
 			                        <span class="glyphicon glyphicon-calendar"></span>
@@ -27,7 +27,7 @@
 						</div>
 						<div class="form-group row">
 							<div class="col-sm-offset-2">
-								<span class="btn btn-primary">
+								<span class="btn btn-primary" id="gen-btn" data-loading-text="<small class='fa fa-refresh fa-spin'></<small>">
 									<i class="fa fa-file-excel-o"></i>
 									<span>Generate Report</span>
 								</span>

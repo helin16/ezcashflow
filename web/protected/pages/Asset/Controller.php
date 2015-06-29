@@ -85,4 +85,14 @@ class Controller extends TService
     	$this->getResponse()->appendHeader('Content-Type: application/json');
     	$this->getResponse()->write(StringUtilsAbstract::getJson($results, $errors));
     }
+
+    private function _getFile($params)
+    {
+    	if (! isset ( $params ['fileName'] ) || ($fileName = trim ( $params ['fileName'] )) === '')
+			throw new Exception ( 'No fileName to get!' );
+    	if (! isset ( $params ['filePath'] ) || ($filePath = trim ( $params ['filePath'] )) === '')
+			throw new Exception ( 'No filePath to get!' );
+
+    	$this->getResponse()->writeFile($fileName, file_get_contents($filePath), StringUtilsAbstract::getMimeType($fileName), null, true);
+    }
 }
