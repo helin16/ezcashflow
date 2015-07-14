@@ -184,7 +184,7 @@ class Transaction extends BaseEntityAbstract
 	 */
 	public function getLogDate()
 	{
-		return $this->logDate;
+		return new UDate(trim($this->logDate));
 	}
 	/**
 	 * Setter for logDate
