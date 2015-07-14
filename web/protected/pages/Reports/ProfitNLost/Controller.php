@@ -44,6 +44,8 @@ class Controller extends BackEndPageAbstract
 				throw new Exception('Error: from date can NOT be empty!');
 			if(!isset($param->CallbackParameter->toDate) || ($toDate = trim($param->CallbackParameter->toDate)) === '')
 				throw new Exception('Error: to date can NOT be empty!');
+			if(!isset($param->CallbackParameter->utcOffset) || ($utcOffsetMins = trim($param->CallbackParameter->utcOffset)) === '')
+				throw new Exception('Error: utcOffset can NOT be empty!');
 			$fromDate = new UDate($fromDate);
 			$toDate = new UDate($toDate);
 			$styles = $this->_getShareStyles();
@@ -60,13 +62,13 @@ class Controller extends BackEndPageAbstract
 			//add the title
 			$rowNo = 1;
 			$activeSheet = $objPHPExcel->setActiveSheetIndex(0)->setTitle('Transactions');
-			$this->_getExcelRow($activeSheet, $rowNo++, 'Account', 'Type', 'Value', 'Comments', 'Attachments');
+			$this->_getExcelRow($activeSheet, $rowNo++, 'Account', 'Type', 'Value', 'Comments', 'Attachments', 'Created');
 			$activeSheet->setSharedStyle($styles['titleRow'], 'A' . ($rowNo - 1)  . ":E" . ($rowNo - 1));
 			// all the income
-			$rowNo = $this->_getAllTrans($activeSheet, $rowNo, $fromDate, $toDate, AccountType::get(AccountType::ID_INCOME));
+			$rowNo = $this->_getAllTrans($activeSheet, $rowNo, $fromDate, $toDate, AccountType::get(AccountType::ID_INCOME), $utcOffsetMins);
 			$activeSheet->setSharedStyle($styles['summaryRow'], 'A' . ($rowNo - 1)  . ":E" . ($rowNo - 1));
 			// all the expense
-			$rowNo = $this->_getAllTrans($activeSheet, $rowNo, $fromDate, $toDate, AccountType::get(AccountType::ID_EXPENSE));
+			$rowNo = $this->_getAllTrans($activeSheet, $rowNo, $fromDate, $toDate, AccountType::get(AccountType::ID_EXPENSE), $utcOffsetMins);
 			$activeSheet->setSharedStyle($styles['summaryRow'], 'A' . ($rowNo - 1)  . ":E" . ($rowNo - 1));
 			//set the column width
 			$activeSheet->getColumnDimension('A')->setAutoSize(true);
@@ -94,9 +96,9 @@ class Controller extends BackEndPageAbstract
 		return array('summaryRow' => $summaryRow, 'titleRow' => $titleRow);
 	}
 
-	private function _getAllTrans(PHPExcel_Worksheet &$activeSheet, $rowNo, $fromDate, $toDate, AccountType $accountType)
+	private function _getAllTrans(PHPExcel_Worksheet &$activeSheet, $rowNo, $fromDate, $toDate, AccountType $accountType, $utcOffsetMins)
 	{
-		$this->_getExcelRow($activeSheet, $rowNo++, '', $accountType->getName() , '', '', '');
+		$this->_getExcelRow($activeSheet, $rowNo++, '', $accountType->getName() , '', '', '', '');
 		Transaction::getQuery()->eagerLoad('Transaction.accountEntry', 'inner join', 'trans_acc', 'trans_acc.id = trans.accountEntryId and trans_acc.typeId=:typeId');
 		$transactions = Transaction::getAllByCriteria('logDate between :fromDate and :toDate', array('fromDate'=> trim($fromDate), 'toDate' => trim($toDate), 'typeId' => $accountType->getId()));
 		$startRow = $rowNo;
@@ -107,16 +109,18 @@ class Controller extends BackEndPageAbstract
 					$transaction->getAccountEntry()->getType()->getName(),
 					$transaction->getValue(),
 					$transaction->getDescription(),
-					$transaction->getAttachments()
+					$transaction->getAttachments(),
+					trim($transaction->getLogDate()->modify(($utcOffsetMins > 0 ? '+' : '') . $utcOffsetMins . ' minutes'))
 			);
 		}
-		$this->_getExcelRow($activeSheet, $rowNo++,	'Sub-Total:', '', (count($transactions) === 0 ? '0': '=SUM(C' . $startRow . ':C' . (($rowNo - 2) > $startRow ? ($rowNo - 2) : $startRow) . ')'), '', '');
+		$this->_getExcelRow($activeSheet, $rowNo++,	'Sub-Total:', '', (count($transactions) === 0 ? '0': '=SUM(C' . $startRow . ':C' . (($rowNo - 2) > $startRow ? ($rowNo - 2) : $startRow) . ')'), '', '', '');
 		return $rowNo;
 	}
 
-	private function _getExcelRow(PHPExcel_Worksheet &$workSheet, $rowNo, $account, $type, $value, $comments, $attachments)
+	private function _getExcelRow(PHPExcel_Worksheet &$workSheet, $rowNo, $account, $type, $value, $comments, $attachments, $createdTime)
 	{
 		$colNo = 0;
+		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($createdTime);
 		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($type);
 		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($account);
 		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($value);

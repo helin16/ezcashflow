@@ -14,6 +14,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				tmp.data[jQuery(item).attr('search-field')] = jQuery(item).val();
 			}
 		});
+		tmp.data.utcOffset = moment().utcOffset();
 		tmp.me.postAjax(tmp.me.getCallbackId("genReports"), tmp.data, {
 			'onLoading': function() {
 				jQuery(btn).button('loading');
