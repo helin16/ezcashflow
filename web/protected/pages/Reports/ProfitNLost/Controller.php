@@ -120,8 +120,8 @@ class Controller extends BackEndPageAbstract
 	private function _getExcelRow(PHPExcel_Worksheet &$workSheet, $rowNo, $account, $type, $value, $comments, $attachments, $createdTime)
 	{
 		$colNo = 0;
-		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($createdTime);
 		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($type);
+		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($createdTime);
 		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($account);
 		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($value);
 		$workSheet->getCellByColumnAndRow($colNo++, $rowNo)->setValue($comments);
@@ -134,7 +134,7 @@ class Controller extends BackEndPageAbstract
 					->getHyperlink()->setUrl((isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/asset/get?id=' . $attachment->getAsset()->getSkey());
 			}
 		}
-		$workSheet->getStyle('C' . $rowNo)->getNumberFormat()->applyFromArray(array('code'=>PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE));
+		$workSheet->getStyle('D' . $rowNo)->getNumberFormat()->applyFromArray(array('code'=>PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_USD_SIMPLE));
 	}
 }
 ?>
