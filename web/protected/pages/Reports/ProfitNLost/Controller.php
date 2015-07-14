@@ -73,7 +73,8 @@ class Controller extends BackEndPageAbstract
 			//set the column width
 			$activeSheet->getColumnDimension('A')->setAutoSize(true);
 			$activeSheet->getColumnDimension('B')->setAutoSize(true);
-			$activeSheet->getColumnDimension('D')->setWidth(40);
+			$activeSheet->getColumnDimension('C')->setAutoSize(true);
+			$activeSheet->getColumnDimension('E')->setWidth(40);
 
 			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 			$file = '/tmp/' . md5($description . trim(new UDate()));
