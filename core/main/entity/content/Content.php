@@ -88,11 +88,8 @@ class Content extends BaseEntityAbstract
      */
     public static function create($contentFilePath)
     {
-    	$class = get_called_class();
-    	$item = new $class();
-    	$item = $item->save();
-    	$stmt = Dao::connect()->prepare('update content set content = Load_FILE("' . $contentFilePath . '") where id = ?');
-    	$stmt->execute(array($item->getId()));
+    	$item = new Content();
+    	$item = $item->setContent(file_get_contents($contentFilePath))->save();
     	return $item;
     }
 }
