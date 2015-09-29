@@ -77,7 +77,7 @@ class Controller extends TService
 	    	$filePath = $dir . ($filename = $response['files'][0]->name);
 	    	if(!is_file($filePath))
 	    		throw new Exception('System Error: file not exsits:' . $filePath);
-	    	chmod($filePath, 755);
+	    	chmod($filePath, 777);
 	    	$results['file'] = array('path' => $filePath, 'name' => $filename);
     	} catch (Exception $ex) {
     		$errors[] = $ex->getMessage() . print_r($response, true);
