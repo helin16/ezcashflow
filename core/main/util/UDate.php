@@ -249,6 +249,17 @@ class UDate
 	{
 	    return $this->_dateTime->format($format);
 	}
+	/**
+	 * Getting the now Udate
+	 *
+	 * @param unknown $timeZone
+	 *
+	 * @return UDate
+	 */
+	public static function now($timeZone = "UTC")
+	{
+	    return new UDate('now', $timeZone);
+	}
 }
 
 ?>

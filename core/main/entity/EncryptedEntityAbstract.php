@@ -9,7 +9,7 @@ abstract class EncryptedEntityAbstract extends BaseEntityAbstract
 {
 	/**
      * The secret key for the organization
-     * 
+     *
      * @var string
      */
     protected $skey = '';
@@ -36,14 +36,13 @@ abstract class EncryptedEntityAbstract extends BaseEntityAbstract
     }
     /**
      * (non-PHPdoc)
-     * @see BaseEntityAbstract::postSave()
+     * @see BaseEntityAbstract::preSave()
      */
-    public function postSave()
+    public function preSave()
     {
-    	parent::postSave();
+    	parent::preSave();
     	if(trim($this->getSkey()) === '') {
-    		$this->setSkey(self::genSkey($this))
-    			->save();
+    		$this->setSkey(self::genSkey($this));
     	}
     }
     /**
@@ -54,19 +53,19 @@ abstract class EncryptedEntityAbstract extends BaseEntityAbstract
     {
     	DaoMap::setStringType('skey', 'varchar', 32);
     	parent::__loadDaoMap();
-    	
+
     	DaoMap::createUniqueIndex('skey');
     }
     /**
      * Generating the skey
-     * 
+     *
      * @param EncryptedEntityAbstract $entity
-     * 
+     *
      * @return string
      */
     public static function genSkey(EncryptedEntityAbstract $entity)
     {
-    	return md5($entity->getId());
+    	return md5(get_class($entity) . '_' . $entity->getId() . '_' . trim(UDate::now()));
     }
     /**
      * Getting the EncryptedEntityAbstract object

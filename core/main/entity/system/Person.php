@@ -16,19 +16,19 @@ class Person extends BaseEntityAbstract
     private $email;
     /**
      * The first name of the user
-     * 
+     *
      * @var string
      */
     private $firstName;
     /**
      * The last name of the user
-     * 
+     *
      * @var string
      */
     private $lastName;
     /**
      * The fullname of the person
-     * 
+     *
      * @var string
      */
     private $fullName;
@@ -37,7 +37,7 @@ class Person extends BaseEntityAbstract
      *
      * @return string
      */
-    public function getFirstName() 
+    public function getFirstName()
     {
         return $this->firstName;
     }
@@ -48,7 +48,7 @@ class Person extends BaseEntityAbstract
      *
      * @return Person
      */
-    public function setFirstName($value) 
+    public function setFirstName($value)
     {
         $this->firstName = $value;
         return $this;
@@ -58,7 +58,7 @@ class Person extends BaseEntityAbstract
      *
      * @return string
      */
-    public function getLastName() 
+    public function getLastName()
     {
         return $this->lastName;
     }
@@ -69,7 +69,7 @@ class Person extends BaseEntityAbstract
      *
      * @return Person
      */
-    public function setLastName($value) 
+    public function setLastName($value)
     {
         $this->lastName = $value;
         return $this;
@@ -79,7 +79,7 @@ class Person extends BaseEntityAbstract
      *
      * @return string
      */
-    public function getEmail() 
+    public function getEmail()
     {
         return $this->email;
     }
@@ -100,7 +100,7 @@ class Person extends BaseEntityAbstract
      *
      * @return string
      */
-    public function getFullName() 
+    public function getFullName()
     {
     	if(trim($this->fullName) === '')
     		return trim(trim($this->getFirstName()) . ' ' . trim($this->getLastName()));
@@ -127,6 +127,20 @@ class Person extends BaseEntityAbstract
     {
         $this->loadManyToOne("person");
         return $this->person;
+    }
+    /**
+     * Adding a role to the person
+     *
+     * @param Organization  $org
+     * @param Role          $role
+     * @param OrgPersonRole $rel
+     *
+     * @return Person
+     */
+    public function addRole(Organization $org, Role $role, OrgPersonRole &$rel = null)
+    {
+        $rel = OrgPersonRole::create($this, $org, $role);
+        return $this;
     }
     /**
      * (non-PHPdoc)
@@ -158,7 +172,7 @@ class Person extends BaseEntityAbstract
         DaoMap::setStringType('lastName', 'varchar', 50);
         DaoMap::setStringType('fullName', 'varchar', 200);
         parent::__loadDaoMap();
-        
+
         DaoMap::createIndex('email');
         DaoMap::createIndex('firstName');
         DaoMap::createIndex('lastName');
@@ -167,11 +181,11 @@ class Person extends BaseEntityAbstract
     }
     /**
      * creating a perosn
-     * 
+     *
      * @param unknown $firstName
      * @param unknown $lastName
      * @param unknown $email
-     * 
+     *
      * @return Person
      */
     public static function create($firstName, $lastName, $email)

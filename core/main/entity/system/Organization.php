@@ -17,9 +17,9 @@ class Organization extends EncryptedEntityAbstract
     /**
      * Getter for name
      *
-     * @return 
+     * @return
      */
-    public function getName() 
+    public function getName()
     {
         return $this->name;
     }
@@ -30,7 +30,7 @@ class Organization extends EncryptedEntityAbstract
      *
      * @return Organization
      */
-    public function setName($value) 
+    public function setName($value)
     {
         $this->name = $value;
         return $this;
@@ -45,19 +45,19 @@ class Organization extends EncryptedEntityAbstract
     	DaoMap::setStringType('name', 'varchar', 100);
     	DaoMap::setStringType('skey', 'varchar', 32);
     	parent::__loadDaoMap();
-    
+
     	DaoMap::createIndex('name');
     	DaoMap::createIndex('skey');
     	DaoMap::commit();
     }
     /**
      * Creating a Organization
-     * 
+     *
      * @param string $name
-     * 
+     *
      * @return Ambigous <BaseEntityAbstract, GenericDAO>
      */
-    public function create($name)
+    public static function create($name)
     {
     	$item = new Organization();
     	return $item->setName(trim($name))

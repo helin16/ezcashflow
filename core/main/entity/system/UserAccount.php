@@ -155,7 +155,7 @@ class UserAccount extends ConfirmEntityAbstract
         DaoMap::setManyToOne('person', 'Person');
         parent::__loadDaoMap();
 
-        DaoMap::createIndex('username');
+        DaoMap::createUniqueIndex('username');
         DaoMap::createIndex('password');
         DaoMap::commit();
     }
