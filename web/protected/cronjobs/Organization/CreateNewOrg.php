@@ -6,6 +6,7 @@ class CreateNewOrg
     const NEW_LINE = "\n";
 
     public static function run($params, $debug = false) {
+        self::_debug('== Started to create a new Organization with new user script: ', self::NEW_LINE, "", $debug);
         Core::setUser(UserAccount::get(UserAccount::ID_SYSTEM_ACCOUNT));
         $args = self::_arguments($params);
         $paramKeys = array(
@@ -29,6 +30,7 @@ class CreateNewOrg
             Dao::rollbackTransaction();
             die($ex->getMessage() . self::NEW_LINE . $ex->getTraceAsString());
         }
+        self::_debug('== Finished creating a new Organization with new user script: ', self::NEW_LINE, "", $debug);
     }
 
     private static function _checkArgv($params, $key, $name) {
