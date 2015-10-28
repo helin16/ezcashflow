@@ -65,7 +65,7 @@ abstract class EncryptedEntityAbstract extends BaseEntityAbstract
      */
     public static function genSkey(EncryptedEntityAbstract $entity)
     {
-    	return md5(get_class($entity) . '_' . $entity->getId() . '_' . trim(UDate::now()));
+    	return md5(get_class($entity) . '_' . $entity->getId() . '_' . trim(UDate::now()) . '_' . rand(0, PHP_INT_MAX));
     }
     /**
      * Getting the EncryptedEntityAbstract object
