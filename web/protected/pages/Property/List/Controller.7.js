@@ -110,7 +110,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 							tmp.me.openEditPage(row);
 						})
 				) })
-				.insert({'bottom': new Element('div', {'class': ' col-sm-2 col-md-offset-9 col-md-1 text-right'})
+				.insert({'bottom': new Element('div', {'class': ' col-sm-2 col-md-push-9 col-md-1 text-right'})
 						.insert({'bottom': !row.id ? '' : new Element('div', {'class': 'btn-group btn-group-sm', 'role': 'group'})
 						.insert({'bottom': new Element('div', {'class': 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown', 'aria-expanded': 'false'})
 							.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-cog'}).setStyle('margin-right: 2px;') })
@@ -140,7 +140,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 						})
 					})
 				})
-				.insert({'bottom': new Element('div', {'class': 'col-md-9 col-sm-12'}).update(!row.id ? 
+				.insert({'bottom': new Element('div', {'class': 'col-md-pull-1 col-md-9 col-sm-12'}).update(!row.id ? 
 					new Element('div', {'class': 'row  hidden-xs  hidden-sm'})
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Bought') })
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Setup') })
