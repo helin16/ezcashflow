@@ -117,7 +117,7 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update('Income') })
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update('Expense') })
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 col-sm-1 col-md-1 '}).update('Profit') })
-						..insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-1 col-sm-1 col-md-1 hidden-sm '}).update('%') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-1 col-sm-1 col-md-1 hidden-sm '}).update('%') })
 					:
 					new Element('div', {'class': 'row'})
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 col-sm-2 col-md-1 hidden-xs'}).update(tmp.me.getCurrency(row.boughtPrice) ) })
