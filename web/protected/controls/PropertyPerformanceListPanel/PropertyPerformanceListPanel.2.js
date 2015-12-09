@@ -45,29 +45,29 @@ PropertyPerformanceListPanelJs.prototype = {
 		tmp.startTime = moment(tmp.me._pageJs.loadUTCTime(row.startTime));
 		tmp.endTime = moment(tmp.me._pageJs.loadUTCTime(row.endTime));
 		tmp.timeString = '&localFromDate=' + tmp.startTime.format('YYYY-MM-DD[T]hh:mm:ss') + '&localToDate=' + tmp.endTime.format('YYYY-MM-DD[T]hh:mm:ss');
-		tmp.income = row.income === '' ? '' :
-			new Element('a', {'target': '_BLANK', 'href': '/transactions.html?lookDownAccId=' + tmp.me._property.incomeAcc.id + tmp.timeString }).update( tmp.me._pageJs.getCurrency(row.income) );
-		tmp.expense = row.expense === '' ? '' :
-			new Element('a', {'target': '_BLANK', 'href': '/transactions.html?lookDownAccId=' + tmp.me._property.expenseAcc.id + tmp.timeString}).update( tmp.me._pageJs.getCurrency(row.expense) );
-		tmp.profit = row.income === '' || row.expense === '' ? '' : tmp.me._pageJs.getCurrency(row.income - row.expense);
-		tmp.profitPercentage = tmp.profit === '' ? '' : (tmp.me._property.boughtPrice > 0 ? Math.round(tmp.me._pageJs.getValueFromCurrency(tmp.profit) * 100 / tmp.me._property.boughtPrice) + '%' : '')
+		tmp.income = (row.income === '' ? '' :
+			new Element('a', {'target': '_BLANK', 'href': '/transactions.html?lookDownAccId=' + tmp.me._property.incomeAcc.id + tmp.timeString }).update( tmp.me._pageJs.getCurrency(row.income) ));
+		tmp.expense = (row.expense === '' ? '' :
+			new Element('a', {'target': '_BLANK', 'href': '/transactions.html?lookDownAccId=' + tmp.me._property.expenseAcc.id + tmp.timeString}).update( tmp.me._pageJs.getCurrency(row.expense) ));
+		tmp.profit = ((row.income === '' || row.expense === '') ? '' : tmp.me._pageJs.getCurrency(row.income - row.expense));
+		tmp.profitPercentage = (tmp.profit === '' ? '' : (tmp.me._property.boughtPrice > 0 ? Math.round(tmp.me._pageJs.getValueFromCurrency(tmp.profit) * 100 / tmp.me._property.boughtPrice) + '%' : ''));
 		tmp.newDiv = new Element('a', {'class': 'list-group-item', 'href': 'javascript: void(0);'})
 			.setStyle("margin: 0; padding: 0;")
 			.store(row)
 			.insert({'bottom': new Element('div', {'class': 'row'})
-				.insert({'bottom': new Element('div', {'class': 'col-sm-4 text-right'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-4 text-right'})
 					.insert({'bottom': new Element('abbr', {'title': tmp.startTime.format('llll') + ' ~ ' + tmp.endTime.format('llll')}).update(tmp.startTime.format('YYYY') + ': ') })
 				})
-				.insert({'bottom': new Element('div', {'class': 'col-sm-2'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2'})
 					.insert({'bottom': tmp.income })
 				})
-				.insert({'bottom': new Element('div', {'class': 'col-sm-2'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2'})
 					.insert({'bottom': tmp.expense })
 				})
-				.insert({'bottom': new Element('div', {'class': 'col-sm-2'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2'})
 					.insert({'bottom': new Element('span').update(tmp.profit).addClassName(tmp.profit === '' ? '' : (tmp.profit < 0 ? 'text-danger' : 'text-success')) })
 				})
-				.insert({'bottom': new Element('div', {'class': 'col-sm-2'})
+				.insert({'bottom': new Element('div', {'class': 'col-xs-2'})
 					.insert({'bottom': new Element('abbr', {'title': 'Profit / boughtPrice'}).update(tmp.profitPercentage).addClassName(tmp.profit === '' ? '' : (tmp.profit < 0 ? 'text-danger' : 'text-success')) })
 				})
 			});
