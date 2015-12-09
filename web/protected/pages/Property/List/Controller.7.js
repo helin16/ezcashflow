@@ -142,12 +142,12 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				})
 				.insert({'bottom': new Element('div', {'class': 'col-md-pull-1 col-md-9 col-sm-12'}).update(!row.id ? 
 					new Element('div', {'class': 'row  hidden-xs  hidden-sm'})
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Bought') })
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Setup') })
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Income') })
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Expense') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Bought') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Setup') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Income') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Expense') })
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Profit') })
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-sm '}).update('%') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('%') })
 					:
 					new Element('div')
 						.insert({'bottom': new Element('div', {'class': 'row'})
