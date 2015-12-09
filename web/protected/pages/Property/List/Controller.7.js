@@ -104,14 +104,44 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 		tmp.newRow = new Element('a', {'href': 'javascript: void(0);', 'class' : 'list-group-item item-row', 'title': (row.id ? 'Description: ' + row.description : ''), 'item-id': row.id ? row.id : '' })
 			.store('data', row)
 			.insert({'bottom': new Element('div', {'class': 'row'})
-				.insert({'bottom': new Element('div', {'class': 'col-xs-2 col-sm-1 col-md-2'}).update(!row.id ? 'Property' :
+				.insert({'bottom': new Element('div', {'class': 'col-md-2 col-sm-10'}).update(!row.id ? 'Property' :
 					new Element('a', {'href': 'javascript: void(0)'}).update(row.name)
 						.observe('click', function(event){
 							tmp.me.openEditPage(row);
 						})
 				) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-9 col-sm-10 col-md-9'}).update(!row.id ? 
-					new Element('div', {'class': 'row'})
+				.insert({'bottom': new Element('div', {'class': ' col-sm-2 col-md-offset-9 col-md-1 text-right'})
+						.insert({'bottom': !row.id ? '' : new Element('div', {'class': 'btn-group btn-group-sm', 'role': 'group'})
+						.insert({'bottom': new Element('div', {'class': 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown', 'aria-expanded': 'false'})
+							.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-cog'}).setStyle('margin-right: 2px;') })
+							.insert({'bottom': new Element('span', {'class': 'caret'}) })
+						})
+						.insert({'bottom': new Element('ul', {'class': 'dropdown-menu', 'role': 'menu'})
+							.insert({'bottom': new Element('li')
+								.insert({'bottom': new Element('a', {'href': 'javascript: void(0);'})
+									.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-pencil'}) })
+									.insert({'bottom': new Element('span', {'class': 'hidden-xs hidden-sm'}).update(' Edit') })
+									.observe('click', function(event){
+										tmp.me.openEditPage(row);
+									})
+								})
+							})
+							.insert({'bottom': new Element('li')
+								.insert({'bottom': new Element('a', {'href': 'javascript: void(0);'})
+									.insert({'bottom': new Element('i', { "class": 'text-danger'})
+										.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-remove'}) })
+									})
+									.insert({'bottom': new Element('span', {'class': 'hidden-xs hidden-sm text-danger'}).update(' Delete') })
+									.observe('click', function(event){
+										tmp.me._showConfirmDeletion(this);
+									})
+								})
+							})
+						})
+					})
+				})
+				.insert({'bottom': new Element('div', {'class': 'col-md-9 col-sm-12'}).update(!row.id ? 
+					new Element('div', {'class': 'row  hidden-xs  hidden-sm'})
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Bought') })
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Setup') })
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Income') })
@@ -143,36 +173,6 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 							.update(tmp.PropertyPerformanceListPanelJs.getPanel())
 						})
 				) })
-				.insert({'bottom': new Element('div', {'class': 'col-xs-1 col-md-1 col-md-1 text-right'})
-						.insert({'bottom': !row.id ? '' : new Element('div', {'class': 'btn-group btn-group-sm', 'role': 'group'})
-						.insert({'bottom': new Element('div', {'class': 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown', 'aria-expanded': 'false'})
-							.insert({'bottom': new Element('span', {'class': 'glyphicon glyphicon-cog'}).setStyle('margin-right: 2px;') })
-							.insert({'bottom': new Element('span', {'class': 'caret'}) })
-						})
-						.insert({'bottom': new Element('ul', {'class': 'dropdown-menu', 'role': 'menu'})
-							.insert({'bottom': new Element('li')
-								.insert({'bottom': new Element('a', {'href': 'javascript: void(0);'})
-									.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-pencil'}) })
-									.insert({'bottom': new Element('span', {'class': 'hidden-xs hidden-sm'}).update(' Edit') })
-									.observe('click', function(event){
-										tmp.me.openEditPage(row);
-									})
-								})
-							})
-							.insert({'bottom': new Element('li')
-								.insert({'bottom': new Element('a', {'href': 'javascript: void(0);'})
-									.insert({'bottom': new Element('i', { "class": 'text-danger'})
-										.insert({'bottom': new Element('i', {'class': 'glyphicon glyphicon-remove'}) })
-									})
-									.insert({'bottom': new Element('span', {'class': 'hidden-xs hidden-sm text-danger'}).update(' Delete') })
-									.observe('click', function(event){
-										tmp.me._showConfirmDeletion(this);
-									})
-								})
-							})
-						})
-					})
-				})
 			});
 		if(row.attachments && row.attachments.size() > 0) {
 			tmp.attachmentRow = new Element('div', {'class': ''});
