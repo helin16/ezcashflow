@@ -142,29 +142,29 @@ PageJs.prototype = Object.extend(new BackEndPageJs(), {
 				})
 				.insert({'bottom': new Element('div', {'class': 'col-md-pull-1 col-md-9 col-sm-12'}).update(!row.id ? 
 					new Element('div', {'class': 'row  hidden-xs  hidden-sm'})
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Bought') })
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Setup') })
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Income') })
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Expense') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Bought') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Setup') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Income') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update('Expense') })
 						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('Profit') })
-						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update('%') })
+						.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs '}).update('%') })
 					:
 					new Element('div')
 						.insert({'bottom': new Element('div', {'class': 'row'})
-							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update(tmp.me.getCurrency(row.boughtPrice) ) })
-							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update(row.setupAcc && row.setupAcc.id ?
+							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update(tmp.me.getCurrency(row.boughtPrice) ) })
+							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update(row.setupAcc && row.setupAcc.id ?
 									new Element('abbr', {'title': row.setupAcc.breadCrumbs.join(' / ')}).update(tmp.me.getCurrency(row.setupAcc.sumValue)) : ''
 							) })
-							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update(row.incomeAcc && row.incomeAcc.id ?
+							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update(row.incomeAcc && row.incomeAcc.id ?
 									new Element('abbr', {'title': row.incomeAcc.breadCrumbs.join(' / ')}).update(tmp.me.getCurrency(row.incomeAcc.sumValue)) : ''
 							) })
-							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2 hidden-xs'}).update( row.expenseAcc && row.expenseAcc.id ?
+							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update( row.expenseAcc && row.expenseAcc.id ?
 									new Element('abbr', {'title': row.expenseAcc.breadCrumbs.join(' / ')}).update(tmp.me.getCurrency(row.expenseAcc.sumValue) ) : ''
 							) })
 							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-2'}).update(
 								(tmp.profit === '' ? '' : '<strong class="' + (tmp.profit < 0 ? "text-danger" : "text-success") + '">' + tmp.me.getCurrency(tmp.profit) + '<strong>')
 							) })
-							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-1 hidden-sm '}).update(
+							.insert({'bottom': new Element('div', {'class': 'show-list-btn col-xs-1'}).update(
 								(tmp.profit === '' ? '' : '<strong class="' + (tmp.profit < 0 ? "text-danger" : "text-success") + '">' + Math.round(tmp.profit * 100 / row.boughtPrice) + '%<strong>')
 							) })
 						})
