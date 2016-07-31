@@ -101,7 +101,7 @@ class Controller extends BackEndPageAbstract
 	{
 		$this->_getExcelRow($activeSheet, $rowNo++, '', $accountType->getName() , '', '', '', '');
 		Transaction::getQuery()->eagerLoad('Transaction.accountEntry', 'inner join', 'trans_acc', 'trans_acc.id = trans.accountEntryId and trans_acc.typeId=:typeId');
-		$transactions = Transaction::getAllByCriteria('logDate between :fromDate and :toDate', array('fromDate'=> trim($fromDate), 'toDate' => trim($toDate), 'typeId' => $accountType->getId()));
+		$transactions = Transaction::getAllByCriteria('trans.organizationId =:orgId AND logDate between :fromDate and :toDate', array('orgId' => trim(Core::getOrganization()->getId()), 'fromDate'=> trim($fromDate), 'toDate' => trim($toDate), 'typeId' => $accountType->getId()));
 		$startRow = $rowNo;
 		foreach($transactions as $index => $transaction) {
 			$this->_getExcelRow($activeSheet,
@@ -114,7 +114,7 @@ class Controller extends BackEndPageAbstract
 					trim($transaction->getLogDate()->modify(($utcOffsetMins > 0 ? '+' : '') . $utcOffsetMins . ' minutes'))
 			);
 		}
-		$this->_getExcelRow($activeSheet, $rowNo++,	'Sub-Total:', '', (count($transactions) === 0 ? '0': '=SUM(C' . $startRow . ':C' . (($rowNo - 2) > $startRow ? ($rowNo - 2) : $startRow) . ')'), '', '', '');
+		$this->_getExcelRow($activeSheet, $rowNo++,	'Sub-Total:', '', (count($transactions) === 0 ? '0': '=SUM(D' . $startRow . ':D' . (($rowNo - 2) > $startRow ? ($rowNo - 2) : $startRow) . ')'), '', '', '');
 		return $rowNo;
 	}
 
