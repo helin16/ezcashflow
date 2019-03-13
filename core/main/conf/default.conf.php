@@ -2,10 +2,11 @@
 return array(
 	'Database' => array(
 			'Driver' => 'mysql',
+			//'DBHost' => 'wordpress.ckhuf3oqhprr.ap-southeast-2.rds.amazonaws.com',
 			'DBHost' => 'localhost',
 			'DB' => 'ezcashflow',
 			'Username' => 'root',
-			'Password' => ''
+			'Password' => 'root'
 		)
 	,'Application' => array(
 		'name' => 'EzBookKeeping'
