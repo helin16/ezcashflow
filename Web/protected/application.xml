@@ -15,7 +15,7 @@
 
 	<!-- configurations for modules -->
 	<modules>
-		<module id="cache" class="System.Caching.TAPCCache" />
+	<!--	<module id="cache" class="System.Caching.TAPCCache" /> -->
 	    <module id="Session" class="Application.classes.Session.SessionDb" UseCustomStorage="true"/>
 		<module id="security" class="TSecurityManager" EncryptionKey="EasyCashFlowCool" ValidationKey="EasyCashFlowCool" />
 		<module id="request" class="THttpRequest" UrlManager="friendly-url" />

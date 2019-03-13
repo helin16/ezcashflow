@@ -2,10 +2,8 @@
 return array(
 				'Database' => array(
 						'Driver' => 'mysql',
+						//'LoadBalancer' => 'wordpress.ckhuf3oqhprr.ap-southeast-2.rds.amazonaws.com',
 						'LoadBalancer' => 'localhost',
-						'ImportNode' => 'localhost',
-						'SecondaryNode' => 'localhost',
-						'NASNode' => 'localhost',
 						'CoreDatabase' => 'ezbk',
 						'Username' => 'root',
 						'Password' => 'root'
